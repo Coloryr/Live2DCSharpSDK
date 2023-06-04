@@ -14,6 +14,9 @@ using csmFlags = Byte;
 using csmMocVersion = UInt32;
 using csmParameterType = Int32;
 
+/// <summary>
+/// Mocデータの管理を行うクラス。
+/// </summary>
 public unsafe class CubismMoc : IDisposable
 {
     /// <summary>
@@ -35,9 +38,9 @@ public unsafe class CubismMoc : IDisposable
     /// <param name="mocBytes"> Mocファイルのバッファ</param>
     /// <param name="shouldCheckMocConsistency">MOCの整合性チェックフラグ(初期値 : false)</param>
     /// <returns></returns>
-    public static CubismMoc Create(byte[] mocBytes, bool shouldCheckMocConsistency = false)
+    public static CubismMoc? Create(byte[] mocBytes, bool shouldCheckMocConsistency = false)
     {
-        CubismMoc cubismMoc = null;
+        CubismMoc? cubismMoc = null;
 
         IntPtr alignedBuffer = CubismFramework.AllocateAligned(mocBytes.Length, csmEnum.csmAlignofMoc);
         Marshal.Copy(mocBytes, 0, alignedBuffer, mocBytes.Length);

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Math;
 
+/// <summary>
+/// 数値計算などに使用するユーティリティクラス
+/// </summary>
 public static class CubismMath
 {
     public const float Pi = 3.1415926535897932384626433832795f;

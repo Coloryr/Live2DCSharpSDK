@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace Live2DCSharpSDK.Core;
 
@@ -42,50 +43,50 @@ public static class csmEnum
     /// <summary>
     /// Additive blend mode mask.
     /// </summary>
-    public const int csmBlendAdditive = 1 << 0;
+    public const byte csmBlendAdditive = 1 << 0;
     /// <summary>
     /// Multiplicative blend mode mask.
     /// </summary>
-    public const int csmBlendMultiplicative = 1 << 1;
+    public const byte csmBlendMultiplicative = 1 << 1;
     /// <summary>
     /// Double-sidedness mask.
     /// </summary>
-    public const int csmIsDoubleSided = 1 << 2;
+    public const byte csmIsDoubleSided = 1 << 2;
     /// <summary>
     /// Clipping mask inversion mode mask.
     /// </summary>
-    public const int csmIsInvertedMask = 1 << 3;
+    public const byte csmIsInvertedMask = 1 << 3;
 
     //Bit masks for dynamic drawable flags.
 
     /// <summary>
     /// Flag set when visible.
     /// </summary>
-    public const int csmIsVisible = 1 << 0;
+    public const byte csmIsVisible = 1 << 0;
     /// <summary>
     /// Flag set when visibility did change.
     /// </summary>
-    public const int csmVisibilityDidChange = 1 << 1;
+    public const byte csmVisibilityDidChange = 1 << 1;
     /// <summary>
     /// Flag set when opacity did change.
     /// </summary>
-    public const int csmOpacityDidChange = 1 << 2;
+    public const byte csmOpacityDidChange = 1 << 2;
     /// <summary>
     /// Flag set when draw order did change.
     /// </summary>
-    public const int csmDrawOrderDidChange = 1 << 3;
+    public const byte csmDrawOrderDidChange = 1 << 3;
     /// <summary>
     /// Flag set when render order did change.
     /// </summary>
-    public const int csmRenderOrderDidChange = 1 << 4;
+    public const byte csmRenderOrderDidChange = 1 << 4;
     /// <summary>
     /// Flag set when vertex positions did change.
     /// </summary>
-    public const int csmVertexPositionsDidChange = 1 << 5;
+    public const byte csmVertexPositionsDidChange = 1 << 5;
     /// <summary>
     /// Flag set when blend color did change.
     /// </summary>
-    public const int csmBlendColorDidChange = 1 << 6;
+    public const byte csmBlendColorDidChange = 1 << 6;
 
     //moc3 file format version.
 
@@ -123,55 +124,13 @@ public static class csmEnum
 }
 
 /// <summary>
-/// 2 component vector.
+/// Log handler.
 /// </summary>
-public struct csmVector2
-{
-    /// <summary>
-    /// First component. 
-    /// </summary>
-    public float X;
-
-    /// <summary>
-    /// Second component.
-    /// </summary>
-    public float Y;
-}
-
-/// <summary>
-/// 4 component vector.
-/// </summary>
-public struct csmVector4
-{
-    /// <summary>
-    /// 1st component.
-    /// </summary>
-    public float X;
-
-    /// <summary>
-    /// 2nd component.
-    /// </summary>
-    public float Y;
-
-    /// <summary>
-    /// 3rd component.
-    /// </summary>
-    public float Z;
-
-    /// <summary>
-    /// 4th component.
-    /// </summary>
-    public float W;
-}
+/// <param name="message">Null-terminated string message to log.</param>
+public delegate void csmLogFunction(string message);
 
 public static class CubismCore
 {
-    /// <summary>
-    /// Log handler.
-    /// </summary>
-    /// <param name="message">Null-terminated string message to log.</param>
-    public delegate void csmLogFunction(string message);
-
     //VERSION
 
     /// <summary>
@@ -272,7 +231,7 @@ public static class CubismCore
     /// <param name="outOriginInPixels">Origin of model on canvas.</param>
     /// <param name="outPixelsPerUnit">Aspect used for scaling pixels to units.</param>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe void csmReadCanvasInfo(csmModel* model, csmVector2* outSizeInPixels, csmVector2* outOriginInPixels, float* outPixelsPerUnit);
+    public extern static unsafe void csmReadCanvasInfo(csmModel* model, Vector2* outSizeInPixels, Vector2* outOriginInPixels, float* outPixelsPerUnit);
 
     //PARAMETERS
 
@@ -469,12 +428,20 @@ public static class CubismCore
     public extern static unsafe int**  csmGetDrawableMasks( csmModel* model);
 
     /// <summary>
+    /// Gets number of vertices of each drawable.
+    /// </summary>
+    /// <param name="model">Model to query.</param>
+    /// <returns>Valid pointer on success; '0' otherwise.</returns>
+    [DllImport("Live2DCubismCore")]
+    public extern static unsafe int* csmGetDrawableVertexCounts(csmModel* model);
+
+    /// <summary>
     /// Gets vertex position data of each drawable.
     /// </summary>
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; a null pointer otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe csmVector2**  csmGetDrawableVertexPositions( csmModel* model);
+    public extern static unsafe Vector2**  csmGetDrawableVertexPositions( csmModel* model);
 
     /// <summary>
     /// Gets texture coordinate data of each drawables.
@@ -482,7 +449,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe csmVector2**  csmGetDrawableVertexUvs( csmModel* model);
+    public extern static unsafe Vector2**  csmGetDrawableVertexUvs( csmModel* model);
 
     /// <summary>
     /// Gets number of triangle indices for each drawable.
@@ -507,7 +474,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe csmVector4*  csmGetDrawableMultiplyColors( csmModel* model);
+    public extern static unsafe Vector4*  csmGetDrawableMultiplyColors( csmModel* model);
 
     /// <summary>
     /// Gets screen color data for each drawable.
@@ -515,7 +482,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe csmVector4*  csmGetDrawableScreenColors( csmModel* model);
+    public extern static unsafe Vector4*  csmGetDrawableScreenColors( csmModel* model);
 
     /// <summary>
     /// Gets drawable's parent part indices.

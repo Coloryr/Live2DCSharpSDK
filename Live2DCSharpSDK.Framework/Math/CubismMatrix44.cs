@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Math;
 
+/// <summary>
+/// 4x4行列の便利クラス。
+/// </summary>
 public class CubismMatrix44
 {
     /// <summary>
