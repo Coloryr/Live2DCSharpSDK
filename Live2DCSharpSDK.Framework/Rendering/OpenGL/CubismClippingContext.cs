@@ -17,7 +17,7 @@ public class CubismClippingContext
     /// <summary>
     /// クリッピングマスクのIDリスト
     /// </summary>
-    public  int _clippingIdList;
+    public unsafe int* _clippingIdList;
     /// <summary>
     /// クリッピングマスクの数
     /// </summary>
@@ -37,11 +37,11 @@ public class CubismClippingContext
     /// <summary>
     /// マスクの位置計算結果を保持する行列
     /// </summary>
-    public CubismMatrix44 _matrixForMask;
+    public readonly CubismMatrix44 _matrixForMask = new();
     /// <summary>
     /// 描画オブジェクトの位置計算結果を保持する行列
     /// </summary>
-    public CubismMatrix44 _matrixForDraw;
+    public readonly CubismMatrix44 _matrixForDraw = new();
     /// <summary>
     /// このマスクにクリップされる描画オブジェクトのリスト
     /// </summary>
@@ -59,9 +59,22 @@ public class CubismClippingContext
     /// <summary>
     /// 引数付きコンストラクタ
     /// </summary>
-    internal CubismClippingContext(CubismClippingManager_OpenGLES2 manager, int clippingDrawableIndices, int clipCount)
-    { 
-        
+    internal unsafe CubismClippingContext(CubismClippingManager_OpenGLES2 manager, int* clippingDrawableIndices, int clipCount)
+    {
+        _owner = manager;
+
+        // クリップしている（＝マスク用の）Drawableのインデックスリスト
+        _clippingIdList = clippingDrawableIndices;
+
+        // マスクの数
+        _clippingIdCount = clipCount;
+
+        _layoutChannelNo = 0;
+
+        _allClippedDrawRect = new csmRectF();
+        _layoutBounds = new csmRectF();
+
+        _clippedDrawableIndexList = new List<int>();
     }
 
     /// <summary>
@@ -69,8 +82,8 @@ public class CubismClippingContext
     /// </summary>
     /// <param name="drawableIndex">クリッピング対象に追加する描画オブジェクトのインデックス</param>
     internal void AddClippedDrawable(int drawableIndex)
-    { 
-    
+    {
+        _clippedDrawableIndexList.Add(drawableIndex);
     }
 
     /// <summary>
@@ -78,7 +91,7 @@ public class CubismClippingContext
     /// </summary>
     /// <returns>クリッピングマネージャのインスタンス</returns>
     internal CubismClippingManager_OpenGLES2 GetClippingManager()
-    { 
-    
+    {
+        return _owner;
     }
 }
