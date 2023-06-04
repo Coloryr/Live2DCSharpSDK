@@ -1,5 +1,6 @@
 ﻿using Live2DCSharpSDK.Core;
 using Live2DCSharpSDK.Framework.Id;
+using Live2DCSharpSDK.Framework.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;

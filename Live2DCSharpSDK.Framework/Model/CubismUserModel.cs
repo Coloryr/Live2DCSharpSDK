@@ -1,6 +1,8 @@
 ﻿using Live2DCSharpSDK.Framework.Effect;
 using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Motion;
+using Live2DCSharpSDK.Framework.Physics;
+using Live2DCSharpSDK.Framework.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -400,15 +402,14 @@ public class CubismUserModel : IDisposable
     /// <summary>
     /// レンダラを生成して初期化を実行する。
     /// </summary>
-    public void CreateRenderer(int maskBufferCount = 1)
+    public void CreateRenderer(CubismRenderer renderer, int maskBufferCount = 1)
     {
         if (_renderer != null)
         {
             DeleteRenderer();
         }
-        _renderer = CubismRenderer.Create();
-
-        _renderer->Initialize(_model, maskBufferCount);
+        _renderer = renderer;
+        _renderer.Initialize(_model, maskBufferCount);
     }
 
     /// <summary>
@@ -418,8 +419,7 @@ public class CubismUserModel : IDisposable
     {
         if (_renderer != null)
         {
-            CubismRenderer.Delete(_renderer);
-
+            _renderer.Dispose();
             _renderer = null;
         }
     }

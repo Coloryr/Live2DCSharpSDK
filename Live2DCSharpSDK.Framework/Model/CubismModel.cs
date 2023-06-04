@@ -1,8 +1,10 @@
 ﻿using Live2DCSharpSDK.Core;
+using Live2DCSharpSDK.Framework.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -203,18 +205,22 @@ public unsafe class CubismModel : IDisposable
             };
 
             // 乗算色
-            CubismTextureColor multiplyColor;
-            multiplyColor.R = 1.0f;
-            multiplyColor.G = 1.0f;
-            multiplyColor.B = 1.0f;
-            multiplyColor.A = 1.0f;
+            CubismTextureColor multiplyColor = new()
+            {
+                R = 1.0f,
+                G = 1.0f,
+                B = 1.0f,
+                A = 1.0f
+            };
 
             // スクリーン色
-            CubismTextureColor screenColor;
-            screenColor.R = 0.0f;
-            screenColor.G = 0.0f;
-            screenColor.B = 0.0f;
-            screenColor.A = 1.0f;
+            CubismTextureColor screenColor = new()
+            {
+                R = 0.0f,
+                G = 0.0f,
+                B = 0.0f,
+                A = 1.0f
+            };
 
             // Parts
             {
@@ -347,8 +353,8 @@ public unsafe class CubismModel : IDisposable
             return 0.0f;
         }
 
-        csmVector2 tmpSizeInPixels;
-        csmVector2 tmpOriginInPixels;
+        Vector2 tmpSizeInPixels;
+        Vector2 tmpOriginInPixels;
         float tmpPixelsPerUnit;
 
         CubismCore.csmReadCanvasInfo(_model, &tmpSizeInPixels, &tmpOriginInPixels, &tmpPixelsPerUnit);
@@ -367,8 +373,8 @@ public unsafe class CubismModel : IDisposable
             return 0.0f;
         }
 
-        csmVector2 tmpSizeInPixels;
-        csmVector2 tmpOriginInPixels;
+        Vector2 tmpSizeInPixels;
+        Vector2 tmpOriginInPixels;
         float tmpPixelsPerUnit;
 
         CubismCore.csmReadCanvasInfo(_model, &tmpSizeInPixels, &tmpOriginInPixels, &tmpPixelsPerUnit);
@@ -387,8 +393,8 @@ public unsafe class CubismModel : IDisposable
             return 0.0f;
         }
 
-        csmVector2 tmpSizeInPixels;
-        csmVector2 tmpOriginInPixels;
+        Vector2 tmpSizeInPixels;
+        Vector2 tmpOriginInPixels;
         float tmpPixelsPerUnit;
 
         CubismCore.csmReadCanvasInfo(_model, &tmpSizeInPixels, &tmpOriginInPixels, &tmpPixelsPerUnit);
@@ -407,8 +413,8 @@ public unsafe class CubismModel : IDisposable
             return 0.0f;
         }
 
-        csmVector2 tmpSizeInPixels;
-        csmVector2 tmpOriginInPixels;
+        Vector2 tmpSizeInPixels;
+        Vector2 tmpOriginInPixels;
         float tmpPixelsPerUnit;
 
         CubismCore.csmReadCanvasInfo(_model, &tmpSizeInPixels, &tmpOriginInPixels, &tmpPixelsPerUnit);
@@ -427,8 +433,8 @@ public unsafe class CubismModel : IDisposable
             return 0.0f;
         }
 
-        csmVector2 tmpSizeInPixels;
-        csmVector2 tmpOriginInPixels;
+        Vector2 tmpSizeInPixels;
+        Vector2 tmpOriginInPixels;
         float tmpPixelsPerUnit;
 
         CubismCore.csmReadCanvasInfo(_model, &tmpSizeInPixels, &tmpOriginInPixels, &tmpPixelsPerUnit);
@@ -905,7 +911,7 @@ public unsafe class CubismModel : IDisposable
     /// </summary>
     /// <param name="drawableIndex">Drawableのインデックス</param>
     /// <returns>Drawableの頂点リスト</returns>
-    public csmVector2* GetDrawableVertexPositions(int drawableIndex)
+    public Vector2* GetDrawableVertexPositions(int drawableIndex)
     {
         var verticesArray = CubismCore.csmGetDrawableVertexPositions(_model);
         return verticesArray[drawableIndex];
@@ -916,7 +922,7 @@ public unsafe class CubismModel : IDisposable
     /// </summary>
     /// <param name="drawableIndex">Drawableのインデックス</param>
     /// <returns>Drawableの頂点のUVリスト</returns>
-    public csmVector2* GetDrawableVertexUvs(int drawableIndex)
+    public Vector2* GetDrawableVertexUvs(int drawableIndex)
     {
         var uvsArray = CubismCore.csmGetDrawableVertexUvs(_model);
         return uvsArray[drawableIndex];
@@ -938,7 +944,7 @@ public unsafe class CubismModel : IDisposable
     /// </summary>
     /// <param name="drawableIndex">Drawableのインデックス</param>
     /// <returns>Drawableの乗算色</returns>
-    public csmVector4 GetDrawableMultiplyColor(int drawableIndex)
+    public Vector4 GetDrawableMultiplyColor(int drawableIndex)
     {
         var multiplyColors = CubismCore.csmGetDrawableMultiplyColors(_model);
         return multiplyColors[drawableIndex];
@@ -949,7 +955,7 @@ public unsafe class CubismModel : IDisposable
     /// </summary>
     /// <param name="drawableIndex">Drawableのインデックス</param>
     /// <returns>Drawableのスクリーン色</returns>
-    public csmVector4 GetDrawableScreenColor(int drawableIndex)
+    public Vector4 GetDrawableScreenColor(int drawableIndex)
     {
         var screenColors = CubismCore.csmGetDrawableScreenColors(_model);
         return screenColors[drawableIndex];
@@ -1164,9 +1170,9 @@ public unsafe class CubismModel : IDisposable
             return _userMultiplyColors[drawableIndex].Color;
         }
 
-        csmVector4 color = GetDrawableMultiplyColor(drawableIndex);
+        Vector4 color = GetDrawableMultiplyColor(drawableIndex);
 
-        return CubismTextureColor(color.X, color.Y, color.Z, color.W);
+        return new CubismTextureColor(color.X, color.Y, color.Z, color.W);
     }
 
     /// <summary>
@@ -1179,8 +1185,8 @@ public unsafe class CubismModel : IDisposable
             return _userScreenColors[drawableIndex].Color;
         }
 
-        csmVector4 color = GetDrawableScreenColor(drawableIndex);
-        return CubismTextureColor(color.X, color.Y, color.Z, color.W);
+        Vector4 color = GetDrawableScreenColor(drawableIndex);
+        return new CubismTextureColor(color.X, color.Y, color.Z, color.W);
     }
 
     /// <summary>

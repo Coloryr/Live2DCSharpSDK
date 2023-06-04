@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Live2DCSharpSDK.Framework.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -133,8 +134,7 @@ public class CubismEyeBlink
     {
         _userTimeSeconds += deltaTimeSeconds;
         float parameterValue;
-        float t = 0.0f;
-
+        float t;
         switch (_blinkingState)
         {
             case EyeState.EyeState_Closing:
@@ -202,7 +202,7 @@ public class CubismEyeBlink
 
         foreach (var item in ParameterIds)
         {
-            model->SetParameterValue(item, parameterValue);
+            model.SetParameterValue(item, parameterValue);
         }
     }
 

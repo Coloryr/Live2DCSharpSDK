@@ -64,8 +64,9 @@ public record CubismTextureColor
 /// モデル描画を処理するレンダラ
 /// サブクラスに環境依存の描画命令を記述する
 /// </summary>
-public class CubismRenderer : IDisposable
+public abstract class CubismRenderer : IDisposable
 {
+    private static CubismRenderer _render;
     /// <summary>
     /// Model-View-Projection 行列
     /// </summary>
@@ -101,7 +102,7 @@ public class CubismRenderer : IDisposable
     /// </summary>
     public static void StaticRelease()
     {
-
+        _render.Dispose();
     }
 
     /// <summary>
@@ -109,6 +110,7 @@ public class CubismRenderer : IDisposable
     /// </summary>
     public CubismRenderer() 
     {
+        _render = this;
         _mvpMatrix4x4 = new();
         _mvpMatrix4x4.LoadIdentity();
     }
@@ -319,11 +321,20 @@ public class CubismRenderer : IDisposable
     /// <param name="opacity">不透明度</param>
     /// <param name="colorBlendMode">カラーブレンディングのタイプ</param>
     /// <param name="invertedMask">マスク使用時のマスクの反転使用</param>
-    public virtual unsafe void DrawMesh(int textureNo, int indexCount, int vertexCount
-                          , short* indexArray, float* vertexArray, float* uvArray
+    internal virtual unsafe void DrawMesh(int textureNo, int indexCount, int vertexCount
+                          , ushort* indexArray, float* vertexArray, float* uvArray
                           , float opacity, CubismBlendMode colorBlendMode, bool invertedMask)
     { 
     
+    }
+
+    /// <summary>
+    /// テクスチャの異方性フィルタリングのパラメータをセットする
+    /// </summary>
+    /// <returns>異方性フィルタリングのパラメータ</returns>
+    internal float GetAnisotropy()
+    {
+        return _anisotropy;
     }
 
     /// <summary>

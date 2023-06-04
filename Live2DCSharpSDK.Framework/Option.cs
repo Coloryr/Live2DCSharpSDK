@@ -46,7 +46,7 @@ public class Option
     /// <summary>
     /// ログ出力の関数ポイ
     /// </summary>
-    public CubismCore.csmLogFunction LogFunction;
+    public csmLogFunction LogFunction;
     /// <summary>
     /// ログ出力レベル設定
     /// </summary>
