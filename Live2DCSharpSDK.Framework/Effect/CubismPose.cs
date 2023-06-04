@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Live2DCSharpSDK.Framework.Model;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -10,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Effect;
 
+/// <summary>
+/// パーツにまつわる諸々のデータを管理する。
+/// </summary>
 public record PartData
 {
     /// <summary>
@@ -54,6 +58,9 @@ public record PartData
     }
 }
 
+/// <summary>
+/// パーツの不透明度の管理と設定を行う。
+/// </summary>
 public class CubismPose
 {
     public const float Epsilon = 0.001f;
@@ -93,7 +100,7 @@ public class CubismPose
         // フェード時間の指定
         if (json[FadeIn] != null)
         {
-            _fadeTimeSeconds = (float)json[FadeIn];
+            _fadeTimeSeconds = json.ContainsKey(FadeIn) ? (float)json[FadeIn] : DefaultFadeInSeconds;
 
             if (_fadeTimeSeconds < 0.0f)
             {
@@ -201,8 +208,8 @@ public class CubismPose
                     continue;
                 }
 
-                model->SetPartOpacity(partsIndex, j == beginIndex ? 1.0f : 0.0f);
-                model->SetParameterValue(paramIndex, j == beginIndex ? 1.0f : 0.0f);
+                model.SetPartOpacity(partsIndex, j == beginIndex ? 1.0f : 0.0f);
+                model.SetParameterValue(paramIndex, j == beginIndex ? 1.0f : 0.0f);
 
                 for (int k = 0; k < _partGroups[j].Link.Count; ++k)
                 {
@@ -244,6 +251,13 @@ public class CubismPose
         }
     }
 
+    /// <summary>
+    /// パーツのフェード操作を行う。
+    /// </summary>
+    /// <param name="model">対象のモデル</param>
+    /// <param name="deltaTimeSeconds">デルタ時間[秒]</param>
+    /// <param name="beginIndex">フェード操作を行うパーツグループの先頭インデックス</param>
+    /// <param name="partGroupCount">フェード操作を行うパーツグループの個数</param>
     private void DoFade(CubismModel model, float deltaTimeSeconds, int beginIndex, int partGroupCount)
     {
         int visiblePartIndex = -1;

@@ -30,6 +30,9 @@ enum EyeState : int
     EyeState_Opening
 };
 
+/// <summary>
+/// 自動まばたき機能を提供する。
+/// </summary>
 public class CubismEyeBlink
 {
     /// <summary>

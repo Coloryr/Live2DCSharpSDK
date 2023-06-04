@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Live2DCSharpSDK.Framework.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Effect;
 
+/// <summary>
+/// 呼吸のパラメータ情報。
+/// </summary>
 public record BreathParameterData
 {
     /// <summary>
@@ -57,7 +61,7 @@ public class CubismBreath
 
         foreach(var item in Parameters)
         {
-            model->AddParameterValue(item.ParameterId, item.Offset + (item.Peak * MathF.Sin(t / item.Cycle)), item.Weight);
+            model.AddParameterValue(item.ParameterId, item.Offset + (item.Peak * MathF.Sin(t / item.Cycle)), item.Weight);
         }
     }
 }
