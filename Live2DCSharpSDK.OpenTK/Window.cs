@@ -3,6 +3,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using ErrorCode = OpenTK.Graphics.OpenGL4.ErrorCode;
 
 namespace Live2DCSharpSDK.OpenTK;
 
@@ -35,6 +36,10 @@ public class Window : GameWindow
         lapp.Run((float)UpdateTime);
 
         var code = GL.GetError();
+        if (code != ErrorCode.NoError)
+        {
+            throw new Exception();
+        }
 
         SwapBuffers();
     }
@@ -46,8 +51,6 @@ public class Window : GameWindow
         lapp.Resize();
 
         GL.Viewport(0, 0, e.Width, e.Height);
-
-        
     }
 
     protected override void OnUpdateFrame(FrameEventArgs e)

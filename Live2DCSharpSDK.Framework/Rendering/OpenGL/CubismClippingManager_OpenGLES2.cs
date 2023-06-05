@@ -51,7 +51,7 @@ public class CubismClippingManager_OpenGLES2
     /// <summary>
     /// マスク配置計算用の矩形
     /// </summary>
-    internal readonly csmRectF _tmpBoundsOnModel = new();
+    internal readonly RectF _tmpBoundsOnModel = new();
 
     internal CubismClippingManager_OpenGLES2(OpenGLApi gl)
     {
@@ -118,7 +118,7 @@ public class CubismClippingManager_OpenGLES2
             int drawableIndex = clippingContext._clippedDrawableIndexList[clippedDrawableIndex];
 
             int drawableVertexCount = model.GetDrawableVertexCount(drawableIndex);
-            float* drawableVertexes = model.GetDrawableVertices(drawableIndex);
+            var drawableVertexes = model.GetDrawableVertices(drawableIndex);
 
             float minX = float.MaxValue, minY = float.MaxValue;
             float maxX = -float.MaxValue, maxY = -float.MaxValue;
@@ -278,8 +278,8 @@ public class CubismClippingManager_OpenGLES2
             {
                 // --- 実際に１つのマスクを描く ---
                 CubismClippingContext clipContext = _clippingContextListForMask[clipIndex];
-                csmRectF allClippedDrawRect = clipContext._allClippedDrawRect; //このマスクを使う、全ての描画オブジェクトの論理座標上の囲み矩形
-                csmRectF layoutBoundsOnTex01 = clipContext._layoutBounds; //この中にマスクを収める
+                RectF allClippedDrawRect = clipContext._allClippedDrawRect; //このマスクを使う、全ての描画オブジェクトの論理座標上の囲み矩形
+                RectF layoutBoundsOnTex01 = clipContext._layoutBounds; //この中にマスクを収める
                 float MARGIN = 0.05f;
                 float scaleX = 0.0f;
                 float scaleY = 0.0f;
@@ -358,7 +358,7 @@ public class CubismClippingManager_OpenGLES2
                         _tmpMatrix.TranslateRelative(-_tmpBoundsOnModel.X, -_tmpBoundsOnModel.Y); //new = [translate][scale][translate]
                     }
                     // tmpMatrixForMask が計算結果
-                    _tmpMatrixForMask.SetMatrix(_tmpMatrix.GetArray());
+                    _tmpMatrixForMask.SetMatrix(_tmpMatrix.Tr);
                 }
 
                 //--------- draw時の mask 参照用行列を計算
@@ -371,12 +371,12 @@ public class CubismClippingManager_OpenGLES2
                         _tmpMatrix.TranslateRelative(-_tmpBoundsOnModel.X, -_tmpBoundsOnModel.Y); //new = [translate][scale][translate]
                     }
 
-                    _tmpMatrixForDraw.SetMatrix(_tmpMatrix.GetArray());
+                    _tmpMatrixForDraw.SetMatrix(_tmpMatrix.Tr);
                 }
 
-                clipContext._matrixForMask.SetMatrix(_tmpMatrixForMask.GetArray());
+                clipContext._matrixForMask.SetMatrix(_tmpMatrixForMask.Tr);
 
-                clipContext._matrixForDraw.SetMatrix(_tmpMatrixForDraw.GetArray());
+                clipContext._matrixForDraw.SetMatrix(_tmpMatrixForDraw.Tr);
 
                 if (!renderer.IsUsingHighPrecisionMask())
                 {

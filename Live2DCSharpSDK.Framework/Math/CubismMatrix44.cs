@@ -8,7 +8,9 @@ public class CubismMatrix44
     /// <summary>
     /// 4x4行列データ
     /// </summary>
-    protected float[] _tr = new float[16];
+    public float[] _tr = new float[16];
+
+    public float[] Tr => _tr;
 
     /// <summary>
     /// コンストラクタ。
@@ -19,60 +21,17 @@ public class CubismMatrix44
     }
 
     /// <summary>
-    /// 受け取った２つの行列の乗算を行う。
-    /// </summary>
-    /// <param name="a">行列a</param>
-    /// <param name="b">行列b</param>
-    /// <param name="dst"格納先の行列></param>
-    public static void Multiply(float[] a, float[] b, float[] dst)
-    {
-        float[] c = new[]{
-                        0.0f, 0.0f, 0.0f, 0.0f,
-                        0.0f, 0.0f, 0.0f, 0.0f,
-                        0.0f, 0.0f, 0.0f, 0.0f,
-                        0.0f, 0.0f, 0.0f, 0.0f
-                        };
-        int n = 4;
-
-        for (int i = 0; i < n; ++i)
-        {
-            for (int j = 0; j < n; ++j)
-            {
-                for (int k = 0; k < n; ++k)
-                {
-                    c[j + i * 4] += a[k + i * 4] * b[j + k * 4];
-                }
-            }
-        }
-
-        for (int i = 0; i < 16; ++i)
-        {
-            dst[i] = c[i];
-        }
-    }
-
-    /// <summary>
     /// 単位行列に初期化する。
     /// </summary>
     public void LoadIdentity()
     {
-        float[] c = new[] {
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    };
-
-        SetMatrix(c);
-    }
-
-    /// <summary>
-    /// 行列を浮動小数点数の配列で取得する。
-    /// </summary>
-    /// <returns>16個の浮動小数点数で表される4x4の行列</returns>
-    public float[] GetArray()
-    {
-        return _tr;
+        SetMatrix(new[]
+        {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        });
     }
 
     /// <summary>
@@ -81,10 +40,7 @@ public class CubismMatrix44
     /// <param name="tr">16個の浮動小数点数で表される4x4の行列</param>
     public void SetMatrix(float[] tr)
     {
-        for (int i = 0; i < 16; ++i)
-        {
-            _tr[i] = tr[i];
-        }
+        Array.Copy(tr, _tr, 16);
     }
 
     /// <summary>
@@ -170,14 +126,10 @@ public class CubismMatrix44
     /// <param name="y">Y軸の移動量</param>
     public void TranslateRelative(float x, float y)
     {
-        float[] tr1 = new[]{
-                          1.0f, 0.0f, 0.0f, 0.0f,
-                          0.0f, 1.0f, 0.0f, 0.0f,
-                          0.0f, 0.0f, 1.0f, 0.0f,
-                          x,    y,    0.0f, 1.0f
-                          };
-
-        Multiply(tr1, _tr, _tr);
+        MultiplyByMatrix(new[]{1.0f, 0.0f, 0.0f, 0.0f,
+                               0.0f, 1.0f, 0.0f, 0.0f,
+                               0.0f, 0.0f, 1.0f, 0.0f,
+                               x,    y,    0.0f, 1.0f}, _tr);
     }
 
     /// <summary>
@@ -216,14 +168,10 @@ public class CubismMatrix44
     /// <param name="y">Y軸の拡大率</param>
     public void ScaleRelative(float x, float y)
     {
-        float[] tr1 = new[]{
-                          x,      0.0f,   0.0f, 0.0f,
-                          0.0f,   y,      0.0f, 0.0f,
-                          0.0f,   0.0f,   1.0f, 0.0f,
-                          0.0f,   0.0f,   0.0f, 1.0f
-                          };
-
-        Multiply(tr1, _tr, _tr);
+        MultiplyByMatrix(new[]{x,    0.0f, 0.0f, 0.0f,
+                               0.0f, y,    0.0f, 0.0f,
+                               0.0f, 0.0f, 1.0f, 0.0f,
+                               0.0f, 0.0f, 0.0f, 1.0f}, _tr);
     }
 
     /// <summary>
@@ -237,12 +185,34 @@ public class CubismMatrix44
         _tr[5] = y;
     }
 
+    public void MultiplyByMatrix(float[] a, float[] b)
+    {
+        float[] c = new[]{0.0f, 0.0f, 0.0f, 0.0f,
+                          0.0f, 0.0f, 0.0f, 0.0f,
+                          0.0f, 0.0f, 0.0f, 0.0f,
+                          0.0f, 0.0f, 0.0f, 0.0f};
+        int n = 4;
+
+        for (int i = 0; i < n; ++i)
+        {
+            for (int j = 0; j < n; ++j)
+            {
+                for (int k = 0; k < n; ++k)
+                {
+                    c[j + i * 4] += a[k + i * 4] * b[j + k * 4];
+                }
+            }
+        }
+
+        Array.Copy(c, _tr, 16);
+    }
+
     /// <summary>
     /// 現在の行列に行列を乗算する。
     /// </summary>
     /// <param name="m">行列</param>
     public void MultiplyByMatrix(CubismMatrix44 m)
     {
-        Multiply(m.GetArray(), _tr, _tr);
+        MultiplyByMatrix(m.Tr, _tr);
     }
 }

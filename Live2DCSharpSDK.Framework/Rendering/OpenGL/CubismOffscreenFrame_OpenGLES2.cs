@@ -42,7 +42,7 @@ public class CubismOffscreenFrame_OpenGLES2
     /// 指定の描画ターゲットに向けて描画開始
     /// </summary>
     /// <param name="restoreFBO">0以上の場合、EndDrawでこの値をglBindFramebufferする</param>
-    public unsafe void BeginDraw(int restoreFBO = -1)
+    public void BeginDraw(int restoreFBO = -1)
     {
         if (_renderTexture == 0)
         {
@@ -52,15 +52,14 @@ public class CubismOffscreenFrame_OpenGLES2
         // バックバッファのサーフェイスを記憶しておく
         if (restoreFBO < 0)
         {
-            fixed (int* ptr = &_oldFBO)
-                GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, ptr);
+            GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, out _oldFBO);
         }
         else
         {
             _oldFBO = restoreFBO;
         }
 
-        // マスク用RenderTextureをactiveにセット
+        //マスク用RenderTextureをactiveにセット
         GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, _renderTexture);
     }
 
@@ -106,13 +105,10 @@ public class CubismOffscreenFrame_OpenGLES2
 
         do
         {
-            int ret = 0;
-
             // 新しく生成する
             if (colorBuffer == 0)
             {
-                fixed (int* ptr = &_colorBuffer)
-                    GL.glGenTextures(1, ptr);
+                _colorBuffer = GL.glGenTexture();
 
                 GL.glBindTexture(GL.GL_TEXTURE_2D, _colorBuffer);
                 GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, displayBufferWidth, displayBufferHeight, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, 0);
@@ -131,10 +127,9 @@ public class CubismOffscreenFrame_OpenGLES2
                 _isColorBufferInherited = true;
             }
 
-            int tmpFramebufferObject;
-            GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, &tmpFramebufferObject);
+            GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, out int tmpFramebufferObject);
 
-            GL.glGenFramebuffers(1, &ret);
+            int ret = GL.glGenFramebuffer();
             GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, ret);
             GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, _colorBuffer, 0);
             GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, tmpFramebufferObject);
@@ -158,19 +153,17 @@ public class CubismOffscreenFrame_OpenGLES2
     /// <summary>
     /// CubismOffscreenFrameの削除
     /// </summary>
-    public unsafe void DestroyOffscreenFrame()
+    public void DestroyOffscreenFrame()
     {
         if (!_isColorBufferInherited && (_colorBuffer != 0))
         {
-            fixed (int* ptr = &_colorBuffer)
-                GL.glDeleteTextures(1, ptr);
+            GL.glDeleteTexture(_colorBuffer);
             _colorBuffer = 0;
         }
 
         if (_renderTexture != 0)
         {
-            fixed (int* ptr = &_renderTexture)
-                GL.glDeleteFramebuffers(1, ptr);
+            GL.glDeleteFramebuffer(_renderTexture);
             _renderTexture = 0;
         }
     }

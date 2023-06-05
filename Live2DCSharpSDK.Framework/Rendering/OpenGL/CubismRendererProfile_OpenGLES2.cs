@@ -80,33 +80,24 @@ internal class CubismRendererProfile_OpenGLES2
     /// <summary>
     /// OpenGLES2のステートを保持する
     /// </summary>
-    internal unsafe void Save()
+    internal void Save()
     {
         //-- push state --
-        fixed (int* ptr = &_lastArrayBufferBinding)
-            GL.glGetIntegerv(GL.GL_ARRAY_BUFFER_BINDING, ptr);
-        fixed (int* ptr = &_lastElementArrayBufferBinding)
-            GL.glGetIntegerv(GL.GL_ELEMENT_ARRAY_BUFFER_BINDING, ptr);
-        fixed (int* ptr = &_lastProgram)
-            GL.glGetIntegerv(GL.GL_CURRENT_PROGRAM, ptr);
+        GL.glGetIntegerv(GL.GL_ARRAY_BUFFER_BINDING, out _lastArrayBufferBinding);
+        GL.glGetIntegerv(GL.GL_ELEMENT_ARRAY_BUFFER_BINDING, out _lastElementArrayBufferBinding);
+        GL.glGetIntegerv(GL.GL_CURRENT_PROGRAM, out _lastProgram);
 
-        fixed (int* ptr = &_lastActiveTexture)
-            GL.glGetIntegerv(GL.GL_ACTIVE_TEXTURE, ptr);
+        GL.glGetIntegerv(GL.GL_ACTIVE_TEXTURE, out _lastActiveTexture);
         GL.glActiveTexture(GL.GL_TEXTURE1); //テクスチャユニット1をアクティブに（以後の設定対象とする）
-        fixed (int* ptr = &_lastTexture1Binding2D)
-            GL.glGetIntegerv(GL.GL_TEXTURE_BINDING_2D, ptr);
+        GL.glGetIntegerv(GL.GL_TEXTURE_BINDING_2D, out _lastTexture1Binding2D);
 
         GL.glActiveTexture(GL.GL_TEXTURE0); //テクスチャユニット0をアクティブに（以後の設定対象とする）
-        fixed (int* ptr = &_lastTexture0Binding2D)
-            GL.glGetIntegerv(GL.GL_TEXTURE_BINDING_2D, ptr);
+        GL.glGetIntegerv(GL.GL_TEXTURE_BINDING_2D, out _lastTexture0Binding2D);
 
-        fixed (int* ptr = _lastVertexAttribArrayEnabled)
-        {
-            GL.glGetVertexAttribiv(0, GL.GL_VERTEX_ATTRIB_ARRAY_ENABLED, &ptr[0]);
-            GL.glGetVertexAttribiv(1, GL.GL_VERTEX_ATTRIB_ARRAY_ENABLED, &ptr[1]);
-            GL.glGetVertexAttribiv(2, GL.GL_VERTEX_ATTRIB_ARRAY_ENABLED, &ptr[2]);
-            GL.glGetVertexAttribiv(3, GL.GL_VERTEX_ATTRIB_ARRAY_ENABLED, &ptr[3]);
-        }
+        GL.glGetVertexAttribiv(0, GL.GL_VERTEX_ATTRIB_ARRAY_ENABLED, out _lastVertexAttribArrayEnabled[0]);
+        GL.glGetVertexAttribiv(1, GL.GL_VERTEX_ATTRIB_ARRAY_ENABLED, out _lastVertexAttribArrayEnabled[1]);
+        GL.glGetVertexAttribiv(2, GL.GL_VERTEX_ATTRIB_ARRAY_ENABLED, out _lastVertexAttribArrayEnabled[2]);
+        GL.glGetVertexAttribiv(3, GL.GL_VERTEX_ATTRIB_ARRAY_ENABLED, out _lastVertexAttribArrayEnabled[3]);
 
         _lastScissorTest = GL.glIsEnabled(GL.GL_SCISSOR_TEST);
         _lastStencilTest = GL.glIsEnabled(GL.GL_STENCIL_TEST);
@@ -114,25 +105,19 @@ internal class CubismRendererProfile_OpenGLES2
         _lastCullFace = GL.glIsEnabled(GL.GL_CULL_FACE);
         _lastBlend = GL.glIsEnabled(GL.GL_BLEND);
 
-        fixed (int* ptr = &_lastFrontFace)
-            GL.glGetIntegerv(GL.GL_FRONT_FACE, ptr);
+        GL.glGetIntegerv(GL.GL_FRONT_FACE, out _lastFrontFace);
 
         GL.glGetBooleanv(GL.GL_COLOR_WRITEMASK, _lastColorMask);
 
         // backup blending
-        fixed (int* ptr = _lastBlending)
-        {
-            GL.glGetIntegerv(GL.GL_BLEND_SRC_RGB, &ptr[0]);
-            GL.glGetIntegerv(GL.GL_BLEND_DST_RGB, &ptr[1]);
-            GL.glGetIntegerv(GL.GL_BLEND_SRC_ALPHA, &ptr[2]);
-            GL.glGetIntegerv(GL.GL_BLEND_DST_ALPHA, &ptr[3]);
-        }
+        GL.glGetIntegerv(GL.GL_BLEND_SRC_RGB, out _lastBlending[0]);
+        GL.glGetIntegerv(GL.GL_BLEND_DST_RGB, out _lastBlending[1]);
+        GL.glGetIntegerv(GL.GL_BLEND_SRC_ALPHA, out _lastBlending[2]);
+        GL.glGetIntegerv(GL.GL_BLEND_DST_ALPHA, out _lastBlending[3]);
 
         // モデル描画直前のFBOとビューポートを保存
-        fixed (int* ptr = &_lastFBO)
-            GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, ptr);
-        fixed (int* ptr = _lastViewport)
-            GL.glGetIntegerv(GL.GL_VIEWPORT, ptr);
+        GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, out _lastFBO);
+        GL.glGetIntegerv(GL.GL_VIEWPORT, _lastViewport);
     }
 
     /// <summary>
@@ -142,10 +127,10 @@ internal class CubismRendererProfile_OpenGLES2
     {
         GL.glUseProgram(_lastProgram);
 
-        SetGlEnableVertexAttribArray(0, _lastVertexAttribArrayEnabled[0] != 0);
-        SetGlEnableVertexAttribArray(1, _lastVertexAttribArrayEnabled[1] != 0);
-        SetGlEnableVertexAttribArray(2, _lastVertexAttribArrayEnabled[2] != 0);
-        SetGlEnableVertexAttribArray(3, _lastVertexAttribArrayEnabled[3] != 0);
+        SetGlEnableVertexAttribArray(0, _lastVertexAttribArrayEnabled[0] > 0);
+        SetGlEnableVertexAttribArray(1, _lastVertexAttribArrayEnabled[1] > 0);
+        SetGlEnableVertexAttribArray(2, _lastVertexAttribArrayEnabled[2] > 0);
+        SetGlEnableVertexAttribArray(3, _lastVertexAttribArrayEnabled[3] > 0);
 
         SetGlEnable(GL.GL_SCISSOR_TEST, _lastScissorTest);
         SetGlEnable(GL.GL_STENCIL_TEST, _lastStencilTest);

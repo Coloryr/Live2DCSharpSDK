@@ -25,12 +25,6 @@ public class CubismModelMatrix : CubismMatrix44
     /// </summary>
     private float _height;
 
-
-    public CubismModelMatrix()
-    {
-
-    }
-
     public CubismModelMatrix(float w, float h)
     {
         _width = w;
