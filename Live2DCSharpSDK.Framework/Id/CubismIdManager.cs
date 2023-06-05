@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Live2DCSharpSDK.Framework.Id;
+﻿namespace Live2DCSharpSDK.Framework.Id;
 
 /// <summary>
 /// ID名を管理する。
@@ -22,7 +16,7 @@ public class CubismIdManager
     /// <param name="list">ID名リスト</param>
     public void RegisterIds(List<string> list)
     {
-        list.ForEach((item) => 
+        list.ForEach((item) =>
         {
             GetId(item);
         });

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
+﻿namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
 /// <summary>
 /// オフスクリーン描画用構造体
@@ -29,11 +23,11 @@ public class CubismOffscreenFrame_OpenGLES2
     /// <summary>
     /// Create時に指定された幅
     /// </summary>
-    private uint _bufferWidth;
+    private int _bufferWidth;
     /// <summary>
     /// Create時に指定された高さ
     /// </summary>
-    private uint _bufferHeight;
+    private int _bufferHeight;
     /// <summary>
     /// 引数によって設定されたカラーバッファか？
     /// </summary>
@@ -41,7 +35,7 @@ public class CubismOffscreenFrame_OpenGLES2
 
     public CubismOffscreenFrame_OpenGLES2(OpenGLApi gl)
     {
-        GL = gl;  
+        GL = gl;
     }
 
     /// <summary>
@@ -58,8 +52,8 @@ public class CubismOffscreenFrame_OpenGLES2
         // バックバッファのサーフェイスを記憶しておく
         if (restoreFBO < 0)
         {
-            fixed(int * ptr = &_oldFBO)
-            GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, ptr);
+            fixed (int* ptr = &_oldFBO)
+                GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, ptr);
         }
         else
         {
@@ -105,7 +99,7 @@ public class CubismOffscreenFrame_OpenGLES2
     /// <param name="displayBufferWidth">作成するバッファ幅</param>
     /// <param name="displayBufferHeight">作成するバッファ高さ</param>
     /// <param name="colorBuffer">0以外の場合、ピクセル格納領域としてcolorBufferを使用する</param>
-    public unsafe bool CreateOffscreenFrame(uint displayBufferWidth, uint displayBufferHeight, int colorBuffer = 0)
+    public unsafe bool CreateOffscreenFrame(int displayBufferWidth, int displayBufferHeight, int colorBuffer = 0)
     {
         // 一旦削除
         DestroyOffscreenFrame();
@@ -117,8 +111,8 @@ public class CubismOffscreenFrame_OpenGLES2
             // 新しく生成する
             if (colorBuffer == 0)
             {
-                fixed(int* ptr = &_colorBuffer)
-                GL.glGenTextures(1, ptr);
+                fixed (int* ptr = &_colorBuffer)
+                    GL.glGenTextures(1, ptr);
 
                 GL.glBindTexture(GL.GL_TEXTURE_2D, _colorBuffer);
                 GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, displayBufferWidth, displayBufferHeight, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, 0);
@@ -200,7 +194,7 @@ public class CubismOffscreenFrame_OpenGLES2
     /// <summary>
     /// バッファ幅取得
     /// </summary>
-    public uint GetBufferWidth()
+    public int GetBufferWidth()
     {
         return _bufferWidth;
     }
@@ -208,7 +202,7 @@ public class CubismOffscreenFrame_OpenGLES2
     /// <summary>
     /// バッファ高さ取得
     /// </summary>
-    public uint GetBufferHeight()
+    public int GetBufferHeight()
     {
         return _bufferHeight;
     }

@@ -1,10 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
@@ -119,7 +114,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
             for (int i = 0; i < maskBufferCount; ++i)
             {
                 CubismOffscreenFrame_OpenGLES2 offscreenSurface = new(GL);
-                offscreenSurface.CreateOffscreenFrame((uint)_clippingManager.GetClippingMaskBufferSize().X, (uint)_clippingManager.GetClippingMaskBufferSize().Y);
+                offscreenSurface.CreateOffscreenFrame((int)_clippingManager.GetClippingMaskBufferSize().X, (int)_clippingManager.GetClippingMaskBufferSize().Y);
                 _offscreenFrameBuffers.Add(offscreenSurface);
             }
 
@@ -326,9 +321,9 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     /// <summary>
     /// 描画完了後の追加処理。
     /// </summary>
-    internal void PostDraw() 
+    internal void PostDraw()
     {
-    
+
     }
 
     /// <summary>
@@ -396,7 +391,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
                     _offscreenFrameBuffers[i].GetBufferHeight() != (uint)_clippingManager.GetClippingMaskBufferSize().Y)
                 {
                     _offscreenFrameBuffers[i].CreateOffscreenFrame(
-                        (uint)_clippingManager.GetClippingMaskBufferSize().X, (uint)_clippingManager.GetClippingMaskBufferSize().Y);
+                        (int)_clippingManager.GetClippingMaskBufferSize().X, (int)_clippingManager.GetClippingMaskBufferSize().Y);
                 }
             }
 
@@ -435,7 +430,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
                 if (clipContext._isUsing) // 書くことになっていた
                 {
                     // 生成したFrameBufferと同じサイズでビューポートを設定
-                    GL.glViewport(0, 0, _clippingManager.GetClippingMaskBufferSize().X, _clippingManager.GetClippingMaskBufferSize().Y);
+                    GL.glViewport(0, 0, (int)_clippingManager.GetClippingMaskBufferSize().X, (int)_clippingManager.GetClippingMaskBufferSize().Y);
 
                     PreDraw(); // バッファをクリアする
 

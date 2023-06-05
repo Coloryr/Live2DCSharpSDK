@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Live2DCSharpSDK.Framework;
+﻿namespace Live2DCSharpSDK.Framework;
 
 public static class CubismLog
 {
     public static void CubismLogPrintln(Option.LogLevel level, string head, string fmt, params object?[] args)
-    { 
+    {
         string data = $"[CSM] {head} {string.Format(fmt, args)}";
         if (level < CubismFramework.GetLoggingLevel())
             return;
@@ -19,7 +13,7 @@ public static class CubismLog
 
     public static void CubismLogVerbose(string fmt, params object?[] args)
     {
-        CubismLogPrintln(Option.LogLevel.LogLevel_Verbose, "[V]",fmt, args);
+        CubismLogPrintln(Option.LogLevel.LogLevel_Verbose, "[V]", fmt, args);
     }
 
     public static void CubismLogDebug(string fmt, params object?[] args)

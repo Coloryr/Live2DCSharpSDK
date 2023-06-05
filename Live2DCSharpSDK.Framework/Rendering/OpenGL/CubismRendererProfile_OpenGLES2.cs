@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
+﻿namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
 internal class CubismRendererProfile_OpenGLES2
 {
@@ -137,7 +131,8 @@ internal class CubismRendererProfile_OpenGLES2
         // モデル描画直前のFBOとビューポートを保存
         fixed (int* ptr = &_lastFBO)
             GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, ptr);
-        GL.glGetIntegerv(GL.GL_VIEWPORT, _lastViewport);
+        fixed (int* ptr = _lastViewport)
+            GL.glGetIntegerv(GL.GL_VIEWPORT, ptr);
     }
 
     /// <summary>
@@ -182,7 +177,7 @@ internal class CubismRendererProfile_OpenGLES2
     /// </summary>
     /// <param name="index">有効・無効にする機能</param>
     /// <param name="enabled">trueなら有効にする</param>
-    internal void SetGlEnable(uint index, bool enabled)
+    internal void SetGlEnable(int index, bool enabled)
     {
         if (enabled == true) GL.glEnable(index);
         else GL.glDisable(index);
@@ -193,7 +188,7 @@ internal class CubismRendererProfile_OpenGLES2
     /// </summary>
     /// <param name="index">有効・無効にする機能</param>
     /// <param name="enabled">trueなら有効にする</param>
-    internal void SetGlEnableVertexAttribArray(uint index, bool enabled)
+    internal void SetGlEnableVertexAttribArray(int index, bool enabled)
     {
         if (enabled) GL.glEnableVertexAttribArray(index);
         else GL.glDisableVertexAttribArray(index);

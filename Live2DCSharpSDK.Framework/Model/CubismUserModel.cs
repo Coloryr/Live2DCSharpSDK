@@ -3,12 +3,6 @@ using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Motion;
 using Live2DCSharpSDK.Framework.Physics;
 using Live2DCSharpSDK.Framework.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Model;
 
@@ -281,7 +275,7 @@ public class CubismUserModel : IDisposable
     /// <param name="name">モーションの名前</param>
     /// <param name="onFinishedMotionHandler">モーション再生終了時に呼び出されるコールバック関数。NULLの場合、呼び出されない。</param>
     /// <returns>モーションクラス</returns>
-    public ACubismMotion LoadMotion(string buffer, string name, ACubismMotion.FinishedMotionCallback onFinishedMotionHandler = null)
+    public ACubismMotion LoadMotion(string buffer, string name, FinishedMotionCallback onFinishedMotionHandler = null)
     {
         return new CubismMotion(buffer, onFinishedMotionHandler);
     }
@@ -432,6 +426,6 @@ public class CubismUserModel : IDisposable
     /// <param name="eventValue">発火したイベントの文字列データ</param>
     void MotionEventFired(string eventValue)
     {
-        CubismLog.CubismLogInfo("%s", eventValue);
+        CubismLog.CubismLogInfo(eventValue);
     }
 }

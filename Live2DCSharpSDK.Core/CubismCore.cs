@@ -3,10 +3,10 @@ using System.Runtime.InteropServices;
 
 namespace Live2DCSharpSDK.Core;
 
-using csmVersion = UInt32;
 using csmFlags = Byte;
 using csmMocVersion = UInt32;
 using csmParameterType = Int32;
+using csmVersion = UInt32;
 
 /// <summary>
 /// Cubism moc.
@@ -266,7 +266,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe float*  csmGetParameterMinimumValues(csmModel* model);
+    public extern static unsafe float* csmGetParameterMinimumValues(csmModel* model);
 
     /// <summary>
     /// Gets maximum parameter values.
@@ -425,7 +425,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int**  csmGetDrawableMasks( csmModel* model);
+    public extern static unsafe int** csmGetDrawableMasks(csmModel* model);
 
     /// <summary>
     /// Gets number of vertices of each drawable.
@@ -441,7 +441,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; a null pointer otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe Vector2**  csmGetDrawableVertexPositions( csmModel* model);
+    public extern static unsafe Vector2** csmGetDrawableVertexPositions(csmModel* model);
 
     /// <summary>
     /// Gets texture coordinate data of each drawables.
@@ -449,7 +449,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe Vector2**  csmGetDrawableVertexUvs( csmModel* model);
+    public extern static unsafe Vector2** csmGetDrawableVertexUvs(csmModel* model);
 
     /// <summary>
     /// Gets number of triangle indices for each drawable.
@@ -474,7 +474,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe Vector4*  csmGetDrawableMultiplyColors( csmModel* model);
+    public extern static unsafe Vector4* csmGetDrawableMultiplyColors(csmModel* model);
 
     /// <summary>
     /// Gets screen color data for each drawable.
@@ -482,7 +482,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe Vector4*  csmGetDrawableScreenColors( csmModel* model);
+    public extern static unsafe Vector4* csmGetDrawableScreenColors(csmModel* model);
 
     /// <summary>
     /// Gets drawable's parent part indices.
@@ -490,7 +490,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int*  csmGetDrawableParentPartIndices( csmModel* model);
+    public extern static unsafe int* csmGetDrawableParentPartIndices(csmModel* model);
 
     /// <summary>
     /// Resets all dynamic drawable flags.

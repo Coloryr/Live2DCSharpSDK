@@ -2,13 +2,7 @@
 using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Physics;
 
@@ -34,7 +28,7 @@ public record CubismPhysicsObj
         public record NormalizationObj
         {
             public record PositionObj
-            { 
+            {
                 public float Minimum { get; set; }
                 public float Maximum { get; set; }
                 public float Default { get; set; }
@@ -45,7 +39,7 @@ public record CubismPhysicsObj
         public record InputObj
         {
             public record SourceObj
-            { 
+            {
                 public string Id { get; set; }
             }
             public float Weight { get; set; }
@@ -66,7 +60,7 @@ public record CubismPhysicsObj
             public string Type { get; set; }
             public bool Reflect { get; set; }
         }
-        public record Vertice 
+        public record Vertice
         {
             public float Mobility { get; set; }
             public float Delay { get; set; }
@@ -150,7 +144,7 @@ public class CubismPhysics
         /// <summary>
         /// 風の方向
         /// </summary>
-        public Vector2 Wind; 
+        public Vector2 Wind;
     }
 
     /// <summary>
@@ -279,19 +273,19 @@ public class CubismPhysics
                 if (input.Type == PhysicsTypeTagX)
                 {
                     _physicsRig.Inputs[inputIndex + j].Type = CubismPhysicsSource.CubismPhysicsSource_X;
-                    _physicsRig.Inputs[inputIndex + j].GetNormalizedParameterValue = 
+                    _physicsRig.Inputs[inputIndex + j].GetNormalizedParameterValue =
                         GetInputTranslationXFromNormalizedParameterValue;
                 }
                 else if (input.Type == PhysicsTypeTagY)
                 {
                     _physicsRig.Inputs[inputIndex + j].Type = CubismPhysicsSource.CubismPhysicsSource_Y;
-                    _physicsRig.Inputs[inputIndex + j].GetNormalizedParameterValue = 
+                    _physicsRig.Inputs[inputIndex + j].GetNormalizedParameterValue =
                         GetInputTranslationYFromNormalizedParameterValue;
                 }
                 else if (input.Type == PhysicsTypeTagAngle)
                 {
                     _physicsRig.Inputs[inputIndex + j].Type = CubismPhysicsSource.CubismPhysicsSource_Angle;
-                    _physicsRig.Inputs[inputIndex + j].GetNormalizedParameterValue = 
+                    _physicsRig.Inputs[inputIndex + j].GetNormalizedParameterValue =
                         GetInputAngleFromNormalizedParameterValue;
                 }
 
@@ -324,7 +318,7 @@ public class CubismPhysics
                 _physicsRig.Outputs[outputIndex + j].VertexIndex = output.VertexIndex;
                 _physicsRig.Outputs[outputIndex + j].AngleScale = output.Scale;
                 _physicsRig.Outputs[outputIndex + j].Weight = output.Weight;
-                _physicsRig.Outputs[outputIndex + j].Destination.TargetType = 
+                _physicsRig.Outputs[outputIndex + j].Destination.TargetType =
                     CubismPhysicsTargetType.CubismPhysicsTargetType_Parameter;
 
                 _physicsRig.Outputs[outputIndex + j].Destination.Id = output.Destination.Id;
@@ -434,7 +428,7 @@ public class CubismPhysics
             totalAngle = 0.0f;
             totalTranslation.X = 0.0f;
             totalTranslation.Y = 0.0f;
-            
+
             var currentSetting = _physicsRig.Settings[settingIndex];
             var currentInputIndex = currentSetting.BaseInputIndex;
             var currentOutputIndex = currentSetting.BaseOutputIndex;
@@ -755,7 +749,7 @@ public class CubismPhysics
     /// オプションを設定する。
     /// </summary>
     /// <param name="options"> オプション</param>
-    public  void SetOptions(Options options)
+    public void SetOptions(Options options)
     {
         _options = options;
     }
@@ -1012,7 +1006,7 @@ public class CubismPhysics
         ) * weight;
     }
 
-    private float GetOutputTranslationX(Vector2 translation, CubismPhysicsParticle[] particles, int start, 
+    private float GetOutputTranslationX(Vector2 translation, CubismPhysicsParticle[] particles, int start,
         int particleIndex, bool isInverted, Vector2 parentGravity)
     {
         float outputValue = translation.X;
@@ -1025,7 +1019,7 @@ public class CubismPhysics
         return outputValue;
     }
 
-    private float GetOutputTranslationY(Vector2 translation, CubismPhysicsParticle[] particles, int start, 
+    private float GetOutputTranslationY(Vector2 translation, CubismPhysicsParticle[] particles, int start,
         int particleIndex, bool isInverted, Vector2 parentGravity)
     {
         float outputValue = translation.Y;
@@ -1038,7 +1032,7 @@ public class CubismPhysics
         return outputValue;
     }
 
-    private float GetOutputAngle(Vector2 translation, CubismPhysicsParticle[] particles, int start, 
+    private float GetOutputAngle(Vector2 translation, CubismPhysicsParticle[] particles, int start,
         int particleIndex, bool isInverted, Vector2 parentGravity)
     {
         float outputValue;

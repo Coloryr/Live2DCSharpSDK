@@ -1,9 +1,4 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Effect;
 
@@ -42,7 +37,7 @@ public class CubismBreath
     /// <summary>
     /// 呼吸にひもづいているパラメータのリスト
     /// </summary>
-    private List<BreathParameterData> Parameters { get; set; }
+    public List<BreathParameterData> Parameters { get; set; }
     /// <summary>
     /// 積算時間[秒]
     /// </summary>
@@ -59,7 +54,7 @@ public class CubismBreath
 
         float t = _currentTime * 2.0f * 3.14159f;
 
-        foreach(var item in Parameters)
+        foreach (var item in Parameters)
         {
             model.AddParameterValue(item.ParameterId, item.Offset + (item.Peak * MathF.Sin(t / item.Cycle)), item.Weight);
         }

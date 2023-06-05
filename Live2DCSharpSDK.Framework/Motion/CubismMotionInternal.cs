@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Live2DCSharpSDK.Framework.Motion;
+﻿namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
 /// モーションカーブのセグメントの評価関数。
@@ -67,7 +61,7 @@ public record CubismMotionPoint
     /// <summary>
     /// 値
     /// </summary>
-    public float Value;        
+    public float Value;
 }
 
 /// <summary>
@@ -86,7 +80,7 @@ public record CubismMotionSegment
     /// <summary>
     /// セグメントの種類
     /// </summary>
-    public CubismMotionSegmentType SegmentType;                                 
+    public CubismMotionSegmentType SegmentType;
 }
 
 /// <summary>
@@ -169,5 +163,5 @@ public record CubismMotionData
     /// <summary>
     /// イベントのリスト
     /// </summary>
-    public List<CubismMotionEvent> Events;          
+    public List<CubismMotionEvent> Events;
 }

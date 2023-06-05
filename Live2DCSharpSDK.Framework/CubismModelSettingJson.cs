@@ -1,11 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Live2DCSharpSDK.Framework;
 
@@ -16,12 +9,12 @@ public record ModelSettingObj
         public record Expression
         {
             public string Name { get; set; }
-            public string FilePath { get; set; }
+            public string File { get; set; }
         }
         public record Motion
         {
-            public string FilePath { get; set; }
-            public string SoundPath { get; set; }
+            public string File { get; set; }
+            public string Sound { get; set; }
             public float FadeInTime { get; set; }
             public float FadeOutTime { get; set; }
         }
@@ -115,7 +108,7 @@ public class CubismModelSettingJson
     public CubismModelSettingJson(string buffer)
     {
         json = JObject.Parse(buffer);
-        Obj = json.ToObject<ModelSettingObj>();
+        Obj = json.ToObject<ModelSettingObj>()!;
     }
 
     /// <summary>
@@ -208,7 +201,7 @@ public class CubismModelSettingJson
     public string GetExpressionFileName(int index)
     {
         var node = Obj.FileReferences.Expressions;
-        return node[index].FilePath;
+        return node[index].File;
     }
 
     // モーションについて
@@ -235,14 +228,14 @@ public class CubismModelSettingJson
     {
         var node = Obj.FileReferences.Motions[groupName][index];
         if (node == null) return "";
-        return node.FilePath;
+        return node.File;
     }
 
     public string GetMotionSoundFileName(string groupName, int index)
     {
         var node = Obj.FileReferences.Motions[groupName][index];
         if (node == null) return "";
-        return node.SoundPath;
+        return node.Sound;
     }
 
     public float GetMotionFadeInTimeValue(string groupName, int index)

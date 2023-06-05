@@ -1,9 +1,4 @@
 ﻿using Live2DCSharpSDK.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework;
 
@@ -50,5 +45,5 @@ public class Option
     /// <summary>
     /// ログ出力レベル設定
     /// </summary>
-    public LogLevel LoggingLevel;                  
+    public LogLevel LoggingLevel;
 }

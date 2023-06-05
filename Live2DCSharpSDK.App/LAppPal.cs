@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Live2DCSharpSDK.App;
+﻿namespace Live2DCSharpSDK.App;
 
 /// <summary>
 /// プラットフォーム依存機能を抽象化する Cubism Platform Abstraction Layer.
@@ -15,16 +9,6 @@ public static class LAppPal
     private static float s_currentFrame;
     private static float s_lastFrame;
     private static float s_deltaTime;
-
-    /// <summary>
-    /// ファイルをバイトデータとして読み込む
-    /// </summary>
-    /// <param name="path">読み込み対象ファイルのパス</param>
-    /// <returns>バイトデータ</returns>
-    public static byte[] LoadFileAsBytes(string path)
-    {
-        return File.ReadAllBytes(path);
-    }
 
     /// <summary>
     /// デルタ時間（前回フレームとの差分）を取得する

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Live2DCSharpSDK.Framework.Math;
+﻿namespace Live2DCSharpSDK.Framework.Math;
 
 /// <summary>
 /// 顔の向きの制御機能を提供するクラス。

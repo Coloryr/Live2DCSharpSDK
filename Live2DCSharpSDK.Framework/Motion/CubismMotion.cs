@@ -1,15 +1,6 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using static Live2DCSharpSDK.Framework.Motion.CubismMotionObj;
 
 namespace Live2DCSharpSDK.Framework.Motion;
 
@@ -21,7 +12,7 @@ enum EvaluationOptionFlag
     /// <summary>
     /// ベジェハンドルの規制状態
     /// </summary>
-    EvaluationOptionFlag_AreBeziersRistricted = 0, 
+    EvaluationOptionFlag_AreBeziersRistricted = 0,
 };
 
 public record CubismMotionObj
@@ -46,10 +37,10 @@ public record CubismMotionObj
         public float? FadeOutTime { get; set; }
         public List<float> Segments { get; set; }
         public string Target { get; set; }
-        public string Id{ get; set; }
+        public string Id { get; set; }
     }
     public record UserDataObj
-    { 
+    {
         public float Time { get; set; }
         public string Value { get; set; }
     }
@@ -327,7 +318,7 @@ public unsafe class CubismMotion : ACubismMotion
         {
             // Get first point of next segment.
             pointPosition = motionData.Segments[i].BasePointIndex
-                + (motionData.Segments[i].SegmentType == 
+                + (motionData.Segments[i].SegmentType ==
                     CubismMotionSegmentType.CubismMotionSegmentType_Bezier ? 3 : 1);
 
 
@@ -423,9 +414,9 @@ public unsafe class CubismMotion : ACubismMotion
 
             _motionData.Curves[curveCount].BaseSegmentIndex = totalSegmentCount;
 
-            _motionData.Curves[curveCount].FadeInTime = item.FadeInTime!=null
+            _motionData.Curves[curveCount].FadeInTime = item.FadeInTime != null
                         ? (float)item.FadeInTime : -1.0f;
-            _motionData.Curves[curveCount].FadeOutTime = item.FadeOutTime!=null
+            _motionData.Curves[curveCount].FadeOutTime = item.FadeOutTime != null
                         ? (float)item.FadeOutTime : -1.0f;
 
             // Segments
@@ -451,7 +442,7 @@ public unsafe class CubismMotion : ACubismMotion
                 {
                     case CubismMotionSegmentType.CubismMotionSegmentType_Linear:
                         {
-                            _motionData.Segments[totalSegmentCount].SegmentType = 
+                            _motionData.Segments[totalSegmentCount].SegmentType =
                                 CubismMotionSegmentType.CubismMotionSegmentType_Linear;
                             _motionData.Segments[totalSegmentCount].Evaluate = LinearEvaluate;
 
@@ -465,7 +456,7 @@ public unsafe class CubismMotion : ACubismMotion
                         }
                     case CubismMotionSegmentType.CubismMotionSegmentType_Bezier:
                         {
-                            _motionData.Segments[totalSegmentCount].SegmentType = 
+                            _motionData.Segments[totalSegmentCount].SegmentType =
                                 CubismMotionSegmentType.CubismMotionSegmentType_Bezier;
                             if (areBeziersRestructed || UseOldBeziersCurveMotion)
                             {
@@ -590,11 +581,11 @@ public unsafe class CubismMotion : ACubismMotion
             CubismLog.CubismLogDebug($"too many lip sync targets : {_lipSyncParameterIds.Count}");
         }
 
-         float tmpFadeIn = (_fadeInSeconds <= 0.0f) ? 1.0f : 
-            CubismMath.GetEasingSine((userTimeSeconds - motionQueueEntry.GetFadeInStartTime()) / _fadeInSeconds);
+        float tmpFadeIn = (_fadeInSeconds <= 0.0f) ? 1.0f :
+           CubismMath.GetEasingSine((userTimeSeconds - motionQueueEntry.GetFadeInStartTime()) / _fadeInSeconds);
 
-         float tmpFadeOut = (_fadeOutSeconds <= 0.0f || motionQueueEntry.GetEndTime() < 0.0f) ? 1.0f : 
-            CubismMath.GetEasingSine((motionQueueEntry.GetEndTime() - userTimeSeconds) / _fadeOutSeconds);
+        float tmpFadeOut = (_fadeOutSeconds <= 0.0f || motionQueueEntry.GetEndTime() < 0.0f) ? 1.0f :
+           CubismMath.GetEasingSine((motionQueueEntry.GetEndTime() - userTimeSeconds) / _fadeOutSeconds);
 
         float value;
         int c, parameterIndex;
@@ -613,7 +604,7 @@ public unsafe class CubismMotion : ACubismMotion
         var curves = _motionData.Curves;
 
         // Evaluate model curves.
-        for (c = 0; c < _motionData.CurveCount && curves[c].Type == 
+        for (c = 0; c < _motionData.CurveCount && curves[c].Type ==
             CubismMotionCurveTarget.CubismMotionCurveTarget_Model; ++c)
         {
             // Evaluate curve and call handler.
@@ -638,7 +629,7 @@ public unsafe class CubismMotion : ACubismMotion
 
         int parameterMotionCurveCount = 0;
 
-        for (; c < _motionData.CurveCount && curves[c].Type == 
+        for (; c < _motionData.CurveCount && curves[c].Type ==
             CubismMotionCurveTarget.CubismMotionCurveTarget_Parameter; ++c)
         {
             parameterMotionCurveCount++;
@@ -652,7 +643,7 @@ public unsafe class CubismMotion : ACubismMotion
                 continue;
             }
 
-             float sourceValue = model.GetParameterValue(parameterIndex);
+            float sourceValue = model.GetParameterValue(parameterIndex);
 
             // Evaluate curve and apply value.
             value = EvaluateCurve(_motionData, c, time);
@@ -718,7 +709,7 @@ public unsafe class CubismMotion : ACubismMotion
                             : CubismMath.GetEasingSine((motionQueueEntry.GetEndTime() - userTimeSeconds) / curves[c].FadeOutTime);
                 }
 
-                 float paramWeight = _weight * fin * fout;
+                float paramWeight = _weight * fin * fout;
 
                 // パラメータごとのフェードを適用
                 v = sourceValue + (value - sourceValue) * paramWeight;
@@ -732,14 +723,14 @@ public unsafe class CubismMotion : ACubismMotion
             {
                 for (int i = 0; i < _eyeBlinkParameterIds.Count && i < MaxTargetSize; ++i)
                 {
-                     float sourceValue = model.GetParameterValue(_eyeBlinkParameterIds[i]);
+                    float sourceValue = model.GetParameterValue(_eyeBlinkParameterIds[i]);
                     //モーションでの上書きがあった時にはまばたきは適用しない
                     if (((eyeBlinkFlags >> i) & 0x01) != 0UL)
                     {
                         continue;
                     }
 
-                     float v = sourceValue + (eyeBlinkValue - sourceValue) * fadeWeight;
+                    float v = sourceValue + (eyeBlinkValue - sourceValue) * fadeWeight;
 
                     model.SetParameterValue(_eyeBlinkParameterIds[i], v);
                 }
@@ -749,14 +740,14 @@ public unsafe class CubismMotion : ACubismMotion
             {
                 for (int i = 0; i < _lipSyncParameterIds.Count && i < MaxTargetSize; ++i)
                 {
-                     float sourceValue = model.GetParameterValue(_lipSyncParameterIds[i]);
+                    float sourceValue = model.GetParameterValue(_lipSyncParameterIds[i]);
                     //モーションでの上書きがあった時にはリップシンクは適用しない
                     if (((lipSyncFlags >> i) & 0x01) != 0UL)
                     {
                         continue;
                     }
 
-                     float v = sourceValue + (lipSyncValue - sourceValue) * fadeWeight;
+                    float v = sourceValue + (lipSyncValue - sourceValue) * fadeWeight;
 
                     model.SetParameterValue(_lipSyncParameterIds[i], v);
                 }
