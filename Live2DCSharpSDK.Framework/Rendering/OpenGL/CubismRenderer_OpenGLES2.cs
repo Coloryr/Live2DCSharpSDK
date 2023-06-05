@@ -248,6 +248,15 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
 
         CubismTextureColor modelColorRGBA = GetModelColor();
 
+        if (opacity > 1)
+        {
+            opacity = 1;
+        }
+        else if (opacity < 0)
+        {
+            opacity = 0;
+        }
+
         if (GetClippingContextBufferForMask() == null) // マスク生成時以外
         {
             modelColorRGBA.A *= opacity;
