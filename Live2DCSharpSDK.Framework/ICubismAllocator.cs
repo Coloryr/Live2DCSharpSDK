@@ -37,7 +37,7 @@ public interface ICubismAllocator
     /// <param name="size">確保するバイト数</param>
     /// <param name="alignment">メモリーブロックのアラインメント幅</param>
     /// <returns>成功すると割り当てられたメモリのアドレス。 そうでなければ '0'を返す。</returns>
-    IntPtr AllocateAligned(int size, uint alignment);
+    IntPtr AllocateAligned(int size, int alignment);
 
     /// <summary>
     /// アラインメント制約ありのヒープ・メモリーを解放します。

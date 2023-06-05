@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Live2DCSharpSDK.App\Live2DCSharpSDK.App.csproj" />
     <ProjectReference Include="..\Live2DCSharpSDK.Core\Live2DCSharpSDK.Core.csproj" />
   </ItemGroup>
 
