@@ -16,7 +16,7 @@ public static class Program
             Size = new Vector2i(600, 600),
             Title = "Live2D",
             // This is needed to run on macos
-            //Flags = ContextFlags.ForwardCompatible,
+            Flags = ContextFlags.ForwardCompatible,
             Vsync = VSyncMode.On,
             Profile = ContextProfile.Compatability
         };

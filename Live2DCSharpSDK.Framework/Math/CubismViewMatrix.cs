@@ -78,7 +78,7 @@ public class CubismViewMatrix : CubismMatrix44
                         0.0f,   1.0f,   0.0f, 0.0f,
                         0.0f,   0.0f,   1.0f, 0.0f,
                         x,      y,      0.0f, 1.0f };
-        Multiply(tr1, _tr, _tr);
+        MultiplyByMatrix(tr1, _tr);
     }
 
     /// <summary>
@@ -109,28 +109,18 @@ public class CubismViewMatrix : CubismMatrix44
             }
         }
 
-        float[] tr1 = new[]{
-                          1.0f, 0.0f, 0.0f, 0.0f,
-                          0.0f, 1.0f, 0.0f, 0.0f,
-                          0.0f, 0.0f, 1.0f, 0.0f,
-                          cx,   cy,   0.0f, 1.0f
-                          };
-        float[] tr2 = new[]{
-                          scale, 0.0f,  0.0f, 0.0f,
-                          0.0f,  scale, 0.0f, 0.0f,
-                          0.0f,  0.0f,  1.0f, 0.0f,
-                          0.0f,  0.0f,  0.0f, 1.0f
-                          };
-        float[] tr3 = new[]{
-                          1.0f, 0.0f, 0.0f, 0.0f,
-                          0.0f, 1.0f, 0.0f, 0.0f,
-                          0.0f, 0.0f, 1.0f, 0.0f,
-                          -cx,  -cy,  0.0f, 1.0f
-                          };
-
-        Multiply(tr3, _tr, _tr);
-        Multiply(tr2, _tr, _tr);
-        Multiply(tr1, _tr, _tr);
+        MultiplyByMatrix(new[]{1.0f, 0.0f, 0.0f, 0.0f,
+                               0.0f, 1.0f, 0.0f, 0.0f,
+                               0.0f, 0.0f, 1.0f, 0.0f,
+                               -cx,  -cy,  0.0f, 1.0f}, _tr);
+        MultiplyByMatrix(new[]{scale, 0.0f,  0.0f, 0.0f,
+                               0.0f,  scale, 0.0f, 0.0f,
+                               0.0f,  0.0f,  1.0f, 0.0f,
+                               0.0f,  0.0f,  0.0f, 1.0f}, _tr);
+        MultiplyByMatrix(new[]{1.0f, 0.0f, 0.0f, 0.0f,
+                               0.0f, 1.0f, 0.0f, 0.0f,
+                               0.0f, 0.0f, 1.0f, 0.0f,
+                               cx,   cy,   0.0f, 1.0f}, _tr);
     }
 
     /// <summary>

@@ -52,6 +52,14 @@ public record CubismTextureColor
         A = 1.0f; 
     }
 
+    public CubismTextureColor(CubismTextureColor old)
+    {
+        R = old.R;
+        G = old.G;
+        B = old.B;
+        A = old.A;
+    }
+
     public CubismTextureColor(float r, float g, float b, float a)
     {
         R = r;
@@ -174,7 +182,7 @@ public abstract class CubismRenderer : IDisposable
     /// <param name="matrix4x4">Model-View-Projection 行列</param>
     public void SetMvpMatrix(CubismMatrix44 matrix4x4)
     {
-        _mvpMatrix4x4.SetMatrix(matrix4x4.GetArray());
+        _mvpMatrix4x4.SetMatrix(matrix4x4.Tr);
     }
 
     /// <summary>
@@ -221,7 +229,7 @@ public abstract class CubismRenderer : IDisposable
     /// <returns>RGBAのカラー情報</returns>
     public CubismTextureColor GetModelColor()
     {
-        return _modelColor;
+        return new(_modelColor);
     }
 
     /// <summary>

@@ -39,8 +39,8 @@ public class LAppModel : CubismUserModel
     /// </summary>
     private readonly Dictionary<string, ACubismMotion> _expressions = new();
 
-    private readonly List<csmRectF> _hitArea = new();
-    private readonly List<csmRectF> _userArea = new();
+    private readonly List<RectF> _hitArea = new();
+    private readonly List<RectF> _userArea = new();
 
     /// <summary>
     /// パラメータID: ParamAngleX

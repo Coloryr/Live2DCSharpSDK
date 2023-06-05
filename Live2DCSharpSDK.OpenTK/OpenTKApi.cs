@@ -99,9 +99,9 @@ public class OpenTKApi : OpenGLApi
         return GL.CreateShader((ShaderType)type);
     }
 
-    public override unsafe void glDeleteFramebuffers(int size, int* data)
+    public override void glDeleteFramebuffer(int data)
     {
-        GL.DeleteFramebuffers(size, data);
+        GL.DeleteFramebuffer(data);
     }
 
     public override void glDeleteProgram(int index)
@@ -114,9 +114,9 @@ public class OpenTKApi : OpenGLApi
         GL.DeleteShader(index);
     }
 
-    public override unsafe void glDeleteTextures(int size, int* data)
+    public override void glDeleteTexture(int data)
     {
-        GL.DeleteTextures(size, data);
+        GL.DeleteTexture(data);
     }
 
     public override void glDetachShader(int index, int data)
@@ -165,14 +165,14 @@ public class OpenTKApi : OpenGLApi
         GL.GenerateMipmap((GenerateMipmapTarget)a);
     }
 
-    public override unsafe void glGenFramebuffers(int size, int* data)
+    public override int glGenFramebuffer()
     {
-        GL.GenFramebuffers(size, data);
+        return GL.GenFramebuffer();
     }
 
-    public override unsafe void glGenTextures(int size, int* data)
+    public override int glGenTexture()
     {
-        GL.GenTextures(size, data);
+        return GL.GenTexture();
     }
 
     public override int glGetAttribLocation(int index, string attr)
@@ -185,7 +185,12 @@ public class OpenTKApi : OpenGLApi
         GL.GetBoolean((GetPName)bit, data);
     }
 
-    public override unsafe void glGetIntegerv(int bit, int* data)
+    public override void glGetIntegerv(int bit, out int data)
+    {
+        GL.GetInteger((GetPName)bit, out data);
+    }
+
+    public override void glGetIntegerv(int bit, int[] data)
     {
         GL.GetInteger((GetPName)bit, data);
     }
@@ -215,9 +220,9 @@ public class OpenTKApi : OpenGLApi
         return GL.GetUniformLocation(index, uni);
     }
 
-    public override unsafe void glGetVertexAttribiv(int index, int bit, int* data)
+    public override unsafe void glGetVertexAttribiv(int index, int bit, out int data)
     {
-        GL.GetVertexAttrib(index, (VertexAttribParameter)bit, data);
+        GL.GetVertexAttrib(index, (VertexAttribParameter)bit, out data);
     }
 
     public override bool glIsEnabled(int bit)

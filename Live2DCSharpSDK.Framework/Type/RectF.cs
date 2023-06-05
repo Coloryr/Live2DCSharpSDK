@@ -1,9 +1,11 @@
-﻿namespace Live2DCSharpSDK.Framework.Type;
+﻿using System.Drawing;
+
+namespace Live2DCSharpSDK.Framework.Type;
 
 /// <summary>
 /// 矩形形状(座標・長さはfloat値)を定義するクラス
 /// </summary>
-public class csmRectF
+public class RectF
 {
     /// <summary>
     /// 左端X座標
@@ -22,7 +24,7 @@ public class csmRectF
     /// </summary>
     public float Height;
 
-    public csmRectF() { }
+    public RectF() { }
     /// <summary>
     /// 引数付きコンストラクタ
     /// </summary>
@@ -30,7 +32,7 @@ public class csmRectF
     /// <param name="y">上端Y座標</param>
     /// <param name="w">幅</param>
     /// <param name="h">高さ</param>
-    public csmRectF(float x, float y, float w, float h)
+    public RectF(float x, float y, float w, float h)
     {
         X = x;
         Y = y;
@@ -42,7 +44,7 @@ public class csmRectF
     /// 矩形に値をセットする
     /// </summary>
     /// <param name="r">矩形のインスタンス</param>
-    public void SetRect(csmRectF r)
+    public void SetRect(RectF r)
     {
         X = r.X;
         Y = r.Y;

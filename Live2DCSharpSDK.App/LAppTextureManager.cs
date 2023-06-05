@@ -48,17 +48,16 @@ public class LAppTextureManager
         if (item != null)
             return item;
 
-        int textureId;
         var data = File.ReadAllBytes(fileName);
 
         using var image = Image.Load<Rgba32>(data);
-        image.Mutate(x => x.Flip(FlipMode.Vertical));
+        //image.Mutate(x => x.Flip(FlipMode.Vertical));
         var pixels = new byte[4 * image.Width * image.Height];
         image.CopyPixelDataTo(pixels);
 
         var GL = Lapp.GL;
         // OpenGL用のテクスチャを生成する
-        GL.glGenTextures(1, &textureId);
+        int textureId = GL.glGenTexture();
         GL.glBindTexture(GL.GL_TEXTURE_2D, textureId);
         fixed (byte* ptr = pixels)
             GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, image.Width, image.Height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, new IntPtr(ptr));

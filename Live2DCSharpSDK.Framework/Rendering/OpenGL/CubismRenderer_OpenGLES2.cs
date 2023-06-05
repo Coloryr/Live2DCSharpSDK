@@ -14,7 +14,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     /// <summary>
     /// モデルが参照するテクスチャとレンダラでバインドしているテクスチャとのマップ
     /// </summary>
-    private readonly Dictionary<int, int> _textures = new();
+    private readonly Dictionary<int, int> _textures;
     /// <summary>
     /// 描画オブジェクトのインデックスを描画順に並べたリスト
     /// </summary>
@@ -73,6 +73,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     {
         GL = gl;
         _rendererProfile = new(gl);
+        _textures = new Dictionary<int, int>(32);
     }
 
     public new static void StaticRelease()

@@ -1105,6 +1105,8 @@ public unsafe class CubismModel : IDisposable
     /// false   クリッピングマスクを使用していない</returns>
     public bool IsUsingMasking()
     {
+        return false;
+
         for (int d = 0; d < CubismCore.csmGetDrawableCount(_model); ++d)
         {
             if (CubismCore.csmGetDrawableMaskCounts(_model)[d] <= 0)

@@ -84,8 +84,11 @@ internal record CubismShaderSet
 internal class CubismShader_OpenGLES2 : IDisposable
 {
     private const string ES2 = "#version 100\n";
-    private const string ES2C = ES2 + "precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;\n";
+    private const string ES2C = ES2 + "precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;";
     private const string Normal = "#version 120\n";
+    private const string Tegra = "#version 100\n" +
+        "#extension GL_NV_shader_framebuffer_fetch : enable\n" +
+        "precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;";
 
     // SetupMask
     public const string VertShaderSrcSetupMask_ES2 =
@@ -94,79 +97,72 @@ internal class CubismShader_OpenGLES2 : IDisposable
         Normal + VertShaderSrcSetupMask_Base;
     private const string VertShaderSrcSetupMask_Base =
         @"attribute vec4 a_position;
-        attribute vec2 a_texCoord;
-        varying vec2 v_texCoord;
-        varying vec4 v_myPos;
-        uniform mat4 u_clipMatrix;
-        void main()
-        {
-        gl_Position = u_clipMatrix * a_position;
-        v_myPos = u_clipMatrix * a_position;
-        v_texCoord = a_texCoord;
-        v_texCoord.y = 1.0 - v_texCoord.y;
-        }";
+attribute vec2 a_texCoord;
+varying vec2 v_texCoord;
+varying vec4 v_myPos;
+uniform mat4 u_clipMatrix;
+void main()
+{
+gl_Position = u_clipMatrix * a_position;
+v_myPos = u_clipMatrix * a_position;
+v_texCoord = a_texCoord;
+v_texCoord.y = 1.0 - v_texCoord.y;
+}";
 
     public const string FragShaderSrcSetupMask_ES2 = ES2C + FragShaderSrcSetupMask_Base;
     public const string FragShaderSrcSetupMask_Normal = Normal + FragShaderSrcSetupMask_Base;
     private const string FragShaderSrcSetupMask_Base =
         @"varying vec2 v_texCoord;
-        varying vec4 v_myPos;
-        uniform sampler2D s_texture0;
-        uniform vec4 u_channelFlag;
-        uniform vec4 u_baseColor;
-        void main()
-        {
-        float isInside = 
-          step(u_baseColor.x, v_myPos.x/v_myPos.w)
-        * step(u_baseColor.y, v_myPos.y/v_myPos.w)
-        * step(v_myPos.x/v_myPos.w, u_baseColor.z)
-        * step(v_myPos.y/v_myPos.w, u_baseColor.w);
-        gl_FragColor = u_channelFlag * texture2D(s_texture0 , v_texCoord).a * isInside;
-        }";
+varying vec4 v_myPos;
+uniform sampler2D s_texture0;
+uniform vec4 u_channelFlag;
+uniform vec4 u_baseColor;
+void main()
+{
+float isInside = 
+    step(u_baseColor.x, v_myPos.x/v_myPos.w)
+* step(u_baseColor.y, v_myPos.y/v_myPos.w)
+* step(v_myPos.x/v_myPos.w, u_baseColor.z)
+* step(v_myPos.y/v_myPos.w, u_baseColor.w);
+gl_FragColor = u_channelFlag * texture2D(s_texture0 , v_texCoord).a * isInside;
+}";
 
     public const string FragShaderSrcSetupMaskTegra =
-        @"#version 100
-        #extension GL_NV_shader_framebuffer_fetch : enable
-        precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;\n"
-        + FragShaderSrcSetupMask_Base;
+        Tegra + FragShaderSrcSetupMask_Base;
 
     //----- バーテックスシェーダプログラム -----
     // Normal & Add & Mult 共通
-    public const string VertShaderSrc_ES2 =
-        ES2 + VertShaderSrc_Base;
-    public const string VertShaderSrc_Normal =
-        Normal + VertShaderSrc_Base;
+    public const string VertShaderSrc_ES2 = ES2 + VertShaderSrc_Base;
+    public const string VertShaderSrc_Normal = Normal + VertShaderSrc_Base;
     private const string VertShaderSrc_Base =
         @"attribute vec4 a_position;
-        attribute vec2 a_texCoord;
-        varying vec2 v_texCoord;
-        uniform mat4 u_matrix;
-        void main()
-        {
-        gl_Position = u_matrix * a_position;
-        v_texCoord = a_texCoord;
-        v_texCoord.y = 1.0 - v_texCoord.y;
-        }";
+attribute vec2 a_texCoord;
+varying vec2 v_texCoord;
+uniform mat4 u_matrix;
+void main()
+{
+gl_Position = u_matrix * a_position;
+v_texCoord = a_texCoord;
+v_texCoord.y = 1.0 - v_texCoord.y;
+}";
 
     // Normal & Add & Mult 共通（クリッピングされたものの描画用）
-    public const string VertShaderSrcMasked_ES2 =
-        ES2 + VertShaderSrcMasked_Base;
-    public const string VertShaderSrcMasked_Normal =
-        Normal + VertShaderSrcMasked_Base;
+    public const string VertShaderSrcMasked_ES2 = ES2 + VertShaderSrcMasked_Base;
+    public const string VertShaderSrcMasked_Normal = Normal + VertShaderSrcMasked_Base;
     private const string VertShaderSrcMasked_Base =
         @"attribute vec4 a_position;
-        attribute vec2 a_texCoord;
-        varying vec2 v_texCoord;
-        varying vec4 v_clipPos;
-        uniform mat4 u_matrix;
-        uniform mat4 u_clipMatrix;
-        void main()
-        {
-        gl_Position = u_matrix * a_position;
-        v_clipPos = u_clipMatrix * a_position;
-        v_texCoord = a_texCoord;
-        v_texCoord.y = 1.0 - v_texCoord.y;
-        }";
+attribute vec2 a_texCoord;
+varying vec2 v_texCoord;
+varying vec4 v_clipPos;
+uniform mat4 u_matrix;
+uniform mat4 u_clipMatrix;
+void main()
+{
+gl_Position = u_matrix * a_position;
+v_clipPos = u_clipMatrix * a_position;
+v_texCoord = a_texCoord;
+v_texCoord.y = 1.0 - v_texCoord.y;
+}";
 
     //----- フラグメントシェーダプログラム -----
     // Normal & Add & Mult 共通
@@ -174,109 +170,93 @@ internal class CubismShader_OpenGLES2 : IDisposable
     public const string FragShaderSrc_Normal = Normal + FragShaderSrc_Base;
     public const string FragShaderSrc_Base =
     @"varying vec2 v_texCoord;
-        uniform sampler2D s_texture0;
-        uniform vec4 u_baseColor;
-        uniform vec4 u_multiplyColor;
-        uniform vec4 u_screenColor;
-        void main()
-        {
-        vec4 texColor = texture2D(s_texture0 , v_texCoord);
-        texColor.rgb = texColor.rgb * u_multiplyColor.rgb;
-        texColor.rgb = texColor.rgb + u_screenColor.rgb - (texColor.rgb * u_screenColor.rgb);
-        vec4 color = texColor * u_baseColor;
-        gl_FragColor = vec4(color.rgb * color.a,  color.a);
-        }";
+uniform sampler2D s_texture0;
+uniform vec4 u_baseColor;
+uniform vec4 u_multiplyColor;
+uniform vec4 u_screenColor;
+void main()
+{
+vec4 texColor = texture2D(s_texture0 , v_texCoord);
+texColor.rgb = texColor.rgb * u_multiplyColor.rgb;
+texColor.rgb = texColor.rgb + u_screenColor.rgb - (texColor.rgb * u_screenColor.rgb);
+vec4 color = texColor * u_baseColor;
+gl_FragColor = vec4(color.rgb * color.a,  color.a);
+}";
 
-    public const string FragShaderSrcTegra =
-        @"#version 100
-        #extension GL_NV_shader_framebuffer_fetch : enable
-        precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;\n"
-        + FragShaderSrc_Base;
+    public const string FragShaderSrcTegra = Tegra + FragShaderSrc_Base;
 
     // Normal & Add & Mult 共通 （PremultipliedAlpha）
     public const string FragShaderSrcPremultipliedAlpha_ES2 = ES2C + FragShaderSrcPremultipliedAlpha_Base;
     public const string FragShaderSrcPremultipliedAlpha_Normal = Normal + FragShaderSrcPremultipliedAlpha_Base;
     public const string FragShaderSrcPremultipliedAlpha_Base =
         @"varying vec2 v_texCoord;
-        uniform sampler2D s_texture0;
-        uniform vec4 u_baseColor;
-        uniform vec4 u_multiplyColor;
-        uniform vec4 u_screenColor;
-        void main()
-        {
-        vec4 texColor = texture2D(s_texture0 , v_texCoord);
-        texColor.rgb = texColor.rgb * u_multiplyColor.rgb;
-        texColor.rgb = (texColor.rgb + u_screenColor.rgb * texColor.a) - (texColor.rgb * u_screenColor.rgb);
-        gl_FragColor = texColor * u_baseColor;
-        }";
+uniform sampler2D s_texture0;
+uniform vec4 u_baseColor;
+uniform vec4 u_multiplyColor;
+uniform vec4 u_screenColor;
+void main()
+{
+vec4 texColor = texture2D(s_texture0 , v_texCoord);
+texColor.rgb = texColor.rgb * u_multiplyColor.rgb;
+texColor.rgb = (texColor.rgb + u_screenColor.rgb * texColor.a) - (texColor.rgb * u_screenColor.rgb);
+gl_FragColor = texColor * u_baseColor;
+}";
 
-    public const string FragShaderSrcPremultipliedAlphaTegra =
-        @"#version 100
-        #extension GL_NV_shader_framebuffer_fetch : enable
-        precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;\n"
-        + FragShaderSrcPremultipliedAlpha_Base;
+    public const string FragShaderSrcPremultipliedAlphaTegra = Tegra + FragShaderSrcPremultipliedAlpha_Base;
 
     // Normal & Add & Mult 共通（クリッピングされたものの描画用）
     public const string FragShaderSrcMask_ES2 = ES2C + FragShaderSrcMask_Base;
     public const string FragShaderSrcMask_Normal = Normal + FragShaderSrcMask_Base;
     public const string FragShaderSrcMask_Base =
         @"varying vec2 v_texCoord;
-        varying vec4 v_clipPos;
-        uniform sampler2D s_texture0;
-        uniform sampler2D s_texture1;
-        uniform vec4 u_channelFlag;
-        uniform vec4 u_baseColor;
-        uniform vec4 u_multiplyColor;
-        uniform vec4 u_screenColor;
-        void main()
-        {
-        vec4 texColor = texture2D(s_texture0 , v_texCoord);
-        texColor.rgb = texColor.rgb * u_multiplyColor.rgb;
-        texColor.rgb = texColor.rgb + u_screenColor.rgb - (texColor.rgb * u_screenColor.rgb);
-        vec4 col_formask = texColor * u_baseColor;
-        col_formask.rgb = col_formask.rgb  * col_formask.a ;
-        vec4 clipMask = (1.0 - texture2D(s_texture1, v_clipPos.xy / v_clipPos.w)) * u_channelFlag;
-        float maskVal = clipMask.r + clipMask.g + clipMask.b + clipMask.a;
-        col_formask = col_formask * maskVal;
-        gl_FragColor = col_formask;
-        }";
+varying vec4 v_clipPos;
+uniform sampler2D s_texture0;
+uniform sampler2D s_texture1;
+uniform vec4 u_channelFlag;
+uniform vec4 u_baseColor;
+uniform vec4 u_multiplyColor;
+uniform vec4 u_screenColor;
+void main()
+{
+vec4 texColor = texture2D(s_texture0 , v_texCoord);
+texColor.rgb = texColor.rgb * u_multiplyColor.rgb;
+texColor.rgb = texColor.rgb + u_screenColor.rgb - (texColor.rgb * u_screenColor.rgb);
+vec4 col_formask = texColor * u_baseColor;
+col_formask.rgb = col_formask.rgb  * col_formask.a ;
+vec4 clipMask = (1.0 - texture2D(s_texture1, v_clipPos.xy / v_clipPos.w)) * u_channelFlag;
+float maskVal = clipMask.r + clipMask.g + clipMask.b + clipMask.a;
+col_formask = col_formask * maskVal;
+gl_FragColor = col_formask;
+}";
 
-    public const string FragShaderSrcMaskTegra =
-        @"#version 100
-        #extension GL_NV_shader_framebuffer_fetch : enable
-        precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;\n"
-        + FragShaderSrcMask_Base;
+    public const string FragShaderSrcMaskTegra = Tegra + FragShaderSrcMask_Base;
 
     // Normal & Add & Mult 共通（クリッピングされて反転使用の描画用）
     public const string FragShaderSrcMaskInverted_ES2 = ES2C + FragShaderSrcMaskInverted_Base;
     public const string FragShaderSrcMaskInverted_Normal = Normal + FragShaderSrcMaskInverted_Base;
     public const string FragShaderSrcMaskInverted_Base =
         @"varying vec2 v_texCoord;
-        varying vec4 v_clipPos;
-        uniform sampler2D s_texture0;
-        uniform sampler2D s_texture1;
-        uniform vec4 u_channelFlag;
-        uniform vec4 u_baseColor;
-        uniform vec4 u_multiplyColor;
-        uniform vec4 u_screenColor;
-        void main()
-        {
-        vec4 texColor = texture2D(s_texture0 , v_texCoord);
-        texColor.rgb = texColor.rgb * u_multiplyColor.rgb;
-        texColor.rgb = texColor.rgb + u_screenColor.rgb - (texColor.rgb * u_screenColor.rgb);
-        vec4 col_formask = texColor * u_baseColor;
-        col_formask.rgb = col_formask.rgb  * col_formask.a ;
-        vec4 clipMask = (1.0 - texture2D(s_texture1, v_clipPos.xy / v_clipPos.w)) * u_channelFlag;
-        float maskVal = clipMask.r + clipMask.g + clipMask.b + clipMask.a;
-        col_formask = col_formask * (1.0 - maskVal);
-        gl_FragColor = col_formask;
-        }";
+varying vec4 v_clipPos;
+uniform sampler2D s_texture0;
+uniform sampler2D s_texture1;
+uniform vec4 u_channelFlag;
+uniform vec4 u_baseColor;
+uniform vec4 u_multiplyColor;
+uniform vec4 u_screenColor;
+void main()
+{
+vec4 texColor = texture2D(s_texture0 , v_texCoord);
+texColor.rgb = texColor.rgb * u_multiplyColor.rgb;
+texColor.rgb = texColor.rgb + u_screenColor.rgb - (texColor.rgb * u_screenColor.rgb);
+vec4 col_formask = texColor * u_baseColor;
+col_formask.rgb = col_formask.rgb  * col_formask.a ;
+vec4 clipMask = (1.0 - texture2D(s_texture1, v_clipPos.xy / v_clipPos.w)) * u_channelFlag;
+float maskVal = clipMask.r + clipMask.g + clipMask.b + clipMask.a;
+col_formask = col_formask * (1.0 - maskVal);
+gl_FragColor = col_formask;
+}";
 
-    public const string FragShaderSrcMaskInvertedTegra =
-        @"#version 100
-        #extension GL_NV_shader_framebuffer_fetch : enable
-        precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;\n"
-        + FragShaderSrcMaskInverted_Base;
+    public const string FragShaderSrcMaskInvertedTegra = Tegra + FragShaderSrcMaskInverted_Base;
 
     // Normal & Add & Mult 共通（クリッピングされたものの描画用、PremultipliedAlphaの場合）
     public const string FragShaderSrcMaskPremultipliedAlpha_ES2 = ES2C + FragShaderSrcMaskPremultipliedAlpha_Base;
@@ -302,44 +282,36 @@ internal class CubismShader_OpenGLES2 : IDisposable
         gl_FragColor = col_formask;
         }";
 
-    public const string FragShaderSrcMaskPremultipliedAlphaTegra =
-        @"#version 100
-        #extension GL_NV_shader_framebuffer_fetch : enable\n
-        precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;\n"
-        + FragShaderSrcMaskPremultipliedAlpha_Base;
+    public const string FragShaderSrcMaskPremultipliedAlphaTegra = Tegra + FragShaderSrcMaskPremultipliedAlpha_Base;
 
     // Normal & Add & Mult 共通（クリッピングされて反転使用の描画用、PremultipliedAlphaの場合）
     public const string FragShaderSrcMaskInvertedPremultipliedAlpha_ES2 = ES2C + FragShaderSrcMaskInvertedPremultipliedAlpha_Base;
     public const string FragShaderSrcMaskInvertedPremultipliedAlpha_Normal = Normal + FragShaderSrcMaskInvertedPremultipliedAlpha_Base;
     public const string FragShaderSrcMaskInvertedPremultipliedAlpha_Base =
         @"varying vec2 v_texCoord;
-        varying vec4 v_clipPos;
-        uniform sampler2D s_texture0;
-        uniform sampler2D s_texture1;
-        uniform vec4 u_channelFlag;
-        uniform vec4 u_baseColor;
-        uniform vec4 u_multiplyColor;
-        uniform vec4 u_screenColor;
-        void main()
-        {
-        vec4 texColor = texture2D(s_texture0 , v_texCoord);
-        texColor.rgb = texColor.rgb * u_multiplyColor.rgb;
-        texColor.rgb = (texColor.rgb + u_screenColor.rgb * texColor.a) - (texColor.rgb * u_screenColor.rgb);
-        vec4 col_formask = texColor * u_baseColor;
-        vec4 clipMask = (1.0 - texture2D(s_texture1, v_clipPos.xy / v_clipPos.w)) * u_channelFlag;
-        float maskVal = clipMask.r + clipMask.g + clipMask.b + clipMask.a;
-        col_formask = col_formask * (1.0 - maskVal);
-        gl_FragColor = col_formask;
-        }";
+varying vec4 v_clipPos;
+uniform sampler2D s_texture0;
+uniform sampler2D s_texture1;
+uniform vec4 u_channelFlag;
+uniform vec4 u_baseColor;
+uniform vec4 u_multiplyColor;
+uniform vec4 u_screenColor;
+void main()
+{
+vec4 texColor = texture2D(s_texture0 , v_texCoord);
+texColor.rgb = texColor.rgb * u_multiplyColor.rgb;
+texColor.rgb = (texColor.rgb + u_screenColor.rgb * texColor.a) - (texColor.rgb * u_screenColor.rgb);
+vec4 col_formask = texColor * u_baseColor;
+vec4 clipMask = (1.0 - texture2D(s_texture1, v_clipPos.xy / v_clipPos.w)) * u_channelFlag;
+float maskVal = clipMask.r + clipMask.g + clipMask.b + clipMask.a;
+col_formask = col_formask * (1.0 - maskVal);
+gl_FragColor = col_formask;
+}";
 
-    public const string FragShaderSrcMaskInvertedPremultipliedAlphaTegra =
-        @"#version 100
-        #extension GL_NV_shader_framebuffer_fetch : enable
-        precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;\n"
-        + FragShaderSrcMaskInvertedPremultipliedAlpha_Base;
+    public const string FragShaderSrcMaskInvertedPremultipliedAlphaTegra = Tegra + FragShaderSrcMaskInvertedPremultipliedAlpha_Base;
 
-    public const int ShaderCount = 19; ///< シェーダの数 = マスク生成用 + (通常 + 加算 + 乗算) * (マスク無 + マスク有 + マスク有反転 + マスク無の乗算済アルファ対応版 + マスク有の乗算済アルファ対応版 + マスク有反転の乗算済アルファ対応版)
-    public static CubismShader_OpenGLES2 s_instance;
+    public const int ShaderCount = 19; // シェーダの数 = マスク生成用 + (通常 + 加算 + 乗算) * (マスク無 + マスク有 + マスク有反転 + マスク無の乗算済アルファ対応版 + マスク有の乗算済アルファ対応版 + マスク有反転の乗算済アルファ対応版)
+    public static CubismShader_OpenGLES2? s_instance;
 
     private readonly OpenGLApi GL;
     /// <summary>
@@ -452,9 +424,9 @@ internal class CubismShader_OpenGLES2 : IDisposable
             var colorChannel = renderer.GetClippingContextBufferForMask().GetClippingManager().GetChannelFlagAsColor(channelNo);
             GL.glUniform4f(shaderSet.UnifromChannelFlagLocation, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
 
-            GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, renderer.GetClippingContextBufferForMask()._matrixForMask.GetArray());
+            GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, renderer.GetClippingContextBufferForMask()._matrixForMask.Tr);
 
-            csmRectF rect = renderer.GetClippingContextBufferForMask()._layoutBounds;
+            RectF rect = renderer.GetClippingContextBufferForMask()._layoutBounds;
 
             GL.glUniform4f(shaderSet.UniformBaseColorLocation,
                         rect.X * 2.0f - 1.0f,
@@ -523,7 +495,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
                 GL.glUniform1i(shaderSet.SamplerTexture1Location, 1);
 
                 // View座標をClippingContextの座標に変換するための行列を設定
-                GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, renderer.GetClippingContextBufferForDraw()._matrixForDraw.GetArray());
+                GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, renderer.GetClippingContextBufferForDraw()._matrixForDraw.Tr);
 
                 // 使用するカラーチャンネルを設定
                 var channelNo = renderer.GetClippingContextBufferForDraw()._layoutChannelNo;
@@ -537,7 +509,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
             GL.glUniform1i(shaderSet.SamplerTexture0Location, 0);
 
             //座標変換
-            GL.glUniformMatrix4fv(shaderSet.UniformMatrixLocation, 1, false, matrix4x4.GetArray()); //
+            GL.glUniformMatrix4fv(shaderSet.UniformMatrixLocation, 1, false, matrix4x4.Tr); //
 
             GL.glUniform4f(shaderSet.UniformBaseColorLocation, baseColor.R, baseColor.G, baseColor.B, baseColor.A);
             GL.glUniform4f(shaderSet.UniformMultiplyColorLocation, multiplyColor.R, multiplyColor.G, multiplyColor.B, multiplyColor.A);

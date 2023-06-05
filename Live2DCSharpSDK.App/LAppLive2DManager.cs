@@ -151,7 +151,7 @@ public class LAppLive2DManager : IDisposable
             }
 
             model.Update();
-            model.Draw(projection);///< 参照渡しなのでprojectionは変質する
+            model.Draw(projection); // 参照渡しなのでprojectionは変質する
         }
     }
 
@@ -199,10 +199,7 @@ public class LAppLive2DManager : IDisposable
     /// </summary>
     public void SetViewMatrix(CubismMatrix44 m)
     {
-        for (int i = 0; i < 16; i++)
-        {
-            _viewMatrix.GetArray()[i] = m.GetArray()[i];
-        }
+        _viewMatrix.SetMatrix(m.Tr);
     }
 
     public void Dispose()

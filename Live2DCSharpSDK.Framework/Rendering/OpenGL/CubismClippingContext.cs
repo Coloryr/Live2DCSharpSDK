@@ -24,11 +24,11 @@ public class CubismClippingContext
     /// <summary>
     /// マスク用チャンネルのどの領域にマスクを入れるか(View座標-1..1, UVは0..1に直す)
     /// </summary>
-    public csmRectF _layoutBounds;
+    public RectF _layoutBounds;
     /// <summary>
     /// このクリッピングで、クリッピングされる全ての描画オブジェクトの囲み矩形（毎回更新）
     /// </summary>
-    public csmRectF _allClippedDrawRect;
+    public RectF _allClippedDrawRect;
     /// <summary>
     /// マスクの位置計算結果を保持する行列
     /// </summary>
@@ -66,8 +66,8 @@ public class CubismClippingContext
 
         _layoutChannelNo = 0;
 
-        _allClippedDrawRect = new csmRectF();
-        _layoutBounds = new csmRectF();
+        _allClippedDrawRect = new RectF();
+        _layoutBounds = new RectF();
 
         _clippedDrawableIndexList = new List<int>();
     }
