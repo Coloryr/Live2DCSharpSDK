@@ -1,6 +1,7 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using static Live2DCSharpSDK.Framework.ModelObj;
 
 namespace Live2DCSharpSDK.Framework.Effect;
 
@@ -12,15 +13,15 @@ public record PartData
     /// <summary>
     /// パーツID
     /// </summary>
-    public string PartId;
+    public required string PartId { get; set; }
     /// <summary>
     /// パラメータのインデックス
     /// </summary>
-    public int ParameterIndex;
+    public int ParameterIndex { get; set; }
     /// <summary>
     ///  パーツのインデックス
     /// </summary>
-    public int PartIndex;
+    public int PartIndex{ get; set; }
     /// <summary>
     ///  連動するパラメータ
     /// </summary>
@@ -68,7 +69,7 @@ public class CubismPose
     /// <summary>
     /// 前回操作したモデル
     /// </summary>
-    private CubismModel _lastModel;
+    private CubismModel? _lastModel;
 
     /// <summary>
     /// インスタンスを作成する。
@@ -113,12 +114,10 @@ public class CubismPose
 
                     for (int linkIndex = 0; linkIndex < linkCount; ++linkIndex)
                     {
-                        PartData linkPart = new();
-                        string linkId = CubismFramework.GetIdManager().GetId(linkListInfo[linkIndex]!.ToString());
-
-                        linkPart.PartId = linkId;
-
-                        partData.Link.Add(linkPart);
+                        partData.Link.Add(new()
+                        {
+                            PartId = CubismFramework.GetIdManager().GetId(linkListInfo[linkIndex]!.ToString())
+                        });
                     }
                 }
 

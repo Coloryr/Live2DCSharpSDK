@@ -62,7 +62,7 @@ public static class CubismFramework
         //Live2D Cubism Coreバージョン情報を表示
         if (s_isStarted)
         {
-            var version = CubismCore.csmGetVersion();
+            var version = CubismCore.GetVersion();
 
             uint major = (version & 0xFF000000) >> 24;
             uint minor = (version & 0x00FF0000) >> 16;

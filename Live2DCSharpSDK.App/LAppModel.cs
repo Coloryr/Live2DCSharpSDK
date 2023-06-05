@@ -175,8 +175,8 @@ public class LAppModel : CubismUserModel
         _userTimeSeconds += deltaTimeSeconds;
 
         _dragManager.Update(deltaTimeSeconds);
-        _dragX = _dragManager.GetX();
-        _dragY = _dragManager.GetY();
+        _dragX = _dragManager.FaceX;
+        _dragY = _dragManager.FaceY;
 
         // モーションによるパラメータ更新の有無
         bool motionUpdated = false;

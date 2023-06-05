@@ -8,23 +8,6 @@ using csmMocVersion = UInt32;
 using csmParameterType = Int32;
 using csmVersion = UInt32;
 
-/// <summary>
-/// Cubism moc.
-/// </summary>
-public struct csmMoc
-{
-
-}
-
-/// <summary>
-/// Cubism model.
-/// </summary>
-public struct csmModel
-{
-
-}
-
-
 public static class csmEnum
 {
     //Alignment constraints.
@@ -137,15 +120,15 @@ public static class CubismCore
     /// Queries Core version.
     /// </summary>
     /// <returns>Core version.</returns>
-    [DllImport("Live2DCubismCore")]
-    public extern static csmVersion csmGetVersion();
+    [DllImport("Live2DCubismCore", EntryPoint = "csmGetVersion")]
+    public extern static csmVersion GetVersion();
 
     /// <summary>
     /// Gets Moc file supported latest version.
     /// </summary>
     /// <returns>csmMocVersion (Moc file latest format version).</returns>
-    [DllImport("Live2DCubismCore")]
-    public extern static csmMocVersion csmGetLatestMocVersion();
+    [DllImport("Live2DCubismCore", EntryPoint = "csmGetLatestMocVersion")]
+    public extern static uint GetLatestMocVersion();
 
     /// <summary>
     /// Gets Moc file format version.
@@ -154,7 +137,7 @@ public static class CubismCore
     /// <param name="size">Size of moc (in bytes).</param>
     /// <returns>csmMocVersion</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static csmMocVersion csmGetMocVersion(IntPtr address, int size);
+    public extern static uint csmGetMocVersion(IntPtr address, int size);
 
     //CONSISTENCY
 
@@ -192,7 +175,7 @@ public static class CubismCore
     /// <param name="size">Size of moc (in bytes).</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe csmMoc* csmReviveMocInPlace(IntPtr address, int size);
+    public extern static IntPtr csmReviveMocInPlace(IntPtr address, int size);
 
     //MODEL
 
@@ -202,7 +185,7 @@ public static class CubismCore
     /// <param name="moc">Moc to query.</param>
     /// <returns>Valid size on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int csmGetSizeofModel(csmMoc* moc);
+    public extern static unsafe int csmGetSizeofModel(IntPtr moc);
 
     /// <summary>
     /// Tries to instantiate a model in place.
@@ -212,14 +195,14 @@ public static class CubismCore
     /// <param name="size">Size of memory block for instance (in bytes).</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe csmModel* csmInitializeModelInPlace(csmMoc* moc, IntPtr address, int size);
+    public extern static unsafe IntPtr csmInitializeModelInPlace(IntPtr moc, IntPtr address, int size);
 
     /// <summary>
     /// Updates a model.
     /// </summary>
     /// <param name="model">Model to update.</param>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe void csmUpdateModel(csmModel* model);
+    public extern static unsafe void csmUpdateModel(IntPtr model);
 
     //CANVAS
 
@@ -231,7 +214,7 @@ public static class CubismCore
     /// <param name="outOriginInPixels">Origin of model on canvas.</param>
     /// <param name="outPixelsPerUnit">Aspect used for scaling pixels to units.</param>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe void csmReadCanvasInfo(csmModel* model, Vector2* outSizeInPixels, Vector2* outOriginInPixels, float* outPixelsPerUnit);
+    public extern static unsafe void csmReadCanvasInfo(IntPtr model, Vector2* outSizeInPixels, Vector2* outOriginInPixels, float* outPixelsPerUnit);
 
     //PARAMETERS
 
@@ -241,7 +224,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid count on success; '-1' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int csmGetParameterCount(csmModel* model);
+    public extern static int csmGetParameterCount(IntPtr model);
 
     /// <summary>
     /// Gets parameter IDs.
@@ -250,7 +233,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe byte** csmGetParameterIds(csmModel* model);
+    public extern static unsafe byte** csmGetParameterIds(IntPtr model);
 
     /// <summary>
     /// Gets parameter types.
@@ -258,7 +241,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe csmParameterType* csmGetParameterTypes(csmModel* model);
+    public extern static unsafe csmParameterType* csmGetParameterTypes(IntPtr model);
 
     /// <summary>
     /// Gets minimum parameter values.
@@ -266,7 +249,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe float* csmGetParameterMinimumValues(csmModel* model);
+    public extern static unsafe float* csmGetParameterMinimumValues(IntPtr model);
 
     /// <summary>
     /// Gets maximum parameter values.
@@ -274,7 +257,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe float* csmGetParameterMaximumValues(csmModel* model);
+    public extern static unsafe float* csmGetParameterMaximumValues(IntPtr model);
 
     /// <summary>
     /// Gets default parameter values.
@@ -282,7 +265,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe float* csmGetParameterDefaultValues(csmModel* model);
+    public extern static unsafe float* csmGetParameterDefaultValues(IntPtr model);
 
     /// <summary>
     /// Gets read/write parameter values buffer.
@@ -290,7 +273,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe float* csmGetParameterValues(csmModel* model);
+    public extern static unsafe float* csmGetParameterValues(IntPtr model);
 
     /// <summary>
     /// Gets number of key values of each parameter.
@@ -298,7 +281,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int* csmGetParameterKeyCounts(csmModel* model);
+    public extern static unsafe int* csmGetParameterKeyCounts(IntPtr model);
 
     /// <summary>
     /// Gets key values of each parameter.
@@ -306,7 +289,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe float** csmGetParameterKeyValues(csmModel* model);
+    public extern static unsafe float** csmGetParameterKeyValues(IntPtr model);
 
     //PARTS
 
@@ -316,7 +299,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid count on success; '-1' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int csmGetPartCount(csmModel* model);
+    public extern static unsafe int csmGetPartCount(IntPtr model);
 
     /// <summary>
     /// Gets parts IDs.
@@ -325,7 +308,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe byte** csmGetPartIds(csmModel* model);
+    public extern static unsafe byte** csmGetPartIds(IntPtr model);
 
     /// <summary>
     /// Gets read/write part opacities buffer.
@@ -333,7 +316,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe float* csmGetPartOpacities(csmModel* model);
+    public extern static unsafe float* csmGetPartOpacities(IntPtr model);
 
     /// <summary>
     /// Gets part's parent part indices.
@@ -341,7 +324,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int* csmGetPartParentPartIndices(csmModel* model);
+    public extern static unsafe int* csmGetPartParentPartIndices(IntPtr model);
 
     //DRAWABLES
 
@@ -351,7 +334,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid count on success; '-1' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int csmGetDrawableCount(csmModel* model);
+    public extern static unsafe int csmGetDrawableCount(IntPtr model);
 
     /// <summary>
     /// Gets drawable IDs.
@@ -360,7 +343,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe byte** csmGetDrawableIds(csmModel* model);
+    public extern static unsafe byte** csmGetDrawableIds(IntPtr model);
 
     /// <summary>
     /// Gets constant drawable flags.
@@ -368,7 +351,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe csmFlags* csmGetDrawableConstantFlags(csmModel* model);
+    public extern static unsafe csmFlags* csmGetDrawableConstantFlags(IntPtr model);
 
     /// <summary>
     /// Gets dynamic drawable flags.
@@ -376,7 +359,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe csmFlags* csmGetDrawableDynamicFlags(csmModel* model);
+    public extern static unsafe csmFlags* csmGetDrawableDynamicFlags(IntPtr model);
 
     /// <summary>
     /// Gets drawable texture indices.
@@ -384,7 +367,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int* csmGetDrawableTextureIndices(csmModel* model);
+    public extern static unsafe int* csmGetDrawableTextureIndices(IntPtr model);
 
     /// <summary>
     /// Gets drawable draw orders.
@@ -392,7 +375,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int* csmGetDrawableDrawOrders(csmModel* model);
+    public extern static unsafe int* csmGetDrawableDrawOrders(IntPtr model);
 
     /// <summary>
     /// Gets drawable render orders.
@@ -401,7 +384,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0'otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int* csmGetDrawableRenderOrders(csmModel* model);
+    public extern static unsafe int* csmGetDrawableRenderOrders(IntPtr model);
 
     /// <summary>
     /// Gets drawable opacities.
@@ -409,7 +392,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe float* csmGetDrawableOpacities(csmModel* model);
+    public extern static unsafe float* csmGetDrawableOpacities(IntPtr model);
 
     /// <summary>
     /// Gets numbers of masks of each drawable.
@@ -417,7 +400,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int* csmGetDrawableMaskCounts(csmModel* model);
+    public extern static unsafe int* csmGetDrawableMaskCounts(IntPtr model);
 
     /// <summary>
     /// Gets number of vertices of each drawable.
@@ -425,7 +408,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int** csmGetDrawableMasks(csmModel* model);
+    public extern static unsafe int** csmGetDrawableMasks(IntPtr model);
 
     /// <summary>
     /// Gets number of vertices of each drawable.
@@ -433,7 +416,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int* csmGetDrawableVertexCounts(csmModel* model);
+    public extern static unsafe int* csmGetDrawableVertexCounts(IntPtr model);
 
     /// <summary>
     /// Gets vertex position data of each drawable.
@@ -441,7 +424,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; a null pointer otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe Vector2** csmGetDrawableVertexPositions(csmModel* model);
+    public extern static unsafe Vector2** csmGetDrawableVertexPositions(IntPtr model);
 
     /// <summary>
     /// Gets texture coordinate data of each drawables.
@@ -449,7 +432,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe Vector2** csmGetDrawableVertexUvs(csmModel* model);
+    public extern static unsafe Vector2** csmGetDrawableVertexUvs(IntPtr model);
 
     /// <summary>
     /// Gets number of triangle indices for each drawable.
@@ -458,7 +441,7 @@ public static class CubismCore
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
     public extern static unsafe int* csmGetDrawableIndexCounts(
-        csmModel* model);
+        IntPtr model);
 
     /// <summary>
     /// Gets triangle index data for each drawable.
@@ -466,7 +449,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe ushort** csmGetDrawableIndices(csmModel* model);
+    public extern static unsafe ushort** csmGetDrawableIndices(IntPtr model);
 
     /// <summary>
     /// Gets multiply color data for each drawable.
@@ -474,7 +457,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe Vector4* csmGetDrawableMultiplyColors(csmModel* model);
+    public extern static unsafe Vector4* csmGetDrawableMultiplyColors(IntPtr model);
 
     /// <summary>
     /// Gets screen color data for each drawable.
@@ -482,7 +465,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe Vector4* csmGetDrawableScreenColors(csmModel* model);
+    public extern static unsafe Vector4* csmGetDrawableScreenColors(IntPtr model);
 
     /// <summary>
     /// Gets drawable's parent part indices.
@@ -490,12 +473,12 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe int* csmGetDrawableParentPartIndices(csmModel* model);
+    public extern static unsafe int* csmGetDrawableParentPartIndices(IntPtr model);
 
     /// <summary>
     /// Resets all dynamic drawable flags.
     /// </summary>
     /// <param name="model">Model containing flags.</param>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe void csmResetDrawableDynamicFlags(csmModel* model);
+    public extern static unsafe void csmResetDrawableDynamicFlags(IntPtr model);
 }

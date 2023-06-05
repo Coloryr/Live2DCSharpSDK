@@ -150,7 +150,7 @@ public class CubismUserModel : IDisposable
 
     public void Dispose()
     {
-        _moc?.DeleteModel(_model);
+        _moc?.Dispose();
 
         DeleteRenderer();
     }
