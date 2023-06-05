@@ -9,7 +9,6 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using static Live2DCSharpSDK.Framework.Physics.CubismPhysicsObj;
 
 namespace Live2DCSharpSDK.Framework.Physics;
 

@@ -24,23 +24,8 @@ public class CubismIdManager
     {
         list.ForEach((item) => 
         {
-            RegisterId(item);
+            GetId(item);
         });
-    }
-
-    /// <summary>
-    /// ID名をリストから登録する。
-    /// 未登録のID名の場合、登録も行う。
-    /// </summary>
-    /// <param name="id">ID名リスト</param>
-    public string RegisterId(string id)
-    {
-        if (_ids.Contains(id))
-            return id;
-
-        _ids.Add(id);
-
-        return id;
     }
 
     /// <summary>
@@ -48,13 +33,13 @@ public class CubismIdManager
     /// 未登録のID名の場合、登録も行う。
     /// </summary>
     /// <param name="item">ID名</param>
-    public string? GetId(string item)
+    public string GetId(string item)
     {
         if (_ids.Contains(item))
-        {
             return item;
-        }
 
-        return null;
+        _ids.Add(item);
+
+        return item;
     }
 }

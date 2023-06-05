@@ -208,7 +208,7 @@ public static class CubismFramework
 
     public static IntPtr Allocate(int size)
         => s_allocator.Allocate(size);
-    public static IntPtr AllocateAligned(int size, uint alignment)
+    public static IntPtr AllocateAligned(int size, int alignment)
         => s_allocator.AllocateAligned(size, alignment);
     public static void Deallocate(IntPtr address)
         => s_allocator.Deallocate(address);

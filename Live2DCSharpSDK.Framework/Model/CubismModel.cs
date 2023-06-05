@@ -2,6 +2,7 @@
 using Live2DCSharpSDK.Framework.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
@@ -71,23 +72,23 @@ public unsafe class CubismModel : IDisposable
     /// <summary>
     /// 存在していないパーツの不透明度のリスト
     /// </summary>
-    private Dictionary<int, float> _notExistPartOpacities;
+    private readonly Dictionary<int, float> _notExistPartOpacities = new();
     /// <summary>
     /// 存在していないパーツIDのリスト
     /// </summary>
-    private Dictionary<string, int> _notExistPartId;
+    private readonly Dictionary<string, int> _notExistPartId = new();
     /// <summary>
     /// 存在していないパラメータの値のリスト
     /// </summary>
-    private Dictionary<int, float> _notExistParameterValues;
+    private readonly Dictionary<int, float> _notExistParameterValues = new();
     /// <summary>
     /// 存在していないパラメータIDのリスト
     /// </summary>
-    private Dictionary<string, int> _notExistParameterId;
+    private readonly Dictionary<string, int> _notExistParameterId = new();
     /// <summary>
     /// 保存されたパラメータ
     /// </summary>
-    private List<float> _savedParameters;
+    private readonly List<float> _savedParameters = new();
     /// <summary>
     /// モデル
     /// </summary>
@@ -115,33 +116,33 @@ public unsafe class CubismModel : IDisposable
 
     public csmModel* GetModel() { return _model; }
 
-    private List<string> _parameterIds;
-    private List<string> _partIds;
-    private List<string> _drawableIds;
+    private readonly List<string> _parameterIds = new();
+    private readonly List<string> _partIds = new();
+    private readonly List<string> _drawableIds = new();
     /// <summary>
     /// Drawable 乗算色の配列
     /// </summary>
-    private List<DrawableColorData> _userScreenColors;
+    private readonly List<DrawableColorData> _userScreenColors = new();
     /// <summary>
     /// Drawable スクリーン色の配列
     /// </summary>
-    private List<DrawableColorData> _userMultiplyColors;
+    private readonly List<DrawableColorData> _userMultiplyColors = new();
     /// <summary>
     /// カリング設定の配列
     /// </summary>
-    private List<DrawableCullingData> _userCullings;
+    private readonly List<DrawableCullingData> _userCullings = new();
     /// <summary>
     /// Part 乗算色の配列
     /// </summary>
-    private List<PartColorData> _userPartScreenColors;
+    private readonly List<PartColorData> _userPartScreenColors = new();
     /// <summary>
     /// Part スクリーン色の配列
     /// </summary>
-    private List<PartColorData> _userPartMultiplyColors;
+    private readonly List<PartColorData> _userPartMultiplyColors = new();
     /// <summary>
     /// Partの子DrawableIndexの配列
     /// </summary>
-    private List<List<int>> _partChildDrawables;
+    private List<int>[] _partChildDrawables;
     /// <summary>
     /// 乗算色を全て上書きするか？
     /// </summary>
@@ -166,7 +167,7 @@ public unsafe class CubismModel : IDisposable
         CubismFramework.DeallocateAligned(new IntPtr(_model));
     }
 
-    public void Initialize()
+    public unsafe void Initialize()
     {
         _parameterValues = CubismCore.csmGetParameterValues(_model);
         _partOpacities = CubismCore.csmGetPartOpacities(_model);
@@ -179,7 +180,8 @@ public unsafe class CubismModel : IDisposable
 
             for (int i = 0; i < parameterCount; ++i)
             {
-                _parameterIds.Add(CubismFramework.GetIdManager().GetId(parameterIds[i]));
+                var str = new string((sbyte*)parameterIds[i]);
+                _parameterIds.Add(CubismFramework.GetIdManager().GetId(str));
             }
         }
 
@@ -187,9 +189,12 @@ public unsafe class CubismModel : IDisposable
         {
             var partIds = CubismCore.csmGetPartIds(_model);
 
+            _partChildDrawables = new List<csmParameterType>[partCount];
             for (int i = 0; i < partCount; ++i)
             {
-                _partIds.Add(CubismFramework.GetIdManager().GetId(partIds[i]));
+                var str = new string((sbyte*)partIds[i]);
+                _partIds.Add(CubismFramework.GetIdManager().GetId(str));
+                _partChildDrawables[i] = new();
             }
         }
 
@@ -263,7 +268,8 @@ public unsafe class CubismModel : IDisposable
 
                 for (int i = 0; i < drawableCount; ++i)
                 {
-                    _drawableIds.Add(CubismFramework.GetIdManager().GetId(drawableIds[i]));
+                    var str = new string((sbyte*)drawableIds[i]);
+                    _drawableIds.Add(CubismFramework.GetIdManager().GetId(str));
                     _userMultiplyColors.Add(userMultiplyColor);
                     _userScreenColors.Add(userScreenColor);
                     _userCullings.Add(userCulling);
@@ -485,7 +491,8 @@ public unsafe class CubismModel : IDisposable
     public string GetPartId(int partIndex)
     {
         var partIds = CubismCore.csmGetPartIds(_model);
-        return CubismFramework.GetIdManager().GetId(partIds[partIndex]);
+        var str = new string((sbyte*)partIds[partIndex]);
+        return CubismFramework.GetIdManager().GetId(str);
     }
 
     /// <summary>
@@ -829,7 +836,8 @@ public unsafe class CubismModel : IDisposable
     public string GetDrawableId(int drawableIndex)
     {
         var parameterIds = CubismCore.csmGetDrawableIds(_model);
-        return CubismFramework.GetIdManager().GetId(parameterIds[drawableIndex]);
+        var str = new string((sbyte*)parameterIds[drawableIndex]);
+        return CubismFramework.GetIdManager().GetId(str);
     }
 
     /// <summary>

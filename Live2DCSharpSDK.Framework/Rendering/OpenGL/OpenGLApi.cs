@@ -21,6 +21,7 @@ public abstract class OpenGLApi
     public uint GL_ONE = 1;
     public uint GL_TRIANGLES = 0x0004;
     public uint GL_ONE_MINUS_SRC_COLOR = 0x0301;
+    public uint GL_SRC_ALPHA = 0x0302;
     public uint GL_ONE_MINUS_SRC_ALPHA = 0x0303;
     public uint GL_DST_COLOR = 0x0306;
     public uint GL_CULL_FACE = 0x0B44;
@@ -122,4 +123,6 @@ public abstract class OpenGLApi
     public abstract void glFramebufferTexture2D(uint a, uint b, uint c, int buff, uint data);
     public abstract unsafe void glDeleteTextures(int size, int* data);
     public abstract unsafe void glDeleteFramebuffers(int size, int* data);
+    public abstract void glBlendFunc(uint a, uint b);
+    public abstract void GetWindowSize(out int w, out int h);
 }
