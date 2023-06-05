@@ -10,7 +10,7 @@ public record BreathParameterData
     /// <summary>
     /// 呼吸をひもづけるパラメータIDs
     /// </summary>
-    public string ParameterId { get; set; }
+    public required string ParameterId { get; set; }
     /// <summary>
     /// 呼吸を正弦波としたときの、波のオフセット
     /// </summary>
@@ -37,7 +37,7 @@ public class CubismBreath
     /// <summary>
     /// 呼吸にひもづいているパラメータのリスト
     /// </summary>
-    public List<BreathParameterData> Parameters { get; set; }
+    public required List<BreathParameterData> Parameters { get; init; }
     /// <summary>
     /// 積算時間[秒]
     /// </summary>

@@ -169,6 +169,17 @@ public static class CubismMath
         return -(b + MathF.Sqrt(b * b - 4.0f * a * c)) / (2.0f * a);
     }
 
+    /// <summary>
+    /// カルダノの公式によってベジェのt値に該当する３次方程式の解を求める。
+    /// 重解になったときには0.0～1.0の値になる解を返す。
+    /// 
+    /// a * x^3 + b * x^2 + c * x + d = 0
+    /// </summary>
+    /// <param name="a">三次項の係数値</param>
+    /// <param name="b">二次項の係数値</param>
+    /// <param name="c">一次項の係数値</param>
+    /// <param name="d">定数項の値</param>
+    /// <returns>0.0～1.0の間にある解</returns>
     public static float CardanoAlgorithmForBezier(float a, float b, float c, float d)
     {
         if (MathF.Abs(a) < Epsilon)

@@ -19,11 +19,11 @@ public class CubismTargetPoint
     /// <summary>
     /// 顔の向きX(-1.0 - 1.0)
     /// </summary>
-    private float _faceX;
+    public float FaceX { get; private set; }
     /// <summary>
     /// 顔の向きY(-1.0 - 1.0)
     /// </summary>
-    private float _faceY;
+    public float FaceY { get; private set; }
     /// <summary>
     /// 顔の向きの変化速度X
     /// </summary>
@@ -70,8 +70,8 @@ public class CubismTargetPoint
         float MaxA = deltaTimeWeight * MaxV / FrameToMaxSpeed;                           // 1frameあたりの加速度
 
         // 目指す向きは、(dx, dy)方向のベクトルとなる
-        float dx = _faceTargetX - _faceX;
-        float dy = _faceTargetY - _faceY;
+        float dx = _faceTargetX - FaceX;
+        float dy = _faceTargetY - FaceY;
 
         if (MathF.Abs(dx) <= Epsilon && MathF.Abs(dy) <= Epsilon)
         {
@@ -128,26 +128,8 @@ public class CubismTargetPoint
             }
         }
 
-        _faceX += _faceVX;
-        _faceY += _faceVY;
-    }
-
-    /// <summary>
-    /// X軸の顔の向きの値を取得する。
-    /// </summary>
-    /// <returns>X軸の顔の向きの値(-1.0 - 1.0)</returns>
-    public float GetX()
-    {
-        return _faceX;
-    }
-
-    /// <summary>
-    /// Y軸の顔の向きの値を取得する。
-    /// </summary>
-    /// <returns>Y軸の顔の向きの値(-1.0 - 1.0)</returns>
-    public float GetY()
-    {
-        return _faceY;
+        FaceX += _faceVX;
+        FaceY += _faceVY;
     }
 
     /// <summary>

@@ -120,8 +120,8 @@ public class LAppView : IDisposable
         _deviceToScreen.TranslateRelative(-width * 0.5f, -height * 0.5f);
 
         // 表示範囲の設定
-        _viewMatrix.SetMaxScale(LAppDefine.ViewMaxScale); // 限界拡大率
-        _viewMatrix.SetMinScale(LAppDefine.ViewMinScale); // 限界縮小率
+        _viewMatrix.MaxScale = LAppDefine.ViewMaxScale; // 限界拡大率
+        _viewMatrix.MinScale = LAppDefine.ViewMinScale; // 限界縮小率
 
         // 表示できる最大範囲
         _viewMatrix.SetMaxScreenRect(

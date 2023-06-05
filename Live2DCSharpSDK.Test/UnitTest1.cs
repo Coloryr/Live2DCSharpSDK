@@ -22,7 +22,7 @@ public class Tests
     [Test]
     public void GetVersion()
     {
-        var version = CubismCore.csmGetVersion();
+        var version = CubismCore.GetVersion();
 
         uint major = (version & 0xFF000000) >> 24;
         uint minor = (version & 0x00FF0000) >> 16;
@@ -31,7 +31,7 @@ public class Tests
 
         Console.WriteLine($"Live2D Cubism Core version: {major:##}.{minor:#}.{patch:####} ({vesionNumber})");
 
-        Console.WriteLine($"Moc Version:{CubismCore.csmGetLatestMocVersion()}");
+        Console.WriteLine($"Moc Version:{CubismCore.GetLatestMocVersion()}");
         Assert.Pass();
     }
 

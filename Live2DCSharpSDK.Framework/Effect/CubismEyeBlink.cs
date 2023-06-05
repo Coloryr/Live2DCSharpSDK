@@ -1,8 +1,11 @@
-﻿using Live2DCSharpSDK.Framework.Model;
+﻿//IDで指定された目のパラメータが、0のときに閉じるなら true 、1の時に閉じるなら false 。
+//#define CloseIfZero
+
+using Live2DCSharpSDK.Framework.Model;
 
 namespace Live2DCSharpSDK.Framework.Effect;
 
-enum EyeState : int
+public enum EyeState
 {
     /// <summary>
     /// 初期状態
@@ -31,11 +34,6 @@ enum EyeState : int
 /// </summary>
 public class CubismEyeBlink
 {
-    /// <summary>
-    /// IDで指定された目のパラメータが、0のときに閉じるなら true 、1の時に閉じるなら false 。
-    /// </summary>
-    public const bool CloseIfZero = true;
-
     /// <summary>
     /// 現在の状態
     /// </summary>
@@ -73,7 +71,7 @@ public class CubismEyeBlink
     /// </summary>
     private float _userTimeSeconds;
 
-    private Random random = new();
+    private readonly Random random = new();
 
     /// <summary>
     /// インスタンスを作成する。
@@ -87,14 +85,12 @@ public class CubismEyeBlink
         _closedSeconds = 0.05f;
         _openingSeconds = 0.15f;
 
-        if (modelSetting == null)
-        {
-            return;
-        }
-
         for (int i = 0; i < modelSetting.GetEyeBlinkParameterCount(); ++i)
         {
-            ParameterIds.Add(modelSetting.GetEyeBlinkParameterId(i));
+            var item = modelSetting.GetEyeBlinkParameterId(i);
+            if (item == null)
+                continue;
+            ParameterIds.Add(item);
         }
     }
 
@@ -189,11 +185,9 @@ public class CubismEyeBlink
 
                 break;
         }
-
-        if (!CloseIfZero)
-        {
-            parameterValue = -parameterValue;
-        }
+#if CloseIfZero
+        parameterValue = -parameterValue;
+#endif
 
         foreach (var item in ParameterIds)
         {

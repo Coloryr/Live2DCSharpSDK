@@ -304,7 +304,7 @@ public class CubismModelSettingJson
         return num;
     }
 
-    public string GetEyeBlinkParameterId(int index)
+    public string? GetEyeBlinkParameterId(int index)
     {
         if (!IsExistEyeBlinkParameters())
         {
