@@ -8,7 +8,7 @@ public abstract class OpenGLApi
 
     public const string CSM_FRAGMENT_SHADER_FP_PRECISION = CSM_FRAGMENT_SHADER_FP_PRECISION_HIGH;
 
-    public bool IsES2;
+    public abstract bool IsES2 { get; }
 
     public int GL_FALSE = 0;
     public int GL_ZERO = 0;
@@ -119,4 +119,5 @@ public abstract class OpenGLApi
     public abstract void GetWindowSize(out int w, out int h);
     public abstract void glGenerateMipmap(int a);
     public abstract void glClearDepth(float data);
+    public abstract int glGetError();
 }

@@ -5,7 +5,7 @@
 /// </summary>
 /// <param name="points">モーションカーブの制御点リスト</param>
 /// <param name="time">評価する時間[秒]</param>
-public delegate float csmMotionSegmentEvaluationFunction(List<CubismMotionPoint> points, int start, float time);
+public delegate float csmMotionSegmentEvaluationFunction(CubismMotionPoint[] points, int start, float time);
 
 /// <summary>
 /// モーションカーブの種類。
@@ -151,17 +151,17 @@ public record CubismMotionData
     /// <summary>
     /// カーブのリスト
     /// </summary>
-    public List<CubismMotionCurve> Curves;
+    public CubismMotionCurve[] Curves;
     /// <summary>
     /// セグメントのリスト
     /// </summary>
-    public List<CubismMotionSegment> Segments;
+    public CubismMotionSegment[] Segments;
     /// <summary>
     /// ポイントのリスト
     /// </summary>
-    public List<CubismMotionPoint> Points;
+    public CubismMotionPoint[] Points;
     /// <summary>
     /// イベントのリスト
     /// </summary>
-    public List<CubismMotionEvent> Events;
+    public CubismMotionEvent[] Events;
 }

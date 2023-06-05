@@ -171,11 +171,11 @@ public record CubismPhysicsSubRig
     /// <summary>
     /// 正規化された位置
     /// </summary>
-    public CubismPhysicsNormalization NormalizationPosition = new();
+    public CubismPhysicsNormalization NormalizationPosition;
     /// <summary>
     /// 正規化された角度
     /// </summary>
-    public CubismPhysicsNormalization NormalizationAngle = new();
+    public CubismPhysicsNormalization NormalizationAngle;
 }
 
 /// <summary>

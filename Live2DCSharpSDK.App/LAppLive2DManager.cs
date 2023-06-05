@@ -150,14 +150,8 @@ public class LAppLive2DManager : IDisposable
                 projection.MultiplyByMatrix(_viewMatrix);
             }
 
-            // モデル1体描画前コール
-            Lapp.GetView().PreModelDraw(model);
-
             model.Update();
             model.Draw(projection);///< 参照渡しなのでprojectionは変質する
-
-            // モデル1体描画後コール
-            Lapp.GetView().PostModelDraw(model);
         }
     }
 

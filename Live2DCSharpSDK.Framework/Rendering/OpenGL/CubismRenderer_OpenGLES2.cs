@@ -319,14 +319,6 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     }
 
     /// <summary>
-    /// 描画完了後の追加処理。
-    /// </summary>
-    internal void PostDraw()
-    {
-
-    }
-
-    /// <summary>
     /// モデル描画直前のOpenGLES2のステートを保持する
     /// </summary>
     protected override void SaveProfile()
@@ -507,7 +499,5 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
                 GetModel().GetDrawableInvertedMask(drawableIndex) // マスクを反転使用するか
             );
         }
-
-        PostDraw();
     }
 }

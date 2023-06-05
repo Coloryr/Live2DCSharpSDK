@@ -252,23 +252,39 @@ public class CubismPhysics
         for (int i = 0; i < _physicsRig.Settings.Length; ++i)
         {
             var set = obj.PhysicsSettings[i];
-            _physicsRig.Settings[i].NormalizationPosition.Minimum = set.Normalization.Position.Minimum;
-            _physicsRig.Settings[i].NormalizationPosition.Maximum = set.Normalization.Position.Maximum;
-            _physicsRig.Settings[i].NormalizationPosition.Default = set.Normalization.Position.Default;
+            _physicsRig.Settings[i] = new()
+            {
+                NormalizationPosition = new()
+                {
+                    Minimum = set.Normalization.Position.Minimum,
+                    Maximum = set.Normalization.Position.Maximum,
+                    Default = set.Normalization.Position.Default
+                },
+                NormalizationAngle = new()
+                {
+                    Minimum = set.Normalization.Angle.Minimum,
+                    Maximum = set.Normalization.Angle.Maximum,
+                    Default = set.Normalization.Angle.Default
+                },
+                // Input
+                InputCount = set.Input.Count,
+                BaseInputIndex = inputIndex
+            };
 
-            _physicsRig.Settings[i].NormalizationAngle.Minimum = set.Normalization.Angle.Minimum;
-            _physicsRig.Settings[i].NormalizationAngle.Maximum = set.Normalization.Angle.Maximum;
-            _physicsRig.Settings[i].NormalizationAngle.Default = set.Normalization.Angle.Default;
-
-            // Input
-            _physicsRig.Settings[i].InputCount = set.Input.Count;
-            _physicsRig.Settings[i].BaseInputIndex = inputIndex;
             for (int j = 0; j < _physicsRig.Settings[i].InputCount; ++j)
             {
                 var input = set.Input[j];
-                _physicsRig.Inputs[inputIndex + j].SourceParameterIndex = -1;
-                _physicsRig.Inputs[inputIndex + j].Weight = input.Weight;
-                _physicsRig.Inputs[inputIndex + j].Reflect = input.Reflect;
+                _physicsRig.Inputs[inputIndex + j] = new()
+                {
+                    SourceParameterIndex = -1,
+                    Weight = input.Weight,
+                    Reflect = input.Reflect,
+                    Source = new()
+                    {
+                        TargetType = CubismPhysicsTargetType.CubismPhysicsTargetType_Parameter,
+                        Id = input.Source.Id
+                    }
+                };
 
                 if (input.Type == PhysicsTypeTagX)
                 {
@@ -288,10 +304,6 @@ public class CubismPhysics
                     _physicsRig.Inputs[inputIndex + j].GetNormalizedParameterValue =
                         GetInputAngleFromNormalizedParameterValue;
                 }
-
-                _physicsRig.Inputs[inputIndex + j].Source.TargetType =
-                    CubismPhysicsTargetType.CubismPhysicsTargetType_Parameter;
-                _physicsRig.Inputs[inputIndex + j].Source.Id = input.Source.Id;
             }
             inputIndex += _physicsRig.Settings[i].InputCount;
 
@@ -299,29 +311,32 @@ public class CubismPhysics
             _physicsRig.Settings[i].OutputCount = set.Output.Count;
             _physicsRig.Settings[i].BaseOutputIndex = outputIndex;
 
-            PhysicsOutput currentRigOutput = new()
+            _currentRigOutputs.Add(new()
             {
                 outputs = new float[set.Output.Count]
-            };
-            _currentRigOutputs.Add(currentRigOutput);
+            });
 
-            PhysicsOutput previousRigOutput = new()
+            _previousRigOutputs.Add(new()
             {
                 outputs = new float[set.Output.Count]
-            };
-            _previousRigOutputs.Add(previousRigOutput);
+            });
 
             for (int j = 0; j < _physicsRig.Settings[i].OutputCount; ++j)
             {
                 var output = set.Output[j];
-                _physicsRig.Outputs[outputIndex + j].DestinationParameterIndex = -1;
-                _physicsRig.Outputs[outputIndex + j].VertexIndex = output.VertexIndex;
-                _physicsRig.Outputs[outputIndex + j].AngleScale = output.Scale;
-                _physicsRig.Outputs[outputIndex + j].Weight = output.Weight;
-                _physicsRig.Outputs[outputIndex + j].Destination.TargetType =
-                    CubismPhysicsTargetType.CubismPhysicsTargetType_Parameter;
-
-                _physicsRig.Outputs[outputIndex + j].Destination.Id = output.Destination.Id;
+                _physicsRig.Outputs[outputIndex + j] = new()
+                {
+                    DestinationParameterIndex = -1,
+                    VertexIndex = output.VertexIndex,
+                    AngleScale = output.Scale,
+                    Weight = output.Weight,
+                    Destination = new()
+                    {
+                        TargetType = CubismPhysicsTargetType.CubismPhysicsTargetType_Parameter,
+                        Id = output.Destination.Id
+                    },
+                    Reflect = output.Reflect
+                };
                 var key = output.Type;
                 if (key == PhysicsTypeTagX)
                 {
@@ -341,8 +356,6 @@ public class CubismPhysics
                     _physicsRig.Outputs[outputIndex + j].GetValue = GetOutputAngle;
                     _physicsRig.Outputs[outputIndex + j].GetScale = GetOutputScaleAngle;
                 }
-
-                _physicsRig.Outputs[outputIndex + j].Reflect = output.Reflect;
             }
             outputIndex += _physicsRig.Settings[i].OutputCount;
 
@@ -352,11 +365,14 @@ public class CubismPhysics
             for (int j = 0; j < _physicsRig.Settings[i].ParticleCount; ++j)
             {
                 var par = set.Vertices[j];
-                _physicsRig.Particles[particleIndex + j].Mobility = par.Mobility;
-                _physicsRig.Particles[particleIndex + j].Delay = par.Delay;
-                _physicsRig.Particles[particleIndex + j].Acceleration = par.Acceleration;
-                _physicsRig.Particles[particleIndex + j].Radius = par.Radius;
-                _physicsRig.Particles[particleIndex + j].Position = par.Position;
+                _physicsRig.Particles[particleIndex + j] = new()
+                {
+                    Mobility = par.Mobility,
+                    Delay = par.Delay,
+                    Acceleration = par.Acceleration,
+                    Radius = par.Radius,
+                    Position = par.Position
+                };
             }
 
             particleIndex += _physicsRig.Settings[i].ParticleCount;

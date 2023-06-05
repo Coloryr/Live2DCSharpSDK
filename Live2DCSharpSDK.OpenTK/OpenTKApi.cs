@@ -1,12 +1,17 @@
-﻿using Live2DCSharpSDK.Framework.Rendering.OpenGL;
+﻿using Live2DCSharpSDK.Framework.Effect;
+using Live2DCSharpSDK.Framework.Rendering.OpenGL;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Desktop;
+using System.Runtime.InteropServices;
 
 namespace Live2DCSharpSDK.OpenTK;
 
 public class OpenTKApi : OpenGLApi
 {
     private NativeWindow Window;
+
+    public override bool IsES2 => false;
+
     public OpenTKApi(NativeWindow window)
     {
         Window = window;
@@ -40,7 +45,7 @@ public class OpenTKApi : OpenGLApi
 
     public override void glBindTexture(int bit, int index)
     {
-        GL.BindBuffer((BufferTarget)bit, index);
+        GL.BindTexture((TextureTarget)bit, index);
     }
 
     public override void glBindVertexArrayOES(int data)
@@ -278,5 +283,10 @@ public class OpenTKApi : OpenGLApi
     public override void glViewport(int x, int y, int w, int h)
     {
         GL.Viewport(x, y, w, h);
+    }
+
+    public override int glGetError()
+    {
+        return (int)GL.GetError();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace Live2DCSharpSDK.Framework.Effect;
 
@@ -24,18 +25,6 @@ public record PartData
     ///  連動するパラメータ
     /// </summary>
     public readonly List<PartData> Link = new();
-
-    public PartData()
-    {
-
-    }
-
-    public PartData(PartData data)
-    {
-        PartId = data.PartId;
-
-        Link.AddRange(data.Link);
-    }
 
     /// <summary>
     /// 初期化する。
@@ -67,11 +56,11 @@ public class CubismPose
     /// <summary>
     /// パーツグループ
     /// </summary>
-    private List<PartData> _partGroups;
+    private readonly List<PartData> _partGroups = new();
     /// <summary>
     /// それぞれのパーツグループの個数
     /// </summary>
-    private List<int> _partGroupCounts;
+    private readonly List<int> _partGroupCounts = new();
     /// <summary>
     /// フェード時間[秒]
     /// </summary>
@@ -92,7 +81,7 @@ public class CubismPose
         // フェード時間の指定
         if (json[FadeIn] != null)
         {
-            _fadeTimeSeconds = json.ContainsKey(FadeIn) ? (float)json[FadeIn] : DefaultFadeInSeconds;
+            _fadeTimeSeconds = json.ContainsKey(FadeIn) ? (float)json[FadeIn]! : DefaultFadeInSeconds;
 
             if (_fadeTimeSeconds < 0.0f)
             {
@@ -101,7 +90,7 @@ public class CubismPose
         }
 
         // パーツグループ
-        var poseListInfo = json[Groups] as JArray;
+        var poseListInfo = (json[Groups] as JArray)!;
 
         foreach (var item in poseListInfo)
         {
@@ -110,22 +99,22 @@ public class CubismPose
 
             for (int groupIndex = 0; groupIndex < idCount; ++groupIndex)
             {
-                var partInfo = item[groupIndex];
-                PartData partData = new();
-                string parameterId = CubismFramework.GetIdManager().GetId(partInfo[Id].ToString());
-
-                partData.PartId = parameterId;
+                var partInfo = item[groupIndex]!;
+                PartData partData = new()
+                {
+                    PartId = CubismFramework.GetIdManager().GetId(partInfo[Id]!.ToString())
+                };
 
                 // リンクするパーツの設定
                 if (partInfo[Link] != null)
                 {
-                    var linkListInfo = partInfo[Link];
+                    var linkListInfo = partInfo[Link]!;
                     int linkCount = linkListInfo.Count();
 
                     for (int linkIndex = 0; linkIndex < linkCount; ++linkIndex)
                     {
                         PartData linkPart = new();
-                        string linkId = CubismFramework.GetIdManager().GetId(linkListInfo[linkIndex].ToString());
+                        string linkId = CubismFramework.GetIdManager().GetId(linkListInfo[linkIndex]!.ToString());
 
                         linkPart.PartId = linkId;
 

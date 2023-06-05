@@ -42,7 +42,7 @@ public class LAppTextureManager
     /// <param name="fileName">読み込む画像ファイルパス名</param>
     /// <returns>画像情報。読み込み失敗時はNULLを返す</returns>
     public unsafe TextureInfo CreateTextureFromPngFile(string fileName)
-    {
+    { 
         //search loaded texture already.
         var item = _textures.FirstOrDefault(a => a.fileName == fileName);
         if (item != null)

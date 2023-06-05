@@ -43,7 +43,7 @@ public class CubismEyeBlink
     /// <summary>
     /// 操作対象のパラメータのIDのリスト
     /// </summary>
-    private List<string> ParameterIds { get; set; }
+    private readonly List<string> ParameterIds = new();
     /// <summary>
     /// 次のまばたきの時刻[秒]
     /// </summary>
