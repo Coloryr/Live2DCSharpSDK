@@ -132,6 +132,8 @@ public class CubismUserModel : IDisposable
     /// </summary>
     public CubismUserModel()
     {
+        _lipSync = true;
+
         _opacity = 1.0f;
 
         // モーションマネージャーを作成

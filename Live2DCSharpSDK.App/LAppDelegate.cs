@@ -114,8 +114,6 @@ public class LAppDelegate : IDisposable
         _live2dManager = new LAppLive2DManager(this);
 
         LAppPal.UpdateTime(0);
-
-        _view.InitializeSprite();
     }
 
     /// <summary>
@@ -152,6 +150,8 @@ public class LAppDelegate : IDisposable
     /// </summary>
     public void Run(float tick)
     {
+        Resize();
+
         // 時間更新
         LAppPal.UpdateTime(tick);
 

@@ -44,7 +44,13 @@ public record CubismTextureColor
     /// </summary>
     public float A;
 
-    public CubismTextureColor() { }
+    public CubismTextureColor() 
+    { 
+        R = 1.0f; 
+        G = 1.0f; 
+        B = 1.0f; 
+        A = 1.0f; 
+    }
 
     public CubismTextureColor(float r, float g, float b, float a)
     {
@@ -69,7 +75,7 @@ public abstract class CubismRenderer : IDisposable
     /// <summary>
     /// モデル自体のカラー(RGBA)
     /// </summary>
-    private CubismTextureColor _modelColor;
+    private readonly CubismTextureColor _modelColor = new();
     /// <summary>
     /// カリングが有効ならtrue
     /// </summary>

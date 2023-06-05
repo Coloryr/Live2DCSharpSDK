@@ -442,6 +442,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
             // 頂点配列の設定
             GL.glEnableVertexAttribArray(shaderSet.AttributePositionLocation);
             GL.glVertexAttribPointer(shaderSet.AttributePositionLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 2, vertexArray);
+
             // テクスチャ頂点の設定
             GL.glEnableVertexAttribArray(shaderSet.AttributeTexCoordLocation);
             GL.glVertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 2, uvArray);
@@ -543,7 +544,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
             GL.glUniform4f(shaderSet.UniformScreenColorLocation, screenColor.R, screenColor.G, screenColor.B, screenColor.A);
         }
 
-        GL.glBlendFuncSeparate((int)SRC_COLOR, (int)DST_COLOR, (int)SRC_ALPHA, (int)DST_ALPHA);
+        GL.glBlendFuncSeparate(SRC_COLOR, DST_COLOR, SRC_ALPHA, DST_ALPHA);
     }
 
     /// <summary>

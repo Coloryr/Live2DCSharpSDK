@@ -308,15 +308,15 @@ public class LAppModel : CubismUserModel
 
         //ex) idle_0
         string name = $"{group}_{no}";
-        CubismMotion motion = _motions[name] as CubismMotion;
-        bool autoDelete = false;
 
-        if (motion == null)
+        bool autoDelete = false;
+        CubismMotion motion;
+        if (!_motions.ContainsKey(name))
         {
             string path = fileName;
             path = _modelHomeDir + path;
 
-            motion = LoadMotion(File.ReadAllText(path), null, onFinishedMotionHandler) as CubismMotion;
+            motion = (LoadMotion(File.ReadAllText(path), null, onFinishedMotionHandler) as CubismMotion)!;
             float fadeTime = _modelSetting.GetMotionFadeInTimeValue(group, no);
             if (fadeTime >= 0.0f)
             {
@@ -333,6 +333,7 @@ public class LAppModel : CubismUserModel
         }
         else
         {
+            motion = (_motions[name] as CubismMotion)!;
             motion.SetFinishedMotionHandler(onFinishedMotionHandler);
         }
 
@@ -713,14 +714,14 @@ public class LAppModel : CubismUserModel
         for (int modelTextureNumber = 0; modelTextureNumber < _modelSetting.GetTextureCount(); modelTextureNumber++)
         {
             // テクスチャ名が空文字だった場合はロード・バインド処理をスキップ
-            if (!string.IsNullOrWhiteSpace(_modelSetting.GetTextureFileName(modelTextureNumber)))
+            if (string.IsNullOrWhiteSpace(_modelSetting.GetTextureFileName(modelTextureNumber)))
             {
                 continue;
             }
 
             //OpenGLのテクスチャユニットにテクスチャをロードする
             var texturePath = _modelSetting.GetTextureFileName(modelTextureNumber);
-            texturePath = _modelHomeDir + texturePath;
+            texturePath = Path.GetFullPath(_modelHomeDir + texturePath);
 
             TextureInfo texture = Lapp.GetTextureManager().CreateTextureFromPngFile(texturePath);
             int glTextueNumber = texture.id;

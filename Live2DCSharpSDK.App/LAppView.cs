@@ -50,11 +50,6 @@ public class LAppView : IDisposable
     /// </summary>
     private float[] _clearColor = new float[4];
 
-    /// <summary>
-    /// モードによっては_renderBufferのテクスチャを描画
-    /// </summary>
-    private LAppSprite _renderSprite;
-
     private LAppDelegate Lapp;
 
     /// <summary>
@@ -148,38 +143,6 @@ public class LAppView : IDisposable
 
         // Cubism更新・描画
         Live2DManager.OnUpdate();
-
-        // 各モデルが持つ描画ターゲットをテクスチャとする場合
-        if (_renderTarget == SelectTarget.SelectTarget_ModelFrameBuffer && _renderSprite != null)
-        {
-            float[] uvVertex = new[]
-            {
-            1.0f, 1.0f,
-            0.0f, 1.0f,
-            0.0f, 0.0f,
-            1.0f, 0.0f,
-        };
-
-            for (int i = 0; i < Live2DManager.GetModelNum(); i++)
-            {
-                LAppModel model = Live2DManager.GetModel(i);
-                float alpha = i < 1 ? 1.0f : model.GetOpacity(); // 片方のみ不透明度を取得できるようにする
-                //_renderSprite.SetColor(1.0f, 1.0f, 1.0f, alpha);
-
-                if (model != null)
-                {
-                    //_renderSprite.RenderImmidiate(model.GetRenderBuffer().GetColorBuffer(), uvVertex);
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 画像の初期化を行う。
-    /// </summary>
-    public void InitializeSprite()
-    {
-
     }
 
     /// <summary>
@@ -266,70 +229,6 @@ public class LAppView : IDisposable
     public float TransformScreenY(float deviceY)
     {
         return _deviceToScreen.TransformY(deviceY);
-    }
-
-    /// <summary>
-    /// モデル1体を描画する直前にコールされる
-    /// </summary>
-    public void PreModelDraw(LAppModel refModel)
-    {
-        // 別のレンダリングターゲットへ向けて描画する場合の使用するフレームバッファ
-        CubismOffscreenFrame_OpenGLES2 useTarget;
-
-        if (_renderTarget != SelectTarget.SelectTarget_None)
-        {// 別のレンダリングターゲットへ向けて描画する場合
-
-            // 使用するターゲット
-            useTarget = (_renderTarget == SelectTarget.SelectTarget_ViewFrameBuffer) ? _renderBuffer : refModel.GetRenderBuffer();
-
-            if (!useTarget.IsValid())
-            {// 描画ターゲット内部未作成の場合はここで作成
-                Lapp.GL.GetWindowSize(out int width, out int height);
-                if (width != 0 && height != 0)
-                {
-                    // モデル描画キャンバス
-                    useTarget.CreateOffscreenFrame((int)(width), (int)(height));
-                }
-            }
-
-            // レンダリング開始
-            useTarget.BeginDraw();
-            useTarget.Clear(_clearColor[0], _clearColor[1], _clearColor[2], _clearColor[3]); // 背景クリアカラー
-        }
-    }
-
-    /// <summary>
-    /// モデル1体を描画した直後にコールされる
-    /// </summary>
-    public void PostModelDraw(LAppModel refModel)
-    {
-        // 別のレンダリングターゲットへ向けて描画する場合の使用するフレームバッファ
-        CubismOffscreenFrame_OpenGLES2 useTarget;
-
-        if (_renderTarget != SelectTarget.SelectTarget_None)
-        {// 別のレンダリングターゲットへ向けて描画する場合
-
-            // 使用するターゲット
-            useTarget = (_renderTarget == SelectTarget.SelectTarget_ViewFrameBuffer) ? _renderBuffer : refModel.GetRenderBuffer();
-
-            // レンダリング終了
-            useTarget.EndDraw();
-
-            // LAppViewの持つフレームバッファを使うなら、スプライトへの描画はここ
-            if (_renderTarget == SelectTarget.SelectTarget_ViewFrameBuffer && _renderSprite != null)
-            {
-                float[] uvVertex = new[]
-                {
-                1.0f, 1.0f,
-                0.0f, 1.0f,
-                0.0f, 0.0f,
-                1.0f, 0.0f,
-            };
-
-                //_renderSprite.SetColor(1.0f, 1.0f, 1.0f, GetSpriteAlpha(0));
-                //_renderSprite.RenderImmidiate(useTarget.GetColorBuffer(), uvVertex);
-            }
-        }
     }
 
     /// <summary>

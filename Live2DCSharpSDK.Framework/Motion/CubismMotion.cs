@@ -156,7 +156,7 @@ public unsafe class CubismMotion : ACubismMotion
         };
     }
 
-    private float LinearEvaluate(List<CubismMotionPoint> points, int start, float time)
+    private float LinearEvaluate(CubismMotionPoint[] points, int start, float time)
     {
         float t = (time - points[start].Time) / (points[start + 1].Time - points[start].Time);
 
@@ -168,7 +168,7 @@ public unsafe class CubismMotion : ACubismMotion
         return points[start].Value + ((points[start + 1].Value - points[start].Value) * t);
     }
 
-    private float BezierEvaluate(List<CubismMotionPoint> points, int start, float time)
+    private float BezierEvaluate(CubismMotionPoint[] points, int start, float time)
     {
         float t = (time - points[start].Time) / (points[start + 3].Time - points[start].Time);
 
@@ -271,7 +271,7 @@ public unsafe class CubismMotion : ACubismMotion
         return LerpPoints(p012, p123, t).Value;
     }
 
-    private float BezierEvaluateCardanoInterpretation(List<CubismMotionPoint> points, int start, float time)
+    private float BezierEvaluateCardanoInterpretation(CubismMotionPoint[] points, int start, float time)
     {
         float x = time;
         float x1 = points[0].Time;
@@ -296,12 +296,12 @@ public unsafe class CubismMotion : ACubismMotion
         return LerpPoints(p012, p123, t).Value;
     }
 
-    private float SteppedEvaluate(List<CubismMotionPoint> points, int start, float time)
+    private float SteppedEvaluate(CubismMotionPoint[] points, int start, float time)
     {
         return points[start].Value;
     }
 
-    private float InverseSteppedEvaluate(List<CubismMotionPoint> points, int start, float time)
+    private float InverseSteppedEvaluate(CubismMotionPoint[] points, int start, float time)
     {
         return points[start + 1].Value;
     }
@@ -362,7 +362,11 @@ public unsafe class CubismMotion : ACubismMotion
             Loop = obj.Meta.Loop,
             CurveCount = obj.Meta.CurveCount,
             Fps = obj.Meta.Fps,
-            EventCount = obj.Meta.UserDataCount
+            EventCount = obj.Meta.UserDataCount,
+            Curves = new CubismMotionCurve[obj.Meta.CurveCount],
+            Segments = new CubismMotionSegment[obj.Meta.TotalSegmentCount],
+            Points = new CubismMotionPoint[obj.Meta.TotalPointCount],
+            Events = new CubismMotionEvent[obj.Meta.UserDataCount]
         };
 
         bool areBeziersRestructed = obj.Meta.AreBeziersRestricted;
@@ -393,61 +397,59 @@ public unsafe class CubismMotion : ACubismMotion
         {
             var item = obj.Curves[curveCount];
             string key = item.Target;
-            if (key == TargetNameModel)
+            _motionData.Curves[curveCount] = new()
             {
-                _motionData.Curves[curveCount].Type = CubismMotionCurveTarget.CubismMotionCurveTarget_Model;
-            }
-            else if (key == TargetNameParameter)
-            {
-                _motionData.Curves[curveCount].Type = CubismMotionCurveTarget.CubismMotionCurveTarget_Parameter;
-            }
-            else if (key == TargetNamePartOpacity)
-            {
-                _motionData.Curves[curveCount].Type = CubismMotionCurveTarget.CubismMotionCurveTarget_PartOpacity;
-            }
-            else
-            {
-                CubismLog.CubismLogWarning("Warning : Unable to get segment type from Curve! The number of \"CurveCount\" may be incorrect!");
-            }
-
-            _motionData.Curves[curveCount].Id = CubismFramework.GetIdManager().GetId(obj.Curves[curveCount].Id);
-
-            _motionData.Curves[curveCount].BaseSegmentIndex = totalSegmentCount;
-
-            _motionData.Curves[curveCount].FadeInTime = item.FadeInTime != null
-                        ? (float)item.FadeInTime : -1.0f;
-            _motionData.Curves[curveCount].FadeOutTime = item.FadeOutTime != null
-                        ? (float)item.FadeOutTime : -1.0f;
+                Id = CubismFramework.GetIdManager().GetId(obj.Curves[curveCount].Id),
+                BaseSegmentIndex = totalSegmentCount,
+                FadeInTime = item.FadeInTime != null ? (float)item.FadeInTime : -1.0f,
+                FadeOutTime = item.FadeOutTime != null ? (float)item.FadeOutTime : -1.0f,
+                Type = key switch 
+                {
+                    TargetNameModel => CubismMotionCurveTarget.CubismMotionCurveTarget_Model,
+                    TargetNameParameter => CubismMotionCurveTarget.CubismMotionCurveTarget_Parameter,
+                    TargetNamePartOpacity => CubismMotionCurveTarget.CubismMotionCurveTarget_PartOpacity,
+                     _ => throw new Exception("Warning : Unable to get segment type from Curve! The number of \"CurveCount\" may be incorrect!")
+                }
+            };
 
             // Segments
             for (int segmentPosition = 0; segmentPosition < item.Segments.Count;)
             {
-                var item1 = item.Segments[segmentPosition];
                 if (segmentPosition == 0)
                 {
-                    _motionData.Segments[totalSegmentCount].BasePointIndex = totalPointCount;
-
-                    _motionData.Points[totalPointCount].Time = item.Segments[segmentPosition];
-                    _motionData.Points[totalPointCount].Value = item.Segments[segmentPosition + 1];
+                    _motionData.Segments[totalSegmentCount] = new()
+                    {
+                        BasePointIndex = totalPointCount
+                    };
+                    _motionData.Points[totalPointCount] = new()
+                    {
+                        Time = item.Segments[segmentPosition],
+                        Value = item.Segments[segmentPosition + 1]
+                    };
 
                     totalPointCount += 1;
                     segmentPosition += 2;
                 }
                 else
                 {
-                    _motionData.Segments[totalSegmentCount].BasePointIndex = totalPointCount - 1;
+                    _motionData.Segments[totalSegmentCount] = new()
+                    {
+                        BasePointIndex = totalPointCount - 1
+                    };
                 }
 
                 switch ((CubismMotionSegmentType)(int)item.Segments[segmentPosition])
                 {
                     case CubismMotionSegmentType.CubismMotionSegmentType_Linear:
                         {
-                            _motionData.Segments[totalSegmentCount].SegmentType =
-                                CubismMotionSegmentType.CubismMotionSegmentType_Linear;
+                            _motionData.Segments[totalSegmentCount].SegmentType = CubismMotionSegmentType.CubismMotionSegmentType_Linear;
                             _motionData.Segments[totalSegmentCount].Evaluate = LinearEvaluate;
 
-                            _motionData.Points[totalPointCount].Time = item.Segments[segmentPosition + 1];
-                            _motionData.Points[totalPointCount].Value = item.Segments[segmentPosition + 2];
+                            _motionData.Points[totalPointCount] = new()
+                            {
+                                Time = item.Segments[segmentPosition + 1],
+                                Value = item.Segments[segmentPosition + 2]
+                            };
 
                             totalPointCount += 1;
                             segmentPosition += 3;
@@ -456,8 +458,7 @@ public unsafe class CubismMotion : ACubismMotion
                         }
                     case CubismMotionSegmentType.CubismMotionSegmentType_Bezier:
                         {
-                            _motionData.Segments[totalSegmentCount].SegmentType =
-                                CubismMotionSegmentType.CubismMotionSegmentType_Bezier;
+                            _motionData.Segments[totalSegmentCount].SegmentType = CubismMotionSegmentType.CubismMotionSegmentType_Bezier;
                             if (areBeziersRestructed || UseOldBeziersCurveMotion)
                             {
                                 _motionData.Segments[totalSegmentCount].Evaluate = BezierEvaluate;
@@ -467,14 +468,23 @@ public unsafe class CubismMotion : ACubismMotion
                                 _motionData.Segments[totalSegmentCount].Evaluate = BezierEvaluateCardanoInterpretation;
                             }
 
-                            _motionData.Points[totalPointCount].Time = item.Segments[segmentPosition + 1];
-                            _motionData.Points[totalPointCount].Value = item.Segments[segmentPosition + 2];
+                            _motionData.Points[totalPointCount] = new()
+                            {
+                                Time = item.Segments[segmentPosition + 1],
+                                Value = item.Segments[segmentPosition + 2]
+                            };
 
-                            _motionData.Points[totalPointCount + 1].Time = item.Segments[segmentPosition + 3];
-                            _motionData.Points[totalPointCount + 1].Value = item.Segments[segmentPosition + 4];
+                            _motionData.Points[totalPointCount + 1] = new()
+                            {
+                                Time = item.Segments[segmentPosition + 3],
+                                Value = item.Segments[segmentPosition + 4]
+                            };
 
-                            _motionData.Points[totalPointCount + 2].Time = item.Segments[segmentPosition + 5];
-                            _motionData.Points[totalPointCount + 2].Value = item.Segments[segmentPosition + 6];
+                            _motionData.Points[totalPointCount + 2] = new()
+                            {
+                                Time = item.Segments[segmentPosition + 5],
+                                Value = item.Segments[segmentPosition + 6]
+                            };
 
                             totalPointCount += 3;
                             segmentPosition += 7;
@@ -483,12 +493,14 @@ public unsafe class CubismMotion : ACubismMotion
                         }
                     case CubismMotionSegmentType.CubismMotionSegmentType_Stepped:
                         {
-                            _motionData.Segments[totalSegmentCount].SegmentType =
-                                CubismMotionSegmentType.CubismMotionSegmentType_Stepped;
+                            _motionData.Segments[totalSegmentCount].SegmentType = CubismMotionSegmentType.CubismMotionSegmentType_Stepped;
                             _motionData.Segments[totalSegmentCount].Evaluate = SteppedEvaluate;
 
-                            _motionData.Points[totalPointCount].Time = item.Segments[segmentPosition + 1];
-                            _motionData.Points[totalPointCount].Value = item.Segments[segmentPosition + 2];
+                            _motionData.Points[totalPointCount] = new()
+                            {
+                                Time = item.Segments[segmentPosition + 1],
+                                Value = item.Segments[segmentPosition + 2]
+                            };
 
                             totalPointCount += 1;
                             segmentPosition += 3;
@@ -497,12 +509,14 @@ public unsafe class CubismMotion : ACubismMotion
                         }
                     case CubismMotionSegmentType.CubismMotionSegmentType_InverseStepped:
                         {
-                            _motionData.Segments[totalSegmentCount].SegmentType =
-                                CubismMotionSegmentType.CubismMotionSegmentType_InverseStepped;
+                            _motionData.Segments[totalSegmentCount].SegmentType = CubismMotionSegmentType.CubismMotionSegmentType_InverseStepped;
                             _motionData.Segments[totalSegmentCount].Evaluate = InverseSteppedEvaluate;
 
-                            _motionData.Points[totalPointCount].Time = item.Segments[segmentPosition + 1];
-                            _motionData.Points[totalPointCount].Value = item.Segments[segmentPosition + 2];
+                            _motionData.Points[totalPointCount] = new()
+                            {
+                                Time = item.Segments[segmentPosition + 1],
+                                Value = item.Segments[segmentPosition + 2]
+                            };
 
                             totalPointCount += 1;
                             segmentPosition += 3;
@@ -520,11 +534,13 @@ public unsafe class CubismMotion : ACubismMotion
             }
         }
 
-
         for (int userdatacount = 0; userdatacount < obj.Meta.UserDataCount; ++userdatacount)
         {
-            _motionData.Events[userdatacount].FireTime = obj.UserData[userdatacount].Time;
-            _motionData.Events[userdatacount].Value = obj.UserData[userdatacount].Value;
+            _motionData.Events[userdatacount] = new()
+            {
+                FireTime = obj.UserData[userdatacount].Time,
+                Value = obj.UserData[userdatacount].Value
+            };
         }
 
         _sourceFrameRate = _motionData.Fps;
@@ -787,7 +803,7 @@ public unsafe class CubismMotion : ACubismMotion
             {
                 if (this._onFinishedMotion != null)
                 {
-                    this._onFinishedMotion(this);
+                    _onFinishedMotion(this);
                 }
 
                 motionQueueEntry.IsFinished(true);
