@@ -1,23 +1,18 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Motion;
+
+/// <summary>
+/// モーション再生終了コールバック関数定義
+/// </summary>
+public delegate void FinishedMotionCallback(ACubismMotion self);
 
 /// <summary>
 /// モーションの抽象基底クラス。MotionQueueManagerによってモーションの再生を管理する。
 /// </summary>
 public abstract class ACubismMotion
 {
-    /// <summary>
-    /// モーション再生終了コールバック関数定義
-    /// </summary>
-    public delegate void FinishedMotionCallback(ACubismMotion self);
-
     /// <summary>
     /// フェードインにかかる時間[秒]
     /// </summary>
@@ -33,7 +28,7 @@ public abstract class ACubismMotion
     /// <summary>
     /// モーション再生の開始時刻[秒]
     /// </summary>
-    protected float _offsetSeconds;        
+    protected float _offsetSeconds;
 
     protected readonly List<string> _firedEventValues = new();
 

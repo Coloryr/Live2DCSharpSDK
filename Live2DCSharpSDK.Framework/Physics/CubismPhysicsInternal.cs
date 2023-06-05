@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.Intrinsics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 
 namespace Live2DCSharpSDK.Framework.Physics;
 
@@ -27,7 +21,7 @@ public enum CubismPhysicsTargetType
     /// <summary>
     /// パラメータに対して適用
     /// </summary>
-    CubismPhysicsTargetType_Parameter,         
+    CubismPhysicsTargetType_Parameter,
 }
 
 /// <summary>
@@ -46,7 +40,7 @@ public enum CubismPhysicsSource
     /// <summary>
     /// 角度から
     /// </summary>
-    CubismPhysicsSource_Angle,      
+    CubismPhysicsSource_Angle,
 }
 
 /// <summary>
@@ -61,7 +55,7 @@ public record PhysicsJsonEffectiveForces
     /// <summary>
     /// 風
     /// </summary>
-    public Vector2 Wind;            
+    public Vector2 Wind;
 };
 
 /// <summary>
@@ -76,7 +70,7 @@ public record CubismPhysicsParameter
     /// <summary>
     /// 適用先の種類
     /// </summary>
-    public CubismPhysicsTargetType TargetType;    
+    public CubismPhysicsTargetType TargetType;
 };
 
 /// <summary>
@@ -95,7 +89,7 @@ public record CubismPhysicsNormalization
     /// <summary>
     /// デフォルト値
     /// </summary>
-    public float Default;         
+    public float Default;
 }
 
 /// <summary>
@@ -142,7 +136,7 @@ public record CubismPhysicsParticle
     /// <summary>
     /// 現在の速度
     /// </summary>
-    public Vector2 Velocity;                 
+    public Vector2 Velocity;
 }
 
 /// <summary>
@@ -177,11 +171,11 @@ public record CubismPhysicsSubRig
     /// <summary>
     /// 正規化された位置
     /// </summary>
-    public CubismPhysicsNormalization NormalizationPosition;
+    public CubismPhysicsNormalization NormalizationPosition = new();
     /// <summary>
     /// 正規化された角度
     /// </summary>
-    public CubismPhysicsNormalization NormalizationAngle;           
+    public CubismPhysicsNormalization NormalizationAngle = new();
 }
 
 /// <summary>
@@ -264,7 +258,7 @@ public record CubismPhysicsInput
     /// <summary>
     /// 正規化されたパラメータ値の取得関数
     /// </summary>
-    public NormalizedPhysicsParameterValueGetter GetNormalizedParameterValue;          
+    public NormalizedPhysicsParameterValueGetter GetNormalizedParameterValue;
 }
 
 /// <summary>
@@ -319,7 +313,7 @@ public record CubismPhysicsOutput
     /// <summary>
     /// 物理演算のスケール値の取得関数
     /// </summary>
-    public PhysicsScaleGetter GetScale;                
+    public PhysicsScaleGetter GetScale;
 }
 
 /// <summary>
@@ -358,5 +352,5 @@ public record CubismPhysicsRig
     /// <summary>
     /// 物理演算動作FPS
     /// </summary>
-    public float Fps;                                
+    public float Fps;
 }

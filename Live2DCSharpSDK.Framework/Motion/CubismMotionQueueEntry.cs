@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Live2DCSharpSDK.Framework.Motion;
+﻿namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
 /// CubismMotionQueueManagerで再生している各モーションの管理クラス。
@@ -55,7 +49,7 @@ public class CubismMotionQueueEntry
     /// <summary>
     /// 最終のMotion側のチェックした時間
     /// </summary>
-    private float _lastEventCheckSeconds;       
+    private float _lastEventCheckSeconds;
     private float _fadeOutSeconds;
     private bool _IsTriggeredFadeOut;
 

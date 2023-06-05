@@ -1,9 +1,4 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Motion;
 
@@ -19,7 +14,7 @@ public class CubismMotionManager : CubismMotionQueueManager
     /// <summary>
     /// 再生予定のモーションの優先度。再生中は0になる。モーションファイルを別スレッドで読み込むときの機能。
     /// </summary>
-    private int _reservePriority;                 
+    private int _reservePriority;
 
     /// <summary>
     /// 再生中のモーションの優先度の取得する。

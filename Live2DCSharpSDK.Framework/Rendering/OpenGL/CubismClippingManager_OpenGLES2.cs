@@ -1,13 +1,7 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Type;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
@@ -246,7 +240,7 @@ public class CubismClippingManager_OpenGLES2
             if (!renderer.IsUsingHighPrecisionMask())
             {
                 // 生成したFrameBufferと同じサイズでビューポートを設定
-                GL.glViewport(0, 0, _clippingMaskBufferSize.X, _clippingMaskBufferSize.Y);
+                GL.glViewport(0, 0, (int)_clippingMaskBufferSize.X, (int)_clippingMaskBufferSize.Y);
 
                 // 後の計算のためにインデックスの最初をセット
                 _currentOffscreenFrame = renderer.GetMaskBuffer(0);

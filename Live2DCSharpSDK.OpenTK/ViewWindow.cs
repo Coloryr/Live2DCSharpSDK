@@ -1,18 +1,24 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using Live2DCSharpSDK.App;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.OpenTK;
 
 public class ViewWindow : GameWindow
 {
-    public ViewWindow(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { Size = (width, height), Title = title }) { }
+    private LAppDelegate lapp;
+    public ViewWindow(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { Size = (width, height), Title = title })
+    {
+        lapp = new(new OpenTKApi(this));
+        var res = lapp.Initialize();
+        if (!res)
+        {
+            throw new Exception();
+        }
+        lapp.GetLive2D().LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+    }
 
     protected override void OnLoad()
     {
@@ -27,9 +33,7 @@ public class ViewWindow : GameWindow
     {
         base.OnRenderFrame(e);
 
-        GL.Clear(ClearBufferMask.ColorBufferBit);
-
-        //Code goes here.
+        lapp.Run((float)RenderTime);
 
         SwapBuffers();
     }
@@ -37,6 +41,8 @@ public class ViewWindow : GameWindow
     protected override void OnResize(ResizeEventArgs e)
     {
         base.OnResize(e);
+
+        lapp.Resize();
 
         GL.Viewport(0, 0, e.Width, e.Height);
     }

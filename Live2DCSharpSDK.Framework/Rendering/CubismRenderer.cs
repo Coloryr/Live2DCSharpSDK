@@ -1,10 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Rendering;
 
@@ -24,7 +19,7 @@ public enum CubismBlendMode
     /// <summary>
     /// 乗算
     /// </summary>
-    CubismBlendMode_Multiplicative = 2,  
+    CubismBlendMode_Multiplicative = 2,
 };
 
 /// <summary>
@@ -47,7 +42,7 @@ public record CubismTextureColor
     /// <summary>
     /// αチャンネル
     /// </summary>
-    public float A;   
+    public float A;
 
     public CubismTextureColor() { }
 
@@ -95,7 +90,7 @@ public abstract class CubismRenderer : IDisposable
     /// <summary>
     /// falseの場合、マスクを纏めて描画する trueの場合、マスクはパーツ描画ごとに書き直す
     /// </summary>
-    private bool _useHighPrecisionMask;  
+    private bool _useHighPrecisionMask;
 
     /// <summary>
     /// レンダラが保持する静的なリソースを解放する
@@ -108,7 +103,7 @@ public abstract class CubismRenderer : IDisposable
     /// <summary>
     /// レンダラのインスタンスを生成して取得する
     /// </summary>
-    public CubismRenderer() 
+    public CubismRenderer()
     {
         _render = this;
         _mvpMatrix4x4 = new();
@@ -120,7 +115,7 @@ public abstract class CubismRenderer : IDisposable
     /// </summary>
     public void Dispose()
     {
-        
+
     }
 
     /// <summary>
@@ -218,7 +213,7 @@ public abstract class CubismRenderer : IDisposable
     /// 各色0.0f～1.0fの間で指定する(1.0fが標準の状態）。
     /// </summary>
     /// <returns>RGBAのカラー情報</returns>
-    public CubismTextureColor GetModelColor() 
+    public CubismTextureColor GetModelColor()
     {
         return _modelColor;
     }
@@ -287,7 +282,7 @@ public abstract class CubismRenderer : IDisposable
     ///  trueの場合、パーツ描画の前にその都度必要なマスクを描き直す
     ///  レンダリング品質は高いが描画処理負荷は増す。
     /// </summary>
-    public void UseHighPrecisionMask(bool high) 
+    public void UseHighPrecisionMask(bool high)
     {
         _useHighPrecisionMask = high;
     }
@@ -304,8 +299,8 @@ public abstract class CubismRenderer : IDisposable
     /// モデル描画の実装
     /// </summary>
     protected virtual void DoDrawModel()
-    { 
-    
+    {
+
     }
 
     /// <summary>
@@ -324,8 +319,8 @@ public abstract class CubismRenderer : IDisposable
     internal virtual unsafe void DrawMesh(int textureNo, int indexCount, int vertexCount
                           , ushort* indexArray, float* vertexArray, float* uvArray
                           , float opacity, CubismBlendMode colorBlendMode, bool invertedMask)
-    { 
-    
+    {
+
     }
 
     /// <summary>
@@ -341,15 +336,15 @@ public abstract class CubismRenderer : IDisposable
     /// モデル描画直前のレンダラのステートを保持する
     /// </summary>
     protected virtual void SaveProfile()
-    { 
-    
+    {
+
     }
 
     /// <summary>
     /// モデル描画直前のレンダラのステートを復帰させる
     /// </summary>
     protected virtual void RestoreProfile()
-    { 
-    
+    {
+
     }
 }

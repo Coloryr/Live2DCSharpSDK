@@ -1,10 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Model;
 
@@ -24,19 +18,19 @@ public record CubismModelUserDataNode
     /// <summary>
     /// ユーザデータ
     /// </summary>
-    public string Value;          
+    public string Value;
 }
 
 public record CubismModelUserDataObj
 {
     public record MetaObj
-    { 
+    {
         public int UserDataCount { get; set; }
         public int TotalUserDataSize { get; set; }
     }
 
     public record UserDataObj
-    { 
+    {
         public string Target { get; set; }
         public string Id { get; set; }
         public string Value { get; set; }

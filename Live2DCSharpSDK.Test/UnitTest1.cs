@@ -4,7 +4,6 @@ using Live2DCSharpSDK.App;
 using Live2DCSharpSDK.Core;
 using Live2DCSharpSDK.Framework;
 using Live2DCSharpSDK.Framework.Model;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 public class Tests

@@ -1,9 +1,4 @@
 ﻿using Live2DCSharpSDK.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.App;
 
@@ -41,7 +36,7 @@ public class LAppDefine
     // モデル定義------------------------------------------
     // モデルを配置したディレクトリ名の配列
     // ディレクトリ名とmodel3.jsonの名前を一致させておくこと
-    public static readonly string[] ModelDir = new[] 
+    public static readonly string[] ModelDir = new[]
     {
         "Haru",
         "Hiyori",
@@ -79,4 +74,6 @@ public class LAppDefine
     // デフォルトのレンダーターゲットサイズ
     public const int RenderTargetWidth = 1920;
     public const int RenderTargetHeight = 1080;
+
+    public const SelectTarget RenderTarget = SelectTarget.SelectTarget_None;
 }

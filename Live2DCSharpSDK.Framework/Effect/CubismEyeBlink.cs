@@ -1,9 +1,4 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Effect;
 
@@ -84,7 +79,7 @@ public class CubismEyeBlink
     /// インスタンスを作成する。
     /// </summary>
     /// <param name="modelSetting">モデルの設定情報</param>
-    public CubismEyeBlink(ICubismModelSetting modelSetting)
+    public CubismEyeBlink(CubismModelSettingJson modelSetting)
     {
         _blinkingState = EyeState.EyeState_First;
         _blinkingIntervalSeconds = 4.0f;

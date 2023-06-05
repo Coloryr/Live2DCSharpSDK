@@ -1,16 +1,7 @@
 ﻿using Live2DCSharpSDK.Core;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Model;
-
-using csmVersion = UInt32;
-using csmFlags = Byte;
 using csmMocVersion = UInt32;
 using csmParameterType = Int32;
 

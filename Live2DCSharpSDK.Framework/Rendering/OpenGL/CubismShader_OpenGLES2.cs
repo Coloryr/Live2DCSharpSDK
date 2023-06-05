@@ -1,10 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Type;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
@@ -43,15 +38,15 @@ internal record CubismShaderSet
     /// <summary>
     /// シェーダプログラムのアドレス
     /// </summary>
-    internal uint ShaderProgram;
+    internal int ShaderProgram;
     /// <summary>
     /// シェーダプログラムに渡す変数のアドレス(Position)
     /// </summary>
-    internal uint AttributePositionLocation;
+    internal int AttributePositionLocation;
     /// <summary>
     /// シェーダプログラムに渡す変数のアドレス(TexCoord)
     /// </summary>
-    internal uint AttributeTexCoordLocation;
+    internal int AttributeTexCoordLocation;
     /// <summary>
     /// シェーダプログラムに渡す変数のアドレス(Matrix)
     /// </summary>
@@ -141,7 +136,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
         ES2 + VertShaderSrc_Base;
     public const string VertShaderSrc_Normal =
         Normal + VertShaderSrc_Base;
-    private const string VertShaderSrc_Base = 
+    private const string VertShaderSrc_Base =
         @"attribute vec4 a_position;
         attribute vec2 a_texCoord;
         varying vec2 v_texCoord;
@@ -158,7 +153,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
         ES2 + VertShaderSrcMasked_Base;
     public const string VertShaderSrcMasked_Normal =
         Normal + VertShaderSrcMasked_Base;
-    private const string VertShaderSrcMasked_Base=
+    private const string VertShaderSrcMasked_Base =
         @"attribute vec4 a_position;
         attribute vec2 a_texCoord;
         varying vec2 v_texCoord;
@@ -286,7 +281,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
     // Normal & Add & Mult 共通（クリッピングされたものの描画用、PremultipliedAlphaの場合）
     public const string FragShaderSrcMaskPremultipliedAlpha_ES2 = ES2C + FragShaderSrcMaskPremultipliedAlpha_Base;
     public const string FragShaderSrcMaskPremultipliedAlpha_Normal = Normal + FragShaderSrcMaskPremultipliedAlpha_Base;
-    public const string FragShaderSrcMaskPremultipliedAlpha_Base = 
+    public const string FragShaderSrcMaskPremultipliedAlpha_Base =
         @"varying vec2 v_texCoord;
         varying vec4 v_clipPos;
         uniform sampler2D s_texture0;
@@ -316,7 +311,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
     // Normal & Add & Mult 共通（クリッピングされて反転使用の描画用、PremultipliedAlphaの場合）
     public const string FragShaderSrcMaskInvertedPremultipliedAlpha_ES2 = ES2C + FragShaderSrcMaskInvertedPremultipliedAlpha_Base;
     public const string FragShaderSrcMaskInvertedPremultipliedAlpha_Normal = Normal + FragShaderSrcMaskInvertedPremultipliedAlpha_Base;
-    public const string FragShaderSrcMaskInvertedPremultipliedAlpha_Base=
+    public const string FragShaderSrcMaskInvertedPremultipliedAlpha_Base =
         @"varying vec2 v_texCoord;
         varying vec4 v_clipPos;
         uniform sampler2D s_texture0;
@@ -429,10 +424,10 @@ internal class CubismShader_OpenGLES2 : IDisposable
         }
 
         // Blending
-        uint SRC_COLOR;
-        uint DST_COLOR;
-        uint SRC_ALPHA;
-        uint DST_ALPHA;
+        int SRC_COLOR;
+        int DST_COLOR;
+        int SRC_ALPHA;
+        int DST_ALPHA;
 
         if (renderer.GetClippingContextBufferForMask() != null) // マスク生成時
         {
@@ -446,17 +441,17 @@ internal class CubismShader_OpenGLES2 : IDisposable
 
             // 頂点配列の設定
             GL.glEnableVertexAttribArray(shaderSet.AttributePositionLocation);
-            GL.glVertexAttribPointer(shaderSet.AttributePositionLocation, 2, GL.GL_FLOAT, GL.GL_FALSE, sizeof(float) * 2, vertexArray);
+            GL.glVertexAttribPointer(shaderSet.AttributePositionLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 2, vertexArray);
             // テクスチャ頂点の設定
             GL.glEnableVertexAttribArray(shaderSet.AttributeTexCoordLocation);
-            GL.glVertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, GL.GL_FLOAT, GL.GL_FALSE, sizeof(float) * 2, uvArray);
+            GL.glVertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 2, uvArray);
 
             // チャンネル
             var channelNo = renderer.GetClippingContextBufferForMask()._layoutChannelNo;
             var colorChannel = renderer.GetClippingContextBufferForMask().GetClippingManager().GetChannelFlagAsColor(channelNo);
             GL.glUniform4f(shaderSet.UnifromChannelFlagLocation, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
 
-            GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, GL.GL_FALSE, renderer.GetClippingContextBufferForMask()._matrixForMask.GetArray());
+            GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, renderer.GetClippingContextBufferForMask()._matrixForMask.GetArray());
 
             csmRectF rect = renderer.GetClippingContextBufferForMask()._layoutBounds;
 
@@ -511,10 +506,10 @@ internal class CubismShader_OpenGLES2 : IDisposable
 
             // 頂点配列の設定
             GL.glEnableVertexAttribArray(shaderSet.AttributePositionLocation);
-            GL.glVertexAttribPointer(shaderSet.AttributePositionLocation, 2, GL.GL_FLOAT, GL.GL_FALSE, sizeof(float) * 2, vertexArray);
+            GL.glVertexAttribPointer(shaderSet.AttributePositionLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 2, vertexArray);
             // テクスチャ頂点の設定
             GL.glEnableVertexAttribArray(shaderSet.AttributeTexCoordLocation);
-            GL.glVertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, GL.GL_FLOAT, GL.GL_FALSE, sizeof(float) * 2, uvArray);
+            GL.glVertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 2, uvArray);
 
             if (masked)
             {
@@ -527,7 +522,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
                 GL.glUniform1i(shaderSet.SamplerTexture1Location, 1);
 
                 // View座標をClippingContextの座標に変換するための行列を設定
-                GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, 0, renderer.GetClippingContextBufferForDraw()._matrixForDraw.GetArray());
+                GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, renderer.GetClippingContextBufferForDraw()._matrixForDraw.GetArray());
 
                 // 使用するカラーチャンネルを設定
                 var channelNo = renderer.GetClippingContextBufferForDraw()._layoutChannelNo;
@@ -541,7 +536,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
             GL.glUniform1i(shaderSet.SamplerTexture0Location, 0);
 
             //座標変換
-            GL.glUniformMatrix4fv(shaderSet.UniformMatrixLocation, 1, 0, matrix4x4.GetArray()); //
+            GL.glUniformMatrix4fv(shaderSet.UniformMatrixLocation, 1, false, matrix4x4.GetArray()); //
 
             GL.glUniform4f(shaderSet.UniformBaseColorLocation, baseColor.R, baseColor.G, baseColor.B, baseColor.A);
             GL.glUniform4f(shaderSet.UniformMultiplyColorLocation, multiplyColor.R, multiplyColor.G, multiplyColor.B, multiplyColor.A);
@@ -860,19 +855,19 @@ internal class CubismShader_OpenGLES2 : IDisposable
     /// <param name="vertShaderSrc">頂点シェーダのソース</param>
     /// <param name="fragShaderSrc">フラグメントシェーダのソース</param>
     /// <returns>シェーダプログラムのアドレス</returns>
-    internal unsafe uint LoadShaderProgram(string vertShaderSrc, string fragShaderSrc)
+    internal unsafe int LoadShaderProgram(string vertShaderSrc, string fragShaderSrc)
     {
         // Create shader program.
-        uint shaderProgram = GL.glCreateProgram();
+        int shaderProgram = GL.glCreateProgram();
 
-        if (!CompileShaderSource(out uint vertShader, GL.GL_VERTEX_SHADER, vertShaderSrc))
+        if (!CompileShaderSource(out int vertShader, GL.GL_VERTEX_SHADER, vertShaderSrc))
         {
             CubismLog.CubismLogError("Vertex shader compile error!");
             return 0;
         }
 
         // Create and compile fragment shader.
-        if (!CompileShaderSource(out uint fragShader, GL.GL_FRAGMENT_SHADER, fragShaderSrc))
+        if (!CompileShaderSource(out int fragShader, GL.GL_FRAGMENT_SHADER, fragShaderSrc))
         {
             CubismLog.CubismLogError("Fragment shader compile error!");
             return 0;
@@ -929,19 +924,19 @@ internal class CubismShader_OpenGLES2 : IDisposable
     /// <param name="shaderSource">シェーダソースコード</param>
     /// <returns>true         ->      コンパイル成功
     /// false        ->      コンパイル失敗</returns>
-    internal unsafe bool CompileShaderSource(out uint outShader, uint shaderType, string shaderSource)
+    internal unsafe bool CompileShaderSource(out int outShader, int shaderType, string shaderSource)
     {
         int status;
 
         outShader = GL.glCreateShader(shaderType);
-        GL.glShaderSource(outShader, 1, shaderSource, 0);
+        GL.glShaderSource(outShader, shaderSource);
         GL.glCompileShader(outShader);
 
         int logLength;
         GL.glGetShaderiv(outShader, GL.GL_INFO_LOG_LENGTH, &logLength);
         if (logLength > 0)
         {
-            GL.glGetShaderInfoLog(outShader, logLength, out string log);
+            GL.glGetShaderInfoLog(outShader, out string log);
             CubismLog.CubismLogError($"Shader compile log: {log}");
         }
 
@@ -961,7 +956,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
     /// <param name="shaderProgram">リンクするシェーダプログラムのアドレス</param>
     /// <returns>true            ->  リンク成功
     /// false           ->  リンク失敗</returns>
-    internal unsafe bool LinkProgram(uint shaderProgram)
+    internal unsafe bool LinkProgram(int shaderProgram)
     {
         int status;
         GL.glLinkProgram(shaderProgram);
@@ -970,7 +965,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
         GL.glGetProgramiv(shaderProgram, GL.GL_INFO_LOG_LENGTH, &logLength);
         if (logLength > 0)
         {
-            GL.glGetProgramInfoLog(shaderProgram, logLength, out string log);
+            GL.glGetProgramInfoLog(shaderProgram, out string log);
             CubismLog.CubismLogError($"Program link log: {log}");
         }
 
@@ -989,7 +984,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
     /// <param name="shaderProgram">検証するシェーダプログラムのアドレス</param>
     /// <returns>true            ->  正常
     /// false           ->  異常</returns>
-    internal unsafe bool ValidateProgram(uint shaderProgram)
+    internal unsafe bool ValidateProgram(int shaderProgram)
     {
         int logLength, status;
 
@@ -997,7 +992,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
         GL.glGetProgramiv(shaderProgram, GL.GL_INFO_LOG_LENGTH, &logLength);
         if (logLength > 0)
         {
-            GL.glGetProgramInfoLog(shaderProgram, logLength, out string log);
+            GL.glGetProgramInfoLog(shaderProgram, out string log);
             CubismLog.CubismLogError($"Validate program log: {log}");
         }
 

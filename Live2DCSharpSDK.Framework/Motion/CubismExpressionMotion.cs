@@ -1,11 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Motion;
 
@@ -25,7 +19,7 @@ public enum ExpressionBlendType
     /// <summary>
     /// 上書き
     /// </summary>
-    ExpressionBlendType_Overwrite = 2   
+    ExpressionBlendType_Overwrite = 2
 };
 
 /// <summary>
@@ -44,7 +38,7 @@ public record ExpressionParameter
     /// <summary>
     /// 値
     /// </summary>
-    public float Value;              
+    public float Value;
 }
 
 /// <summary>

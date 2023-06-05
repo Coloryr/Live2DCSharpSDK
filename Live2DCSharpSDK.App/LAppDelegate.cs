@@ -1,11 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework;
-using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Rendering.OpenGL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.App;
 
@@ -49,6 +43,10 @@ public class LAppDelegate : IDisposable
     /// </summary>
     private LAppTextureManager _textureManager;
 
+    private LAppLive2DManager _live2dManager;
+
+    public OpenGLApi GL { get; }
+
     /// <summary>
     /// Initialize関数で設定したウィンドウ幅
     /// </summary>
@@ -56,12 +54,21 @@ public class LAppDelegate : IDisposable
     /// <summary>
     /// Initialize関数で設定したウィンドウ高さ
     /// </summary>
-    private int _windowHeight;                          
+    private int _windowHeight;
+
+    public LAppDelegate(OpenGLApi gl)
+    {
+        GL = gl;
+
+        _view = new LAppView(this);
+        _textureManager = new LAppTextureManager(this);
+        _cubismAllocator = new LAppAllocator();
+    }
 
     /// <summary>
     /// APPに必要なものを初期化する。
     /// </summary>
-    public bool Initialize(OpenGLApi GL)
+    public bool Initialize()
     {
         if (LAppDefine.DebugLogEnable)
         {
@@ -104,14 +111,11 @@ public class LAppDelegate : IDisposable
         CubismFramework.Initialize();
 
         //load model
-        LAppLive2DManager.GetInstance();
-
-        //default proj
-        CubismMatrix44 projection;
+        _live2dManager = new LAppLive2DManager(this);
 
         LAppPal.UpdateTime(0);
 
-        _view->InitializeSprite();
+        _view.InitializeSprite();
     }
 
     /// <summary>
@@ -119,15 +123,45 @@ public class LAppDelegate : IDisposable
     /// </summary>
     public void Dispose()
     {
-        
+        _view.Dispose();
+
+        // リソースを解放
+        GetLive2D().Dispose();
+
+        //Cubism SDK の解放
+        CubismFramework.Dispose();
+    }
+
+    public void Resize()
+    {
+        GL.GetWindowSize(out int width, out int height);
+        if ((_windowWidth != width || _windowHeight != height) && width > 0 && height > 0)
+        {
+            //AppViewの初期化
+            _view.Initialize();
+            // スプライトサイズを再設定
+            //_view.ResizeSprite();
+            // サイズを保存しておく
+            _windowWidth = width;
+            _windowHeight = height;
+        }
     }
 
     /// <summary>
     /// 実行処理。
     /// </summary>
-    public void Run()
-    { 
-    
+    public void Run(float tick)
+    {
+        // 時間更新
+        LAppPal.UpdateTime(tick);
+
+        // 画面の初期化
+        GL.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+        GL.glClearDepth(1.0f);
+
+        //描画更新
+        _view.Render();
     }
 
     /// <summary>
@@ -208,5 +242,10 @@ public class LAppDelegate : IDisposable
     public LAppTextureManager GetTextureManager()
     {
         return _textureManager;
+    }
+
+    public LAppLive2DManager GetLive2D()
+    {
+        return _live2dManager;
     }
 }

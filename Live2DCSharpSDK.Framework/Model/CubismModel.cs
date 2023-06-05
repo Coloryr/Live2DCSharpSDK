@@ -1,19 +1,8 @@
 ﻿using Live2DCSharpSDK.Core;
 using Live2DCSharpSDK.Framework.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Model;
-
-using csmVersion = UInt32;
-using csmFlags = Byte;
-using csmMocVersion = UInt32;
 using csmParameterType = Int32;
 
 public record DrawableColorData
@@ -61,7 +50,7 @@ public record PartColorData
     }
 
     public PartColorData(bool isOverwritten, CubismTextureColor color)
-        {
+    {
         IsOverwritten = isOverwritten;
         Color = color;
     }
@@ -1208,7 +1197,7 @@ public unsafe class CubismModel : IDisposable
     /// <summary>
     /// drawableの乗算色を設定する
     /// </summary>
-    public void SetMultiplyColor(int drawableIndex, float r, float g, float b, float a = 1.0f) 
+    public void SetMultiplyColor(int drawableIndex, float r, float g, float b, float a = 1.0f)
     {
         _userMultiplyColors[drawableIndex].Color.R = r;
         _userMultiplyColors[drawableIndex].Color.G = g;
@@ -1256,7 +1245,7 @@ public unsafe class CubismModel : IDisposable
     /// <summary>
     /// partのスクリーン色を設定する
     /// </summary>
-    public void SetPartMultiplyColor(int partIndex, CubismTextureColor color) 
+    public void SetPartMultiplyColor(int partIndex, CubismTextureColor color)
     {
         SetPartMultiplyColor(partIndex, color.R, color.G, color.B, color.A);
     }
@@ -1264,7 +1253,7 @@ public unsafe class CubismModel : IDisposable
     /// <summary>
     /// partの乗算色を設定する
     /// </summary>
-    public void SetPartMultiplyColor(int partIndex, float r, float g, float b, float a = 1.0f) 
+    public void SetPartMultiplyColor(int partIndex, float r, float g, float b, float a = 1.0f)
     {
         SetPartColor(partIndex, r, g, b, a, _userPartMultiplyColors, _userMultiplyColors);
     }
@@ -1272,7 +1261,7 @@ public unsafe class CubismModel : IDisposable
     /// <summary>
     /// partのスクリーン色を設定する
     /// </summary>
-    public void SetPartScreenColor(int partIndex, CubismTextureColor color) 
+    public void SetPartScreenColor(int partIndex, CubismTextureColor color)
     {
         SetPartScreenColor(partIndex, color.R, color.G, color.B, color.A);
     }
@@ -1281,7 +1270,7 @@ public unsafe class CubismModel : IDisposable
     /// partのスクリーン色を設定する
     /// </summary>
     /// <param name="a"></param>
-    public void SetPartScreenColor(int partIndex, float r, float g, float b, float a = 1.0f) 
+    public void SetPartScreenColor(int partIndex, float r, float g, float b, float a = 1.0f)
     {
         SetPartColor(partIndex, r, g, b, a, _userPartScreenColors, _userScreenColors);
     }
@@ -1310,7 +1299,7 @@ public unsafe class CubismModel : IDisposable
     /// SDKからモデル全体の乗算色を上書きするかをセットする
     /// SDK上の色情報を使うならtrue、モデルの色情報を使うならfalse
     /// </summary>
-    public void SetOverwriteFlagForModelMultiplyColors(bool value) 
+    public void SetOverwriteFlagForModelMultiplyColors(bool value)
     {
         _isOverwrittenModelMultiplyColors = value;
     }
@@ -1319,7 +1308,7 @@ public unsafe class CubismModel : IDisposable
     /// SDKからモデル全体のスクリーン色を上書きするかをセットする
     /// SDK上の色情報を使うならtrue、モデルの色情報を使うならfalse
     /// </summary>
-    public void SetOverwriteFlagForModelScreenColors(bool value) 
+    public void SetOverwriteFlagForModelScreenColors(bool value)
     {
         _isOverwrittenModelScreenColors = value;
     }
@@ -1329,7 +1318,7 @@ public unsafe class CubismModel : IDisposable
     /// </summary>
     /// <returns>true    ->  SDK上の色情報を使用
     /// false   ->  モデルの色情報を使用</returns>
-    public bool GetOverwriteFlagForDrawableMultiplyColors(int drawableIndex) 
+    public bool GetOverwriteFlagForDrawableMultiplyColors(int drawableIndex)
     {
         return _userMultiplyColors[drawableIndex].IsOverwritten;
     }
@@ -1339,7 +1328,7 @@ public unsafe class CubismModel : IDisposable
     /// </summary>
     /// <returns>true    ->  SDK上の色情報を使用
     /// false   ->  モデルの色情報を使用</returns>
-    public bool GetOverwriteFlagForDrawableScreenColors(int drawableIndex) 
+    public bool GetOverwriteFlagForDrawableScreenColors(int drawableIndex)
     {
         return _userScreenColors[drawableIndex].IsOverwritten;
     }
@@ -1348,7 +1337,7 @@ public unsafe class CubismModel : IDisposable
     /// SDKからdrawableの乗算色を上書きするかをセットする
     /// SDK上の色情報を使うならtrue、モデルの色情報を使うならfalse
     /// </summary>
-    public void SetOverwriteFlagForDrawableMultiplyColors(int drawableIndex, bool value) 
+    public void SetOverwriteFlagForDrawableMultiplyColors(int drawableIndex, bool value)
     {
         _userMultiplyColors[drawableIndex].IsOverwritten = value;
     }
@@ -1357,7 +1346,7 @@ public unsafe class CubismModel : IDisposable
     /// SDKからdrawableのスクリーン色を上書きするかをセットする
     /// SDK上の色情報を使うならtrue、モデルの色情報を使うならfalse
     /// </summary>
-    public void SetOverwriteFlagForDrawableScreenColors(int drawableIndex, bool value) 
+    public void SetOverwriteFlagForDrawableScreenColors(int drawableIndex, bool value)
     {
         _userScreenColors[drawableIndex].IsOverwritten = value;
     }
@@ -1367,7 +1356,7 @@ public unsafe class CubismModel : IDisposable
     /// </summary>
     /// <returns>true    ->  SDK上の色情報を使用
     /// false   ->  モデルの色情報を使用</returns>
-    public bool GetOverwriteColorForPartMultiplyColors(int partIndex) 
+    public bool GetOverwriteColorForPartMultiplyColors(int partIndex)
     {
         return _userPartMultiplyColors[partIndex].IsOverwritten;
     }
@@ -1376,7 +1365,7 @@ public unsafe class CubismModel : IDisposable
     /// SDKからpartのスクリーン色を上書きするかをセットする
     /// SDK上の色情報を使うならtrue、モデルの色情報を使うならfalse
     /// </summary>
-    public bool GetOverwriteColorForPartScreenColors(int partIndex) 
+    public bool GetOverwriteColorForPartScreenColors(int partIndex)
     {
         return _userPartScreenColors[partIndex].IsOverwritten;
     }
@@ -1400,7 +1389,7 @@ public unsafe class CubismModel : IDisposable
     /// <summary>
     /// Drawableのカリング情報を設定する
     /// </summary>
-    public void SetDrawableCulling(int drawableIndex, int isCulling) 
+    public void SetDrawableCulling(int drawableIndex, int isCulling)
     {
         _userCullings[drawableIndex].IsCulling = isCulling;
     }
@@ -1410,7 +1399,7 @@ public unsafe class CubismModel : IDisposable
     /// </summary>
     /// <returns>true    ->  SDK上のカリング設定を使用
     /// false   ->  モデルのカリング設定を使用</returns>
-    public bool GetOverwriteFlagForModelCullings() 
+    public bool GetOverwriteFlagForModelCullings()
     {
         return _isOverwrittenCullings;
     }
@@ -1419,7 +1408,7 @@ public unsafe class CubismModel : IDisposable
     /// SDKからモデル全体のカリング設定を上書きするかをセットする
     /// SDK上のカリング設定を使うならtrue、モデルのカリング設定を使うならfalse
     /// </summary>
-    public void SetOverwriteFlagForModelCullings(bool value) 
+    public void SetOverwriteFlagForModelCullings(bool value)
     {
         _isOverwrittenCullings = value;
     }
@@ -1429,7 +1418,7 @@ public unsafe class CubismModel : IDisposable
     /// </summary>
     /// <returns>true    ->  SDK上のカリング設定を使用
     /// false   ->  モデルのカリング設定を使用</returns>
-    public bool GetOverwriteFlagForDrawableCullings(int drawableIndex) 
+    public bool GetOverwriteFlagForDrawableCullings(int drawableIndex)
     {
         return _userCullings[drawableIndex].IsOverwritten;
     }
@@ -1438,7 +1427,7 @@ public unsafe class CubismModel : IDisposable
     /// SDKからdrawableのカリング設定を上書きするかをセットする
     /// SDK上のカリング設定を使うならtrue、モデルのカリング設定を使うならfalse
     /// </summary>
-    public void SetOverwriteFlagForDrawableCullings(int drawableIndex, bool value) 
+    public void SetOverwriteFlagForDrawableCullings(int drawableIndex, bool value)
     {
         _userCullings[drawableIndex].IsOverwritten = value;
     }
@@ -1447,7 +1436,7 @@ public unsafe class CubismModel : IDisposable
     /// モデルの不透明度を取得する
     /// </summary>
     /// <returns>不透明度の値</returns>
-    public float GetModelOpacity() 
+    public float GetModelOpacity()
     {
         return _modelOpacity;
     }
@@ -1456,7 +1445,7 @@ public unsafe class CubismModel : IDisposable
     /// モデルの不透明度を設定する
     /// </summary>
     /// <param name="value">不透明度の値</param>
-    public void SetModelOpacity(float value) 
+    public void SetModelOpacity(float value)
     {
         _modelOpacity = value;
     }

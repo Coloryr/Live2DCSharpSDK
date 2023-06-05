@@ -1,10 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Type;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
@@ -49,12 +44,12 @@ public class CubismClippingContext
     /// <summary>
     /// このマスクが割り当てられるレンダーテクスチャ（フレームバッファ）やカラーバッファのインデックス
     /// </summary>
-    public int _bufferIndex;                          
+    public int _bufferIndex;
 
     /// <summary>
     /// このマスクを管理しているマネージャのインスタンス
     /// </summary>
-    internal CubismClippingManager_OpenGLES2 _owner;        
+    internal CubismClippingManager_OpenGLES2 _owner;
 
     /// <summary>
     /// 引数付きコンストラクタ

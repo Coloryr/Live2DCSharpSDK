@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Live2DCSharpSDK.Framework.Type;
+﻿namespace Live2DCSharpSDK.Framework.Type;
 
 /// <summary>
 /// 矩形形状(座標・長さはfloat値)を定義するクラス
@@ -26,7 +20,7 @@ public class csmRectF
     /// <summary>
     /// 高さ
     /// </summary>
-    public float Height; 
+    public float Height;
 
     public csmRectF() { }
     /// <summary>
@@ -80,9 +74,9 @@ public class csmRectF
     /// <summary>
     /// 矩形中央のY座標を取得する
     /// </summary>
-    public float GetCenterY() 
+    public float GetCenterY()
     {
-        return Y + 0.5f * Height; 
+        return Y + 0.5f * Height;
     }
 
     /// <summary>

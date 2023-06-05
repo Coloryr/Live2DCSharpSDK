@@ -1,9 +1,4 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Motion;
 
@@ -40,12 +35,12 @@ public class CubismMotionQueueManager
     /// <summary>
     /// コールバックに戻されるデータ
     /// </summary>
-    private dynamic _eventCustomData;   
+    private dynamic _eventCustomData;
 
     /// <summary>
     /// デルタ時間の積算値[秒]
     /// </summary>
-    protected float _userTimeSeconds;        
+    protected float _userTimeSeconds;
 
     /// <summary>
     /// 指定したモーションを開始する。同じタイプのモーションが既にある場合は、既存のモーションに終了フラグを立て、フェードアウトを開始させる。
@@ -233,7 +228,7 @@ public class CubismMotionQueueManager
 
             if (motion == null)
             {
-                 _motions.Remove(item);          // 削除
+                _motions.Remove(item);          // 削除
                 continue;
             }
 
