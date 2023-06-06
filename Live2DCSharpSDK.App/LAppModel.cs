@@ -193,7 +193,8 @@ public class LAppModel : CubismUserModel
             motionUpdated = _motionManager.UpdateMotion(_model, deltaTimeSeconds); // モーションを更新
         }
         _model.SaveParameters(); // 状態を保存
-                                 //-----------------------------------------------------------------
+
+        //-----------------------------------------------------------------
 
         // 不透明度
         _opacity = _model.GetModelOpacity();
@@ -201,17 +202,11 @@ public class LAppModel : CubismUserModel
         // まばたき
         if (!motionUpdated)
         {
-            if (_eyeBlink != null)
-            {
-                // メインモーションの更新がないとき
-                _eyeBlink.UpdateParameters(_model, deltaTimeSeconds); // 目パチ
-            }
+            // メインモーションの更新がないとき
+            _eyeBlink?.UpdateParameters(_model, deltaTimeSeconds); // 目パチ
         }
 
-        if (_expressionManager != null)
-        {
-            _expressionManager.UpdateMotion(_model, deltaTimeSeconds); // 表情でパラメータ更新（相対変化）
-        }
+        _expressionManager?.UpdateMotion(_model, deltaTimeSeconds); // 表情でパラメータ更新（相対変化）
 
         //ドラッグによる変化
         //ドラッグによる顔の向きの調整
@@ -227,16 +222,10 @@ public class LAppModel : CubismUserModel
         _model.AddParameterValue(_idParamEyeBallY, _dragY);
 
         // 呼吸など
-        if (_breath != null)
-        {
-            _breath.UpdateParameters(_model, deltaTimeSeconds);
-        }
+        _breath?.UpdateParameters(_model, deltaTimeSeconds);
 
         // 物理演算の設定
-        if (_physics != null)
-        {
-            _physics.Evaluate(_model, deltaTimeSeconds);
-        }
+        //_physics?.Evaluate(_model, deltaTimeSeconds);
 
         // リップシンクの設定
         if (_lipSync)
@@ -255,10 +244,7 @@ public class LAppModel : CubismUserModel
         }
 
         // ポーズの設定
-        if (_pose != null)
-        {
-            _pose.UpdateParameters(_model, deltaTimeSeconds);
-        }
+        _pose?.UpdateParameters(_model, deltaTimeSeconds);
 
         _model.Update();
     }
@@ -293,7 +279,7 @@ public class LAppModel : CubismUserModel
     {
         if (priority == LAppDefine.PriorityForce)
         {
-            _motionManager.SetReservePriority(priority);
+            _motionManager.ReservePriority = priority;
         }
         else if (!_motionManager.ReserveMotion(priority))
         {
@@ -320,13 +306,13 @@ public class LAppModel : CubismUserModel
             float fadeTime = _modelSetting.GetMotionFadeInTimeValue(group, no);
             if (fadeTime >= 0.0f)
             {
-                motion.SetFadeInTime(fadeTime);
+                motion.FadeIn = fadeTime;
             }
 
             fadeTime = _modelSetting.GetMotionFadeOutTimeValue(group, no);
             if (fadeTime >= 0.0f)
             {
-                motion.SetFadeOutTime(fadeTime);
+                motion.FadeOut = fadeTime;
             }
             motion.SetEffectIds(_eyeBlinkIds, _lipSyncIds);
             autoDelete = true; // 終了時にメモリから削除

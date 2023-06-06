@@ -11,35 +11,16 @@ public enum ExpressionBlendType
     /// <summary>
     /// 加算
     /// </summary>
-    ExpressionBlendType_Add = 0,
+    Add = 0,
     /// <summary>
     /// 乗算
     /// </summary>
-    ExpressionBlendType_Multiply = 1,
+    Multiply = 1,
     /// <summary>
     /// 上書き
     /// </summary>
-    ExpressionBlendType_Overwrite = 2
+    Overwrite = 2
 };
-
-/// <summary>
-/// 表情のパラメータ情報の構造体。
-/// </summary>
-public record ExpressionParameter
-{
-    /// <summary>
-    /// パラメータID
-    /// </summary>
-    public string ParameterId;
-    /// <summary>
-    /// パラメータの演算種類
-    /// </summary>
-    public ExpressionBlendType BlendType;
-    /// <summary>
-    /// 値
-    /// </summary>
-    public float Value;
-}
 
 /// <summary>
 /// 表情のモーションクラス。
@@ -70,50 +51,49 @@ public class CubismExpressionMotion : ACubismMotion
     {
         var json = JObject.Parse(buf);
 
-        SetFadeInTime(json.ContainsKey(ExpressionKeyFadeIn)
-            ? (float)json[ExpressionKeyFadeIn]! : DefaultFadeTime);   // フェードイン
-        SetFadeOutTime(json.ContainsKey(ExpressionKeyFadeOut)
-            ? (float)json[ExpressionKeyFadeOut]! : DefaultFadeTime); // フェードアウト
+        FadeIn = json.ContainsKey(ExpressionKeyFadeIn)
+            ? (float)json[ExpressionKeyFadeIn]! : DefaultFadeTime;   // フェードイン
+        FadeOut = json.ContainsKey(ExpressionKeyFadeOut)
+            ? (float)json[ExpressionKeyFadeOut]! : DefaultFadeTime; // フェードアウト
 
         // 各パラメータについて
-        int parameterCount = json[ExpressionKeyParameters].Count();
+        var list = json[ExpressionKeyParameters]!;
+        int parameterCount = list.Count();
 
         for (int i = 0; i < parameterCount; ++i)
         {
-            var param = json[ExpressionKeyParameters][i];
-            var parameterId = CubismFramework.GetIdManager().GetId(param[ExpressionKeyId].ToString()); // パラメータID
-            var value = (float)param[ExpressionKeyValue]; // 値
+            var param = list[i]!;
+            var parameterId = CubismFramework.GetIdManager().GetId(param[ExpressionKeyId]!.ToString()); // パラメータID
+            var value = (float)param[ExpressionKeyValue]!; // 値
 
             // 計算方法の設定
             ExpressionBlendType blendType;
             var type = param[ExpressionKeyBlend]?.ToString();
             if (type == null || type == BlendValueAdd)
             {
-                blendType = ExpressionBlendType.ExpressionBlendType_Add;
+                blendType = ExpressionBlendType.Add;
             }
             else if (type == BlendValueMultiply)
             {
-                blendType = ExpressionBlendType.ExpressionBlendType_Multiply;
+                blendType = ExpressionBlendType.Multiply;
             }
             else if (type == BlendValueOverwrite)
             {
-                blendType = ExpressionBlendType.ExpressionBlendType_Overwrite;
+                blendType = ExpressionBlendType.Overwrite;
             }
             else
             {
                 // その他 仕様にない値を設定したときは加算モードにすることで復旧
-                blendType = ExpressionBlendType.ExpressionBlendType_Add;
+                blendType = ExpressionBlendType.Add;
             }
 
             // 設定オブジェクトを作成してリストに追加する
-            ExpressionParameter item = new()
+            _parameters.Add(new()
             {
                 ParameterId = parameterId,
                 BlendType = blendType,
                 Value = value
-            };
-
-            _parameters.Add(item);
+            });
         }
     }
 
@@ -123,17 +103,17 @@ public class CubismExpressionMotion : ACubismMotion
         {
             switch (item.BlendType)
             {
-                case ExpressionBlendType.ExpressionBlendType_Add:
+                case ExpressionBlendType.Add:
                     {
                         model.AddParameterValue(item.ParameterId, item.Value, weight);            // 相対変化 加算
                         break;
                     }
-                case ExpressionBlendType.ExpressionBlendType_Multiply:
+                case ExpressionBlendType.Multiply:
                     {
                         model.MultiplyParameterValue(item.ParameterId, item.Value, weight);       // 相対変化 乗算
                         break;
                     }
-                case ExpressionBlendType.ExpressionBlendType_Overwrite:
+                case ExpressionBlendType.Overwrite:
                     {
                         model.SetParameterValue(item.ParameterId, item.Value, weight);            // 絶対変化 上書き
                         break;

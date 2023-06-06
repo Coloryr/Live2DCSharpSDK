@@ -391,7 +391,7 @@ public class CubismClippingManager_OpenGLES2
                             continue;
                         }
 
-                        renderer.IsCulling(model.GetDrawableCulling(clipDrawIndex) != 0);
+                        renderer.IsCulling(model.GetDrawableCulling(clipDrawIndex));
 
                         // マスクがクリアされていないなら処理する
                         if (!_clearedFrameBufferFlags[clipContext._bufferIndex])

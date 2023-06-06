@@ -167,10 +167,10 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         _clippingManager.SetClippingMaskBufferSize(width, height);
 
         _clippingManager.Initialize(
-            GetModel(),
-            GetModel().GetDrawableCount(),
-            GetModel().GetDrawableMasks(),
-            GetModel().GetDrawableMaskCounts(),
+            Model,
+            Model.GetDrawableCount(),
+            Model.GetDrawableMasks(),
+            Model.GetDrawableMaskCounts(),
             renderTextureCount
         );
     }
@@ -397,14 +397,14 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
                 }
             }
 
-            _clippingManager.SetupClippingContext(GetModel(), this, _rendererProfile._lastFBO, _rendererProfile._lastViewport);
+            _clippingManager.SetupClippingContext(Model, this, _rendererProfile._lastFBO, _rendererProfile._lastViewport);
         }
 
         // 上記クリッピング処理内でも一度PreDrawを呼ぶので注意!!
         PreDraw();
 
-        var drawableCount = GetModel().GetDrawableCount();
-        var renderOrder = GetModel().GetDrawableRenderOrders();
+        var drawableCount = Model.GetDrawableCount();
+        var renderOrder = Model.GetDrawableRenderOrders();
 
         // インデックスを描画順でソート
         for (int i = 0; i < drawableCount; ++i)
@@ -419,7 +419,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
             var drawableIndex = _sortedDrawableIndexList[i];
 
             // Drawableが表示状態でなければ処理をパスする
-            if (!GetModel().GetDrawableDynamicFlagIsVisible(drawableIndex))
+            if (!Model.GetDrawableDynamicFlagIsVisible(drawableIndex))
             {
                 continue;
             }
@@ -453,27 +453,27 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
                         var clipDrawIndex = clipContext._clippingIdList[index];
 
                         // 頂点情報が更新されておらず、信頼性がない場合は描画をパスする
-                        if (!GetModel().GetDrawableDynamicFlagVertexPositionsDidChange(clipDrawIndex))
+                        if (!Model.GetDrawableDynamicFlagVertexPositionsDidChange(clipDrawIndex))
                         {
                             continue;
                         }
 
-                        IsCulling(GetModel().GetDrawableCulling(clipDrawIndex) != 0);
+                        IsCulling(Model.GetDrawableCulling(clipDrawIndex));
 
                         // 今回専用の変換を適用して描く
                         // チャンネルも切り替える必要がある(A,R,G,B)
                         SetClippingContextBufferForMask(clipContext);
 
                         DrawMeshOpenGL(
-                            GetModel().GetDrawableTextureIndex(clipDrawIndex),
-                            GetModel().GetDrawableVertexIndexCount(clipDrawIndex),
-                            GetModel().GetDrawableVertexCount(clipDrawIndex),
-                            GetModel().GetDrawableVertexIndices(clipDrawIndex),
-                            GetModel().GetDrawableVertices(clipDrawIndex),
-                            (float*)GetModel().GetDrawableVertexUvs(clipDrawIndex),
-                            GetModel().GetMultiplyColor(clipDrawIndex),
-                            GetModel().GetScreenColor(clipDrawIndex),
-                            GetModel().GetDrawableOpacity(clipDrawIndex),
+                            Model.GetDrawableTextureIndex(clipDrawIndex),
+                            Model.GetDrawableVertexIndexCount(clipDrawIndex),
+                            Model.GetDrawableVertexCount(clipDrawIndex),
+                            Model.GetDrawableVertexIndices(clipDrawIndex),
+                            Model.GetDrawableVertices(clipDrawIndex),
+                            (float*)Model.GetDrawableVertexUvs(clipDrawIndex),
+                            Model.GetMultiplyColor(clipDrawIndex),
+                            Model.GetScreenColor(clipDrawIndex),
+                            Model.GetDrawableOpacity(clipDrawIndex),
                             CubismBlendMode.CubismBlendMode_Normal,   //クリッピングは通常描画を強制
                             false // マスク生成時はクリッピングの反転使用は全く関係がない
                         );
@@ -493,20 +493,20 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
             // クリッピングマスクをセットする
             SetClippingContextBufferForDraw(clipContext);
 
-            IsCulling(GetModel().GetDrawableCulling(drawableIndex) != 0);
+            IsCulling(Model.GetDrawableCulling(drawableIndex));
 
             DrawMeshOpenGL(
-                GetModel().GetDrawableTextureIndex(drawableIndex),
-                GetModel().GetDrawableVertexIndexCount(drawableIndex),
-                GetModel().GetDrawableVertexCount(drawableIndex),
-                GetModel().GetDrawableVertexIndices(drawableIndex),
-                GetModel().GetDrawableVertices(drawableIndex),
-                (float*)GetModel().GetDrawableVertexUvs(drawableIndex),
-                GetModel().GetMultiplyColor(drawableIndex),
-                GetModel().GetScreenColor(drawableIndex),
-                GetModel().GetDrawableOpacity(drawableIndex),
-                GetModel().GetDrawableBlendMode(drawableIndex),
-                GetModel().GetDrawableInvertedMask(drawableIndex) // マスクを反転使用するか
+                Model.GetDrawableTextureIndex(drawableIndex),
+                Model.GetDrawableVertexIndexCount(drawableIndex),
+                Model.GetDrawableVertexCount(drawableIndex),
+                Model.GetDrawableVertexIndices(drawableIndex),
+                Model.GetDrawableVertices(drawableIndex),
+                (float*)Model.GetDrawableVertexUvs(drawableIndex),
+                Model.GetMultiplyColor(drawableIndex),
+                Model.GetScreenColor(drawableIndex),
+                Model.GetDrawableOpacity(drawableIndex),
+                Model.GetDrawableBlendMode(drawableIndex),
+                Model.GetDrawableInvertedMask(drawableIndex) // マスクを反転使用するか
             );
         }
     }

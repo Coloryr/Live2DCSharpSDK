@@ -99,7 +99,7 @@ public abstract class CubismRenderer : IDisposable
     /// <summary>
     /// レンダリング対象のモデル
     /// </summary>
-    private CubismModel _model;
+    public CubismModel Model { get; private set; }
 
     /// <summary>
     /// falseの場合、マスクを纏めて描画する trueの場合、マスクはパーツ描画ごとに書き直す
@@ -150,7 +150,7 @@ public abstract class CubismRenderer : IDisposable
     /// <param name="maskBufferCount">バッファの生成数</param>
     public virtual void Initialize(CubismModel model, int maskBufferCount)
     {
-        _model = model;
+        Model = model ?? throw new Exception("model is null");
     }
 
     /// <summary>
@@ -158,8 +158,6 @@ public abstract class CubismRenderer : IDisposable
     /// </summary>
     public void DrawModel()
     {
-        if (GetModel() == null) return;
-
         /**
          * DoDrawModelの描画前と描画後に以下の関数を呼んでください。
          * ・SaveProfile();
@@ -278,15 +276,6 @@ public abstract class CubismRenderer : IDisposable
     public void SetAnisotropy(float anisotropy)
     {
         _anisotropy = anisotropy;
-    }
-
-    /// <summary>
-    /// レンダリングするモデルを取得する。
-    /// </summary>
-    /// <returns>レンダリングするモデルのポインタ</returns>
-    public CubismModel GetModel()
-    {
-        return _model;
     }
 
     /// <summary>

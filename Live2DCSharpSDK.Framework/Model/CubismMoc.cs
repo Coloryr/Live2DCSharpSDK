@@ -27,7 +27,7 @@ public class CubismMoc : IDisposable
     /// <returns></returns>
     public CubismMoc(byte[] mocBytes, bool shouldCheckMocConsistency = false)
     {
-        IntPtr alignedBuffer = CubismFramework.AllocateAligned(mocBytes.Length, csmEnum.csmAlignofMoc);
+        IntPtr alignedBuffer = CubismFramework.AllocateAligned(mocBytes.Length, CsmEnum.csmAlignofMoc);
         Marshal.Copy(mocBytes, 0, alignedBuffer, mocBytes.Length);
 
         if (shouldCheckMocConsistency)
@@ -57,7 +57,7 @@ public class CubismMoc : IDisposable
         _mocVersion = CubismCore.csmGetMocVersion(alignedBuffer, mocBytes.Length);
 
         int modelSize = CubismCore.csmGetSizeofModel(_moc);
-        IntPtr modelMemory = CubismFramework.AllocateAligned(modelSize, csmEnum.csmAlignofModel);
+        IntPtr modelMemory = CubismFramework.AllocateAligned(modelSize, CsmEnum.csmAlignofModel);
 
         var model = CubismCore.csmInitializeModelInPlace(_moc, modelMemory, modelSize);
 
@@ -100,7 +100,7 @@ public class CubismMoc : IDisposable
     /// <returns>'true' if Moc is valid; 'false' otherwise.</returns>
     public static bool HasMocConsistencyFromUnrevivedMoc(byte[] data)
     {
-        IntPtr alignedBuffer = CubismFramework.AllocateAligned(data.Length, csmEnum.csmAlignofMoc);
+        IntPtr alignedBuffer = CubismFramework.AllocateAligned(data.Length, CsmEnum.csmAlignofMoc);
         Marshal.Copy(data, 0, alignedBuffer, data.Length);
 
         bool consistency = HasMocConsistency(alignedBuffer, data.Length);

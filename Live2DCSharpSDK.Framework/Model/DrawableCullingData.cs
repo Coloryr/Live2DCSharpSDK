@@ -12,5 +12,5 @@ namespace Live2DCSharpSDK.Framework.Model;
 public record DrawableCullingData
 {
     public bool IsOverwritten { get; set; }
-    public int IsCulling { get; set; }
+    public bool IsCulling { get; set; }
 }

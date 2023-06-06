@@ -250,7 +250,7 @@ public class CubismUserModel : IDisposable
     /// <param name="shouldCheckMocConsistency">MOCの整合性チェックフラグ(初期値 : false)</param>
     public void LoadModel(byte[] buffer, bool shouldCheckMocConsistency = false)
     {
-        _moc = CubismMoc.Create(buffer, shouldCheckMocConsistency);
+        _moc = new CubismMoc(buffer, shouldCheckMocConsistency);
 
         if (_moc == null)
         {
@@ -258,7 +258,7 @@ public class CubismUserModel : IDisposable
             return;
         }
 
-        _model = _moc.CreateModel();
+        _model = _moc.Model;
 
         if (_model == null)
         {

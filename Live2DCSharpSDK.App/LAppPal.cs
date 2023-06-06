@@ -24,9 +24,10 @@ public static class LAppPal
     /// </summary>
     public static void UpdateTime(float time)
     {
-        s_currentFrame = time;
-        s_deltaTime = s_currentFrame - s_lastFrame;
-        s_lastFrame = s_currentFrame;
+        s_deltaTime = time;
+        //s_currentFrame = time;
+        //s_deltaTime = s_currentFrame - s_lastFrame;
+        //s_lastFrame = s_currentFrame;
     }
 
     /// <summary>

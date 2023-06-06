@@ -31,11 +31,11 @@ public class CubismMotionQueueManager
     /// <summary>
     /// コールバック関数ポインタ
     /// </summary>
-    private CubismMotionEventFunction _eventCallback;
+    private CubismMotionEventFunction? _eventCallback;
     /// <summary>
     /// コールバックに戻されるデータ
     /// </summary>
-    private dynamic _eventCustomData;
+    private object _eventCustomData;
 
     /// <summary>
     /// デルタ時間の積算値[秒]
@@ -56,7 +56,7 @@ public class CubismMotionQueueManager
             return null;
         }
 
-        CubismMotionQueueEntry motionQueueEntry = null;
+        CubismMotionQueueEntry motionQueueEntry;
 
         // 既にモーションがあれば終了フラグを立てる
         for (int i = 0; i < _motions.Count; ++i)
@@ -67,13 +67,13 @@ public class CubismMotionQueueManager
                 continue;
             }
 
-            motionQueueEntry.SetFadeout(motionQueueEntry._motion.GetFadeOutTime());
+            motionQueueEntry.SetFadeout(motionQueueEntry.Motion.FadeOut);
         }
 
         motionQueueEntry = new CubismMotionQueueEntry
         {
-            _autoDelete = autoDelete,
-            _motion = motion
+            AutoDelete = autoDelete,
+            Motion = motion
         }; // 終了時に破棄する
 
         _motions.Add(motionQueueEntry);
@@ -99,16 +99,14 @@ public class CubismMotionQueueManager
                 continue;
             }
 
-            ACubismMotion motion = item._motion;
-
-            if (motion == null)
+            if (item.Motion == null)
             {
                 _motions.Remove(item);          // 削除
                 continue;
             }
 
             // ----- 終了済みの処理があれば削除する ------
-            if (!item.IsFinished())
+            if (!item.Finished)
             {
                 return false;
             }
@@ -134,7 +132,7 @@ public class CubismMotionQueueManager
                 continue;
             }
 
-            if (item._motionQueueEntryHandle == motionQueueEntryNumber && !item.IsFinished())
+            if (item._motionQueueEntryHandle == motionQueueEntryNumber && !item.Finished)
             {
                 return false;
             }
@@ -224,7 +222,7 @@ public class CubismMotionQueueManager
                 continue;
             }
 
-            ACubismMotion motion = item._motion;
+            var motion = item.Motion;
 
             if (motion == null)
             {
@@ -238,27 +236,26 @@ public class CubismMotionQueueManager
 
             // ------ ユーザトリガーイベントを検査する ----
             var firedList = motion.GetFiredEvent(
-                item.GetLastCheckEventTime() - item.GetStartTime()
-                , userTimeSeconds - item.GetStartTime()
-            );
+                item.LastEventCheckSeconds - item.StartTime, 
+                userTimeSeconds - item.StartTime);
 
             for (int i = 0; i < firedList.Count; ++i)
             {
-                _eventCallback(this, firedList[i], _eventCustomData);
+                _eventCallback?.Invoke(this, firedList[i], _eventCustomData);
             }
 
-            item.SetLastCheckEventTime(userTimeSeconds);
+            item.LastEventCheckSeconds = userTimeSeconds;
 
             // ----- 終了済みの処理があれば削除する ------
-            if (item.IsFinished())
+            if (item.Finished)
             {
                 _motions.Remove(item);          // 削除
             }
             else
             {
-                if (item.IsTriggeredFadeOut())
+                if (item.IsTriggeredFadeOut)
                 {
-                    item.StartFadeout(item.GetFadeOutSeconds(), userTimeSeconds);
+                    item.StartFadeout(item.FadeOutSeconds, userTimeSeconds);
                 }
             }
         }

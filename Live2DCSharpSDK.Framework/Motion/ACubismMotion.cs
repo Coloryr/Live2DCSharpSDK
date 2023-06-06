@@ -16,33 +16,33 @@ public abstract class ACubismMotion
     /// <summary>
     /// フェードインにかかる時間[秒]
     /// </summary>
-    protected float _fadeInSeconds;
+    public float FadeIn { get; set; }
     /// <summary>
     /// フェードアウトにかかる時間[秒]
     /// </summary>
-    protected float _fadeOutSeconds;
+    public float FadeOut { get; set; }
     /// <summary>
     /// モーションの重み
     /// </summary>
-    protected float _weight;
+    public float Weight { get; set; }
     /// <summary>
     /// モーション再生の開始時刻[秒]
     /// </summary>
-    protected float _offsetSeconds;
+    public float Offset { get; set; }
 
     protected readonly List<string> _firedEventValues = new();
 
     // モーション再生終了コールバック関数
-    protected FinishedMotionCallback _onFinishedMotion;
+    protected FinishedMotionCallback? _onFinishedMotion;
 
     /// <summary>
     /// コンストラクタ。
     /// </summary>
     public ACubismMotion()
     {
-        _fadeInSeconds = -1.0f;
-        _fadeOutSeconds = -1.0f;
-        _weight = 1.0f;
+        FadeIn = -1.0f;
+        FadeOut = -1.0f;
+        Weight = 1.0f;
     }
 
     /// <summary>
@@ -53,38 +53,36 @@ public abstract class ACubismMotion
     /// <param name="userTimeSeconds">デルタ時間の積算値[秒]</param>
     public void UpdateParameters(CubismModel model, CubismMotionQueueEntry motionQueueEntry, float userTimeSeconds)
     {
-        if (!motionQueueEntry.IsAvailable() || motionQueueEntry.IsFinished())
+        if (!motionQueueEntry.Available || motionQueueEntry.Finished)
         {
             return;
         }
 
-        if (!motionQueueEntry.IsStarted())
+        if (!motionQueueEntry.Started)
         {
-            motionQueueEntry.IsStarted(true);
-            motionQueueEntry.SetStartTime(userTimeSeconds - _offsetSeconds); //モーションの開始時刻を記録
-            motionQueueEntry.SetFadeInStartTime(userTimeSeconds); //フェードインの開始時刻
+            motionQueueEntry.Started = true;
+            motionQueueEntry.StartTime = userTimeSeconds - Offset;//モーションの開始時刻を記録
+            motionQueueEntry.FadeInStart = userTimeSeconds; //フェードインの開始時刻
 
             float duration = GetDuration();
 
-            if (motionQueueEntry.GetEndTime() < 0)
+            if (motionQueueEntry.EndTime < 0)
             {
                 //開始していないうちに終了設定している場合がある。
-                motionQueueEntry.SetEndTime((duration <= 0) ? -1 : motionQueueEntry.GetStartTime() + duration);
+                motionQueueEntry.EndTime = (duration <= 0) ? -1 : motionQueueEntry.StartTime + duration;
                 //duration == -1 の場合はループする
             }
         }
 
-        float fadeWeight = _weight; //現在の値と掛け合わせる割合
+        float fadeWeight = Weight; //現在の値と掛け合わせる割合
 
         //---- フェードイン・アウトの処理 ----
         //単純なサイン関数でイージングする
-        float fadeIn = _fadeInSeconds == 0.0f
-                           ? 1.0f
-                           : CubismMath.GetEasingSine((userTimeSeconds - motionQueueEntry.GetFadeInStartTime()) / _fadeInSeconds);
+        float fadeIn = FadeIn == 0.0f ? 1.0f
+                           : CubismMath.GetEasingSine((userTimeSeconds - motionQueueEntry.FadeInStart) / FadeIn);
 
-        float fadeOut = (_fadeOutSeconds == 0.0f || motionQueueEntry.GetEndTime() < 0.0f)
-                            ? 1.0f
-                            : CubismMath.GetEasingSine((motionQueueEntry.GetEndTime() - userTimeSeconds) / _fadeOutSeconds);
+        float fadeOut = (FadeOut == 0.0f || motionQueueEntry.EndTime < 0.0f)  ? 1.0f
+                            : CubismMath.GetEasingSine((motionQueueEntry.EndTime - userTimeSeconds) / FadeOut);
 
         fadeWeight = fadeWeight * fadeIn * fadeOut;
 
@@ -100,64 +98,10 @@ public abstract class ACubismMotion
 
         //後処理
         //終了時刻を過ぎたら終了フラグを立てる（CubismMotionQueueManager）
-        if ((motionQueueEntry.GetEndTime() > 0) && (motionQueueEntry.GetEndTime() < userTimeSeconds))
+        if ((motionQueueEntry.EndTime > 0) && (motionQueueEntry.EndTime < userTimeSeconds))
         {
-            motionQueueEntry.IsFinished(true);      //終了
+            motionQueueEntry.Finished = true;      //終了
         }
-    }
-
-    /// <summary>
-    /// フェードインの時間を設定する。
-    /// </summary>
-    /// <param name="fadeInSeconds">フェードインにかかる時間[秒]</param>
-    public void SetFadeInTime(float fadeInSeconds)
-    {
-        _fadeInSeconds = fadeInSeconds;
-    }
-
-    /// <summary>
-    /// フェードアウトの時間を設定する。
-    /// </summary>
-    /// <param name="fadeOutSeconds">フェードアウトにかかる時間[秒]</param>
-    public void SetFadeOutTime(float fadeOutSeconds)
-    {
-        _fadeOutSeconds = fadeOutSeconds;
-    }
-
-    /// <summary>
-    /// フェードアウトにかかる時間を取得する。
-    /// </summary>
-    /// <returns>フェードアウトにかかる時間[秒]</returns>
-    public float GetFadeOutTime()
-    {
-        return _fadeOutSeconds;
-    }
-
-    /// <summary>
-    /// フェードインにかかる時間を取得する。
-    /// </summary>
-    /// <returns>フェードインにかかる時間[秒]</returns>
-    public float GetFadeInTime()
-    {
-        return _fadeInSeconds;
-    }
-
-    /// <summary>
-    /// モーション適用の重みを設定する。
-    /// </summary>
-    /// <param name="weight">重み(0.0 - 1.0)</param>
-    public void SetWeight(float weight)
-    {
-        _weight = weight;
-    }
-
-    /// <summary>
-    /// モーション適用の重みを取得する。
-    /// </summary>
-    /// <returns>重み(0.0 - 1.0)</returns>
-    public float GetWeight()
-    {
-        return _weight;
     }
 
     /// <summary>
@@ -184,15 +128,6 @@ public abstract class ACubismMotion
     public virtual float GetLoopDuration()
     {
         return -1.0f;
-    }
-
-    /// <summary>
-    /// モーション再生の開始時刻を設定する。
-    /// </summary>
-    /// <param name="offsetSeconds">モーション再生の開始時刻[秒]</param>
-    public void SetOffsetTime(float offsetSeconds)
-    {
-        _offsetSeconds = offsetSeconds;
     }
 
     /// <summary>
@@ -224,7 +159,7 @@ public abstract class ACubismMotion
     /// モーション再生終了コールバックを取得する。
     /// </summary>
     /// <returns>登録されているモーション再生終了コールバック関数。NULLのとき、関数は何も登録されていない。</returns>
-    public FinishedMotionCallback GetFinishedMotionHandler()
+    public FinishedMotionCallback? GetFinishedMotionHandler()
     {
         return _onFinishedMotion;
     }
