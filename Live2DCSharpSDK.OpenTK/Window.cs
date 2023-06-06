@@ -33,7 +33,7 @@ public class Window : GameWindow
     {
         base.OnRenderFrame(e);
 
-        lapp.Run((float)UpdateTime);
+        lapp.Run((float)RenderTime);
 
         var code = GL.GetError();
         if (code != ErrorCode.NoError)

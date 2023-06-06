@@ -419,10 +419,10 @@ public class CubismPhysics
         float* parameterMinimumValues;
         float* parameterDefaultValues;
 
-        parameterValues = CubismCore.csmGetParameterValues(model.GetModel());
-        parameterMaximumValues = CubismCore.csmGetParameterMaximumValues(model.GetModel());
-        parameterMinimumValues = CubismCore.csmGetParameterMinimumValues(model.GetModel());
-        parameterDefaultValues = CubismCore.csmGetParameterDefaultValues(model.GetModel());
+        parameterValues = CubismCore.csmGetParameterValues(model.Model);
+        parameterMaximumValues = CubismCore.csmGetParameterMaximumValues(model.Model);
+        parameterMinimumValues = CubismCore.csmGetParameterMinimumValues(model.Model);
+        parameterDefaultValues = CubismCore.csmGetParameterDefaultValues(model.Model);
 
         if (_parameterCaches.Length < model.GetParameterCount())
         {
@@ -608,10 +608,10 @@ public class CubismPhysics
             _currentRemainTime = 0.0f;
         }
 
-        parameterValues = CubismCore.csmGetParameterValues(model.GetModel());
-        parameterMaximumValues = CubismCore.csmGetParameterMaximumValues(model.GetModel());
-        parameterMinimumValues = CubismCore.csmGetParameterMinimumValues(model.GetModel());
-        parameterDefaultValues = CubismCore.csmGetParameterDefaultValues(model.GetModel());
+        parameterValues = CubismCore.csmGetParameterValues(model.Model);
+        parameterMaximumValues = CubismCore.csmGetParameterMaximumValues(model.Model);
+        parameterMinimumValues = CubismCore.csmGetParameterMinimumValues(model.Model);
+        parameterDefaultValues = CubismCore.csmGetParameterDefaultValues(model.Model);
 
         if (_parameterCaches.Length < model.GetParameterCount())
         {
@@ -828,9 +828,9 @@ public class CubismPhysics
         float* parameterMaximumValues;
         float* parameterMinimumValues;
 
-        parameterValues = CubismCore.csmGetParameterValues(model.GetModel());
-        parameterMaximumValues = CubismCore.csmGetParameterMaximumValues(model.GetModel());
-        parameterMinimumValues = CubismCore.csmGetParameterMinimumValues(model.GetModel());
+        parameterValues = CubismCore.csmGetParameterValues(model.Model);
+        parameterMaximumValues = CubismCore.csmGetParameterMaximumValues(model.Model);
+        parameterMinimumValues = CubismCore.csmGetParameterMinimumValues(model.Model);
 
         for (settingIndex = 0; settingIndex < _physicsRig.SubRigCount; ++settingIndex)
         {

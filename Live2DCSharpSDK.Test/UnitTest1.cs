@@ -40,7 +40,7 @@ public class Tests
     {
         var data = File.ReadAllBytes("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\Haru.moc3");
         var all = new LAppAllocator();
-        var ptr = all.AllocateAligned(data.Length, csmEnum.csmAlignofMoc);
+        var ptr = all.AllocateAligned(data.Length, CsmEnum.csmAlignofMoc);
         Marshal.Copy(data, 0, ptr, data.Length);
         var version = CubismCore.csmGetMocVersion(ptr, data.Length);
         Assert.That(version, Is.Not.Zero);
@@ -74,13 +74,13 @@ public class Tests
         FrameworkInit();
 
         var data = File.ReadAllBytes("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\Haru.moc3");
-        var moc = CubismMoc.Create(data);
+        var moc = new CubismMoc(data);
         Assert.That(moc, Is.Not.Null);
 
-        var model = moc.CreateModel();
+        var model = moc.Model;
         Assert.That(model, Is.Not.Null);
 
         model.Initialize();
-        Assert.That(new IntPtr(model.GetModel()), Is.Not.EqualTo(IntPtr.Zero));
+        Assert.That(model.Model, Is.Not.EqualTo(IntPtr.Zero));
     }
 }

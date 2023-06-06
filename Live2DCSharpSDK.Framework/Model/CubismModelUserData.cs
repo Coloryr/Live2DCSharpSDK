@@ -3,44 +3,6 @@
 namespace Live2DCSharpSDK.Framework.Model;
 
 /// <summary>
-/// Jsonから読み込んだユーザデータを記録しておくための構造体
-/// </summary>
-public record CubismModelUserDataNode
-{
-    /// <summary>
-    /// ユーザデータターゲットタイプ
-    /// </summary>
-    public string TargetType;
-    /// <summary>
-    /// ユーザデータターゲットのID
-    /// </summary>
-    public string TargetId;
-    /// <summary>
-    /// ユーザデータ
-    /// </summary>
-    public string Value;
-}
-
-public record CubismModelUserDataObj
-{
-    public record MetaObj
-    {
-        public int UserDataCount { get; set; }
-        public int TotalUserDataSize { get; set; }
-    }
-
-    public record UserDataObj
-    {
-        public string Target { get; set; }
-        public string Id { get; set; }
-        public string Value { get; set; }
-    }
-
-    public MetaObj Meta { get; set; }
-    public List<UserDataObj> UserData { get; set; }
-}
-
-/// <summary>
 /// ユーザデータをロード、管理、検索インターフェイス、解放までを行う。
 /// </summary>
 public class CubismModelUserData
@@ -63,23 +25,21 @@ public class CubismModelUserData
     /// </summary>
     private readonly List<CubismModelUserDataNode> _artMeshUserDataNodes = new();
 
-    private CubismModelUserDataObj Obj;
-
     /// <summary>
     /// userdata3.jsonをパースする。
     /// </summary>
     /// <param name="data">userdata3.jsonが読み込まれいるバッファ</param>
     public CubismModelUserData(string data)
     {
-        Obj = JsonConvert.DeserializeObject<CubismModelUserDataObj>(data)!;
+        var obj = JsonConvert.DeserializeObject<CubismModelUserDataObj>(data)!;
 
         string typeOfArtMesh = CubismFramework.GetIdManager().GetId(ArtMesh);
 
-        int nodeCount = Obj.Meta.UserDataCount;
+        int nodeCount = obj.Meta.UserDataCount;
 
         for (int i = 0; i < nodeCount; i++)
         {
-            var node = Obj.UserData[i];
+            var node = obj.UserData[i];
             CubismModelUserDataNode addNode = new()
             {
                 TargetId = CubismFramework.GetIdManager().GetId(node.Id),

@@ -15,15 +15,15 @@ public enum CubismMotionCurveTarget
     /// <summary>
     /// モデルに対して
     /// </summary>
-    CubismMotionCurveTarget_Model,
+    Model,
     /// <summary>
     /// パラメータに対して
     /// </summary>
-    CubismMotionCurveTarget_Parameter,
+    Parameter,
     /// <summary>
     /// パーツの不透明度に対して
     /// </summary>
-    CubismMotionCurveTarget_PartOpacity
+    PartOpacity
 };
 
 /// <summary>
@@ -34,19 +34,19 @@ public enum CubismMotionSegmentType : int
     /// <summary>
     /// リニア
     /// </summary>
-    CubismMotionSegmentType_Linear = 0,
+    Linear = 0,
     /// <summary>
     /// ベジェ曲線
     /// </summary>
-    CubismMotionSegmentType_Bezier = 1,
+    Bezier = 1,
     /// <summary>
     /// ステップ
     /// </summary>
-    CubismMotionSegmentType_Stepped = 2,
+    Stepped = 2,
     /// <summary>
     /// インバースステップ
     /// </summary>
-    CubismMotionSegmentType_InverseStepped = 3
+    InverseStepped = 3
 };
 
 /// <summary>

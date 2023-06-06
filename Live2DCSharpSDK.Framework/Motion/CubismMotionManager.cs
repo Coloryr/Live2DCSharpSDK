@@ -10,38 +10,11 @@ public class CubismMotionManager : CubismMotionQueueManager
     /// <summary>
     /// 現在再生中のモーションの優先度
     /// </summary>
-    private int _currentPriority;
+    public int CurrentPriority { get; private set; }
     /// <summary>
     /// 再生予定のモーションの優先度。再生中は0になる。モーションファイルを別スレッドで読み込むときの機能。
     /// </summary>
-    private int _reservePriority;
-
-    /// <summary>
-    /// 再生中のモーションの優先度の取得する。
-    /// </summary>
-    /// <returns>モーションの優先度</returns>
-    public int GetCurrentPriority()
-    {
-        return _currentPriority;
-    }
-
-    /// <summary>
-    /// 予約中のモーションの優先度を取得する。
-    /// </summary>
-    /// <returns>モーションの優先度</returns>
-    public int GetReservePriority()
-    {
-        return _reservePriority;
-    }
-
-    /// <summary>
-    /// 予約中のモーションの優先度を設定する。
-    /// </summary>
-    /// <param name="val">優先度</param>
-    public void SetReservePriority(int val)
-    {
-        _reservePriority = val;
-    }
+    public int ReservePriority { get; set; }
 
     /// <summary>
     /// 優先度を設定してモーションを開始する。
@@ -52,12 +25,12 @@ public class CubismMotionManager : CubismMotionQueueManager
     /// <returns>開始したモーションの識別番号を返す。個別のモーションが終了したか否かを判定するIsFinished()の引数で使用する。開始できない時は「-1」</returns>
     public object StartMotionPriority(ACubismMotion motion, bool autoDelete, int priority)
     {
-        if (priority == _reservePriority)
+        if (priority == ReservePriority)
         {
-            _reservePriority = 0;           // 予約を解除
+            ReservePriority = 0;           // 予約を解除
         }
 
-        _currentPriority = priority;        // 再生中モーションの優先度を設定
+        CurrentPriority = priority;        // 再生中モーションの優先度を設定
 
         return StartMotion(motion, autoDelete, _userTimeSeconds);
     }
@@ -77,7 +50,7 @@ public class CubismMotionManager : CubismMotionQueueManager
 
         if (IsFinished())
         {
-            _currentPriority = 0;           // 再生中モーションの優先度を解除
+            CurrentPriority = 0;           // 再生中モーションの優先度を解除
         }
 
         return updated;
@@ -91,12 +64,12 @@ public class CubismMotionManager : CubismMotionQueueManager
     /// false   予約できなかった</returns>
     public bool ReserveMotion(int priority)
     {
-        if ((priority <= _reservePriority) || (priority <= _currentPriority))
+        if ((priority <= ReservePriority) || (priority <= CurrentPriority))
         {
             return false;
         }
 
-        _reservePriority = priority;
+        ReservePriority = priority;
 
         return true;
     }

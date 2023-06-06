@@ -1,44 +1,8 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using static Live2DCSharpSDK.Framework.ModelObj;
 
 namespace Live2DCSharpSDK.Framework.Effect;
-
-/// <summary>
-/// パーツにまつわる諸々のデータを管理する。
-/// </summary>
-public record PartData
-{
-    /// <summary>
-    /// パーツID
-    /// </summary>
-    public required string PartId { get; set; }
-    /// <summary>
-    /// パラメータのインデックス
-    /// </summary>
-    public int ParameterIndex { get; set; }
-    /// <summary>
-    ///  パーツのインデックス
-    /// </summary>
-    public int PartIndex{ get; set; }
-    /// <summary>
-    ///  連動するパラメータ
-    /// </summary>
-    public readonly List<PartData> Link = new();
-
-    /// <summary>
-    /// 初期化する。
-    /// </summary>
-    /// <param name="model">初期化に使用するモデル</param>
-    public void Initialize(CubismModel model)
-    {
-        ParameterIndex = model.GetParameterIndex(PartId);
-        PartIndex = model.GetPartIndex(PartId);
-
-        model.SetParameterValue(ParameterIndex, 1);
-    }
-}
 
 /// <summary>
 /// パーツの不透明度の管理と設定を行う。
@@ -65,7 +29,7 @@ public class CubismPose
     /// <summary>
     /// フェード時間[秒]
     /// </summary>
-    private float _fadeTimeSeconds;
+    private float _fadeTimeSeconds = DefaultFadeInSeconds;
     /// <summary>
     /// 前回操作したモデル
     /// </summary>
@@ -138,7 +102,7 @@ public class CubismPose
     public void UpdateParameters(CubismModel model, float deltaTimeSeconds)
     {
         // 前回のモデルと同じではないときは初期化が必要
-        if (model != _lastModel)
+        if (model.Model != _lastModel?.Model)
         {
             // パラメータインデックスの初期化
             Reset(model);
@@ -263,7 +227,7 @@ public class CubismPose
                 newOpacity = model.GetPartOpacity(partIndex);
 
                 // 新しい不透明度を計算
-                newOpacity += (deltaTimeSeconds / _fadeTimeSeconds);
+                newOpacity += deltaTimeSeconds / _fadeTimeSeconds;
 
                 if (newOpacity > 1.0f)
                 {

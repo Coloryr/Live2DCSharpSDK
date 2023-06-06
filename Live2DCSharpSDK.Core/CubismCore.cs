@@ -4,11 +4,8 @@ using System.Runtime.InteropServices;
 namespace Live2DCSharpSDK.Core;
 
 using csmFlags = Byte;
-using csmMocVersion = UInt32;
-using csmParameterType = Int32;
-using csmVersion = UInt32;
 
-public static class csmEnum
+public static class CsmEnum
 {
     //Alignment constraints.
 
@@ -26,11 +23,11 @@ public static class csmEnum
     /// <summary>
     /// Additive blend mode mask.
     /// </summary>
-    public const byte csmBlendAdditive = 1 << 0;
+    public const byte CsmBlendAdditive = 1 << 0;
     /// <summary>
     /// Multiplicative blend mode mask.
     /// </summary>
-    public const byte csmBlendMultiplicative = 1 << 1;
+    public const byte CsmBlendMultiplicative = 1 << 1;
     /// <summary>
     /// Double-sidedness mask.
     /// </summary>
@@ -45,65 +42,65 @@ public static class csmEnum
     /// <summary>
     /// Flag set when visible.
     /// </summary>
-    public const byte csmIsVisible = 1 << 0;
+    public const byte CsmIsVisible = 1 << 0;
     /// <summary>
     /// Flag set when visibility did change.
     /// </summary>
-    public const byte csmVisibilityDidChange = 1 << 1;
+    public const byte CsmVisibilityDidChange = 1 << 1;
     /// <summary>
     /// Flag set when opacity did change.
     /// </summary>
-    public const byte csmOpacityDidChange = 1 << 2;
+    public const byte CsmOpacityDidChange = 1 << 2;
     /// <summary>
     /// Flag set when draw order did change.
     /// </summary>
-    public const byte csmDrawOrderDidChange = 1 << 3;
+    public const byte CsmDrawOrderDidChange = 1 << 3;
     /// <summary>
     /// Flag set when render order did change.
     /// </summary>
-    public const byte csmRenderOrderDidChange = 1 << 4;
+    public const byte CsmRenderOrderDidChange = 1 << 4;
     /// <summary>
     /// Flag set when vertex positions did change.
     /// </summary>
-    public const byte csmVertexPositionsDidChange = 1 << 5;
+    public const byte CsmVertexPositionsDidChange = 1 << 5;
     /// <summary>
     /// Flag set when blend color did change.
     /// </summary>
-    public const byte csmBlendColorDidChange = 1 << 6;
+    public const byte CsmBlendColorDidChange = 1 << 6;
 
     //moc3 file format version.
 
     /// <summary>
     /// unknown
     /// </summary>
-    public const int csmMocVersion_Unknown = 0;
+    public const int CsmMocVersion_Unknown = 0;
     /// <summary>
     /// moc3 file version 3.0.00 - 3.2.07
     /// </summary>
-    public const int csmMocVersion_30 = 1;
+    public const int CsmMocVersion_30 = 1;
     /// <summary>
     /// moc3 file version 3.3.00 - 3.3.03
     /// </summary>
-    public const int csmMocVersion_33 = 2;
+    public const int CsmMocVersion_33 = 2;
     /// <summary>
     /// moc3 file version 4.0.00 - 4.1.05
     /// </summary>
-    public const int csmMocVersion_40 = 3;
+    public const int CsmMocVersion_40 = 3;
     /// <summary>
     /// moc3 file version 4.2.00 -
     /// </summary>
-    public const int csmMocVersion_42 = 4;
+    public const int CsmMocVersion_42 = 4;
 
     //Parameter types.
 
     /// <summary>
     /// Normal parameter.
     /// </summary>
-    public const int csmParameterType_Normal = 0;
+    public const int CsmParameterType_Normal = 0;
     /// <summary>
     /// Parameter for blend shape.
     /// </summary>
-    public const int csmParameterType_BlendShape = 1;
+    public const int CsmParameterType_BlendShape = 1;
 }
 
 /// <summary>
@@ -112,7 +109,7 @@ public static class csmEnum
 /// <param name="message">Null-terminated string message to log.</param>
 public delegate void csmLogFunction(string message);
 
-public static class CubismCore
+public static partial class CubismCore
 {
     //VERSION
 
@@ -120,15 +117,15 @@ public static class CubismCore
     /// Queries Core version.
     /// </summary>
     /// <returns>Core version.</returns>
-    [DllImport("Live2DCubismCore", EntryPoint = "csmGetVersion")]
-    public extern static csmVersion GetVersion();
+    [LibraryImport("Live2DCubismCore", EntryPoint = "csmGetVersion")]
+    public static partial uint GetVersion();
 
     /// <summary>
     /// Gets Moc file supported latest version.
     /// </summary>
     /// <returns>csmMocVersion (Moc file latest format version).</returns>
-    [DllImport("Live2DCubismCore", EntryPoint = "csmGetLatestMocVersion")]
-    public extern static uint GetLatestMocVersion();
+    [LibraryImport("Live2DCubismCore", EntryPoint = "csmGetLatestMocVersion")]
+    public static partial uint GetLatestMocVersion();
 
     /// <summary>
     /// Gets Moc file format version.
@@ -214,7 +211,7 @@ public static class CubismCore
     /// <param name="outOriginInPixels">Origin of model on canvas.</param>
     /// <param name="outPixelsPerUnit">Aspect used for scaling pixels to units.</param>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe void csmReadCanvasInfo(IntPtr model, Vector2* outSizeInPixels, Vector2* outOriginInPixels, float* outPixelsPerUnit);
+    public extern static unsafe void csmReadCanvasInfo(IntPtr model, out Vector2 outSizeInPixels, out Vector2 outOriginInPixels, out float outPixelsPerUnit);
 
     //PARAMETERS
 
@@ -233,7 +230,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe byte** csmGetParameterIds(IntPtr model);
+    public extern static unsafe sbyte** csmGetParameterIds(IntPtr model);
 
     /// <summary>
     /// Gets parameter types.
@@ -241,7 +238,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe csmParameterType* csmGetParameterTypes(IntPtr model);
+    public extern static unsafe int* csmGetParameterTypes(IntPtr model);
 
     /// <summary>
     /// Gets minimum parameter values.
@@ -308,7 +305,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe byte** csmGetPartIds(IntPtr model);
+    public extern static unsafe sbyte** csmGetPartIds(IntPtr model);
 
     /// <summary>
     /// Gets read/write part opacities buffer.
@@ -343,7 +340,7 @@ public static class CubismCore
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
     [DllImport("Live2DCubismCore")]
-    public extern static unsafe byte** csmGetDrawableIds(IntPtr model);
+    public extern static unsafe sbyte** csmGetDrawableIds(IntPtr model);
 
     /// <summary>
     /// Gets constant drawable flags.
