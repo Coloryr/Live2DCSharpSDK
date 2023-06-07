@@ -62,7 +62,7 @@ public class CubismMotionQueueManager
                 continue;
             }
 
-            motionQueueEntry.SetFadeout(motionQueueEntry.Motion.FadeOut);
+            motionQueueEntry.SetFadeout(motionQueueEntry.Motion.FadeOutSeconds);
         }
 
         motionQueueEntry = new CubismMotionQueueEntry
@@ -87,6 +87,19 @@ public class CubismMotionQueueManager
 
         foreach (var item in new List<CubismMotionQueueEntry>(_motions))
         {
+            if (item == null)
+            {
+                _motions.Remove(item);
+                continue;
+            }
+
+            var motion = item.Motion;
+            if (motion == null)
+            {
+                _motions.Remove(item);
+                continue;
+            }
+
             // ----- 終了済みの処理があれば削除する ------
             if (!item.Finished)
             {

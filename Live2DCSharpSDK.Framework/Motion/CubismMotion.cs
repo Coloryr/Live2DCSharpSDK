@@ -116,97 +116,97 @@ public unsafe class CubismMotion : ACubismMotion
         return LerpPoints(p012, p123, t).Value;
     }
 
-    private static float BezierEvaluateBinarySearch(List<CubismMotionPoint> points, int start, float time)
-    {
-        float x_error = 0.01f;
+    //private static float BezierEvaluateBinarySearch(List<CubismMotionPoint> points, int start, float time)
+    //{
+    //    float x_error = 0.01f;
 
-        float x = time;
-        float x1 = points[0].Time;
-        float x2 = points[3].Time;
-        float cx1 = points[1].Time;
-        float cx2 = points[2].Time;
+    //    float x = time;
+    //    float x1 = points[0].Time;
+    //    float x2 = points[3].Time;
+    //    float cx1 = points[1].Time;
+    //    float cx2 = points[2].Time;
 
-        float ta = 0.0f;
-        float tb = 1.0f;
-        float t = 0.0f;
-        int i = 0;
-        for (; i < 20; ++i)
-        {
-            if (x < x1 + x_error)
-            {
-                t = ta;
-                break;
-            }
+    //    float ta = 0.0f;
+    //    float tb = 1.0f;
+    //    float t = 0.0f;
+    //    int i = 0;
+    //    for (; i < 20; ++i)
+    //    {
+    //        if (x < x1 + x_error)
+    //        {
+    //            t = ta;
+    //            break;
+    //        }
 
-            if (x2 - x_error < x)
-            {
-                t = tb;
-                break;
-            }
+    //        if (x2 - x_error < x)
+    //        {
+    //            t = tb;
+    //            break;
+    //        }
 
-            float centerx = (cx1 + cx2) * 0.5f;
-            cx1 = (x1 + cx1) * 0.5f;
-            cx2 = (x2 + cx2) * 0.5f;
-            float ctrlx12 = (cx1 + centerx) * 0.5f;
-            float ctrlx21 = (cx2 + centerx) * 0.5f;
-            centerx = (ctrlx12 + ctrlx21) * 0.5f;
-            if (x < centerx)
-            {
-                tb = (ta + tb) * 0.5f;
-                if (centerx - x_error < x)
-                {
-                    t = tb;
-                    break;
-                }
+    //        float centerx = (cx1 + cx2) * 0.5f;
+    //        cx1 = (x1 + cx1) * 0.5f;
+    //        cx2 = (x2 + cx2) * 0.5f;
+    //        float ctrlx12 = (cx1 + centerx) * 0.5f;
+    //        float ctrlx21 = (cx2 + centerx) * 0.5f;
+    //        centerx = (ctrlx12 + ctrlx21) * 0.5f;
+    //        if (x < centerx)
+    //        {
+    //            tb = (ta + tb) * 0.5f;
+    //            if (centerx - x_error < x)
+    //            {
+    //                t = tb;
+    //                break;
+    //            }
 
-                x2 = centerx;
-                cx2 = ctrlx12;
-            }
-            else
-            {
-                ta = (ta + tb) * 0.5f;
-                if (x < centerx + x_error)
-                {
-                    t = ta;
-                    break;
-                }
+    //            x2 = centerx;
+    //            cx2 = ctrlx12;
+    //        }
+    //        else
+    //        {
+    //            ta = (ta + tb) * 0.5f;
+    //            if (x < centerx + x_error)
+    //            {
+    //                t = ta;
+    //                break;
+    //            }
 
-                x1 = centerx;
-                cx1 = ctrlx21;
-            }
-        }
+    //            x1 = centerx;
+    //            cx1 = ctrlx21;
+    //        }
+    //    }
 
-        if (i == 20)
-        {
-            t = (ta + tb) * 0.5f;
-        }
+    //    if (i == 20)
+    //    {
+    //        t = (ta + tb) * 0.5f;
+    //    }
 
-        if (t < 0.0f)
-        {
-            t = 0.0f;
-        }
-        if (t > 1.0f)
-        {
-            t = 1.0f;
-        }
+    //    if (t < 0.0f)
+    //    {
+    //        t = 0.0f;
+    //    }
+    //    if (t > 1.0f)
+    //    {
+    //        t = 1.0f;
+    //    }
 
-        CubismMotionPoint p01 = LerpPoints(points[start], points[start + 1], t);
-        CubismMotionPoint p12 = LerpPoints(points[start + 1], points[start + 2], t);
-        CubismMotionPoint p23 = LerpPoints(points[start + 2], points[start + 3], t);
+    //    CubismMotionPoint p01 = LerpPoints(points[start], points[start + 1], t);
+    //    CubismMotionPoint p12 = LerpPoints(points[start + 1], points[start + 2], t);
+    //    CubismMotionPoint p23 = LerpPoints(points[start + 2], points[start + 3], t);
 
-        CubismMotionPoint p012 = LerpPoints(p01, p12, t);
-        CubismMotionPoint p123 = LerpPoints(p12, p23, t);
+    //    CubismMotionPoint p012 = LerpPoints(p01, p12, t);
+    //    CubismMotionPoint p123 = LerpPoints(p12, p23, t);
 
-        return LerpPoints(p012, p123, t).Value;
-    }
+    //    return LerpPoints(p012, p123, t).Value;
+    //}
 
     private static float BezierEvaluateCardanoInterpretation(CubismMotionPoint[] points, int start, float time)
     {
         float x = time;
-        float x1 = points[0].Time;
-        float x2 = points[3].Time;
-        float cx1 = points[1].Time;
-        float cx2 = points[2].Time;
+        float x1 = points[start].Time;
+        float x2 = points[start + 3].Time;
+        float cx1 = points[start + 1].Time;
+        float cx2 = points[start + 2].Time;
 
         float a = x2 - 3.0f * cx2 + 3.0f * cx1 - x1;
         float b = 3.0f * cx2 - 6.0f * cx1 + 3.0f * x1;
@@ -299,20 +299,20 @@ public unsafe class CubismMotion : ACubismMotion
 
         if (obj.Meta.FadeInTime != null)
         {
-            FadeIn = obj.Meta.FadeInTime < 0.0f ? 1.0f : (float)obj.Meta.FadeInTime;
+            FadeInSeconds = obj.Meta.FadeInTime < 0.0f ? 1.0f : (float)obj.Meta.FadeInTime;
         }
         else
         {
-            FadeIn = 1.0f;
+            FadeInSeconds = 1.0f;
         }
 
         if (obj.Meta.FadeOutTime != null)
         {
-            FadeOut = obj.Meta.FadeOutTime < 0.0f ? 1.0f : (float)obj.Meta.FadeOutTime;
+            FadeOutSeconds = obj.Meta.FadeOutTime < 0.0f ? 1.0f : (float)obj.Meta.FadeOutTime;
         }
         else
         {
-            FadeOut = 1.0f;
+            FadeOutSeconds = 1.0f;
         }
 
         int totalPointCount = 0;
@@ -483,20 +483,11 @@ public unsafe class CubismMotion : ACubismMotion
     /// <param name="motionQueueEntry">CubismMotionQueueManagerで管理されているモーション</param>
     public override void DoUpdateParameters(CubismModel model, float userTimeSeconds, float fadeWeight, CubismMotionQueueEntry motionQueueEntry)
     {
-        if (_modelCurveIdEyeBlink == null)
-        {
-            _modelCurveIdEyeBlink = CubismFramework.GetIdManager().GetId(EffectNameEyeBlink);
-        }
+        _modelCurveIdEyeBlink ??= CubismFramework.GetIdManager().GetId(EffectNameEyeBlink);
 
-        if (_modelCurveIdLipSync == null)
-        {
-            _modelCurveIdLipSync = CubismFramework.GetIdManager().GetId(EffectNameLipSync);
-        }
+        _modelCurveIdLipSync ??= CubismFramework.GetIdManager().GetId(EffectNameLipSync);
 
-        if (_modelCurveIdOpacity == null)
-        {
-            _modelCurveIdOpacity = CubismFramework.GetIdManager().GetId(IdNameOpacity);
-        }
+        _modelCurveIdOpacity ??= CubismFramework.GetIdManager().GetId(IdNameOpacity);
 
         float timeOffsetSeconds = userTimeSeconds - motionQueueEntry.StartTime;
 
@@ -523,11 +514,11 @@ public unsafe class CubismMotion : ACubismMotion
             CubismLog.CubismLogDebug($"too many lip sync targets : {_lipSyncParameterIds.Count}");
         }
 
-        float tmpFadeIn = (FadeIn <= 0.0f) ? 1.0f :
-           CubismMath.GetEasingSine((userTimeSeconds - motionQueueEntry.FadeInStart) / FadeIn);
+        float tmpFadeIn = (FadeInSeconds <= 0.0f) ? 1.0f :
+           CubismMath.GetEasingSine((userTimeSeconds - motionQueueEntry.FadeInStartTime) / FadeInSeconds);
 
-        float tmpFadeOut = (FadeOut <= 0.0f || motionQueueEntry.EndTime < 0.0f) ? 1.0f :
-           CubismMath.GetEasingSine((motionQueueEntry.EndTime - userTimeSeconds) / FadeOut);
+        float tmpFadeOut = (FadeOutSeconds <= 0.0f || motionQueueEntry.EndTime < 0.0f) ? 1.0f :
+           CubismMath.GetEasingSine((motionQueueEntry.EndTime - userTimeSeconds) / FadeOutSeconds);
 
         float value;
         int c, parameterIndex;
@@ -634,7 +625,7 @@ public unsafe class CubismMotion : ACubismMotion
                 else
                 {
                     fin = curves[c].FadeInTime == 0.0f ? 1.0f
-                            : CubismMath.GetEasingSine((userTimeSeconds - motionQueueEntry.FadeInStart) / curves[c].FadeInTime);
+                            : CubismMath.GetEasingSine((userTimeSeconds - motionQueueEntry.FadeInStartTime) / curves[c].FadeInTime);
                 }
 
                 if (curves[c].FadeOutTime < 0.0f)
@@ -716,7 +707,7 @@ public unsafe class CubismMotion : ACubismMotion
                 if (IsLoopFadeIn)
                 {
                     //ループ中でループ用フェードインが有効のときは、フェードイン設定し直し
-                    motionQueueEntry.FadeInStart = userTimeSeconds;
+                    motionQueueEntry.FadeInStartTime = userTimeSeconds;
                 }
             }
             else
