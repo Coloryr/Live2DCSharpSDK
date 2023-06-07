@@ -2,17 +2,6 @@
 
 namespace Live2DCSharpSDK.Framework.Physics;
 
-public static class CubismPhysicsInternal
-{
-    public static void Normalize(this Vector2 vector)
-    {
-        float length = MathF.Pow((vector.X * vector.X) + (vector.Y * vector.Y), 0.5f);
-
-        vector.X /= length;
-        vector.Y /= length;
-    }
-}
-
 /// <summary>
 /// 物理演算の適用先の種類。
 /// </summary>
@@ -66,7 +55,7 @@ public record CubismPhysicsParameter
     /// <summary>
     /// パラメータID
     /// </summary>
-    public string Id;
+    public required string Id;
     /// <summary>
     /// 適用先の種類
     /// </summary>
@@ -171,11 +160,11 @@ public record CubismPhysicsSubRig
     /// <summary>
     /// 正規化された位置
     /// </summary>
-    public CubismPhysicsNormalization NormalizationPosition;
+    public required CubismPhysicsNormalization NormalizationPosition;
     /// <summary>
     /// 正規化された角度
     /// </summary>
-    public CubismPhysicsNormalization NormalizationAngle;
+    public required CubismPhysicsNormalization NormalizationAngle;
 }
 
 /// <summary>
@@ -238,7 +227,7 @@ public record CubismPhysicsInput
     /// <summary>
     /// 入力元のパラメータ
     /// </summary>
-    public CubismPhysicsParameter Source;
+    public required CubismPhysicsParameter Source;
     /// <summary>
     /// 入力元のパラメータのインデックス
     /// </summary>
@@ -258,7 +247,7 @@ public record CubismPhysicsInput
     /// <summary>
     /// 正規化されたパラメータ値の取得関数
     /// </summary>
-    public NormalizedPhysicsParameterValueGetter GetNormalizedParameterValue;
+    public  NormalizedPhysicsParameterValueGetter GetNormalizedParameterValue;
 }
 
 /// <summary>
@@ -269,7 +258,7 @@ public record CubismPhysicsOutput
     /// <summary>
     /// 出力先のパラメータ
     /// </summary>
-    public CubismPhysicsParameter Destination;
+    public required CubismPhysicsParameter Destination;
     /// <summary>
     /// 出力先のパラメータのインデックス
     /// </summary>
@@ -328,19 +317,19 @@ public record CubismPhysicsRig
     /// <summary>
     /// 物理演算の物理点の管理のリスト
     /// </summary>
-    public CubismPhysicsSubRig[] Settings = Array.Empty<CubismPhysicsSubRig>();
+    public required CubismPhysicsSubRig[] Settings;
     /// <summary>
     /// 物理演算の入力のリスト
     /// </summary>
-    public CubismPhysicsInput[] Inputs = Array.Empty<CubismPhysicsInput>();
+    public required CubismPhysicsInput[] Inputs;
     /// <summary>
     /// 物理演算の出力のリスト
     /// </summary>
-    public CubismPhysicsOutput[] Outputs = Array.Empty<CubismPhysicsOutput>();
+    public required CubismPhysicsOutput[] Outputs;
     /// <summary>
     /// 物理演算の物理点のリスト
     /// </summary>
-    public CubismPhysicsParticle[] Particles = Array.Empty<CubismPhysicsParticle>();
+    public required CubismPhysicsParticle[] Particles;
     /// <summary>
     /// 重力
     /// </summary>

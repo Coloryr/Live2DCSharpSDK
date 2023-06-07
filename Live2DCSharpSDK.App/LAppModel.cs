@@ -225,7 +225,7 @@ public class LAppModel : CubismUserModel
         _breath?.UpdateParameters(_model, deltaTimeSeconds);
 
         // 物理演算の設定
-        //_physics?.Evaluate(_model, deltaTimeSeconds);
+        _physics?.Evaluate(_model, deltaTimeSeconds);
 
         // リップシンクの設定
         if (_lipSync)
