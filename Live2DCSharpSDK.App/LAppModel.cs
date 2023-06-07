@@ -357,7 +357,7 @@ public class LAppModel : CubismUserModel
         if (!motionUpdated)
         {
             // メインモーションの更新がないとき
-            _eyeBlink?.UpdateParameters(Model, deltaTimeSeconds); // 目パチ
+            //_eyeBlink?.UpdateParameters(Model, deltaTimeSeconds); // 目パチ
         }
 
         _expressionManager?.UpdateMotion(Model, deltaTimeSeconds); // 表情でパラメータ更新（相対変化）
@@ -469,13 +469,13 @@ public class LAppModel : CubismUserModel
             float fadeTime = _modelSetting.GetMotionFadeInTimeValue(group, no);
             if (fadeTime >= 0.0f)
             {
-                motion.FadeIn = fadeTime;
+                motion.FadeInSeconds = fadeTime;
             }
 
             fadeTime = _modelSetting.GetMotionFadeOutTimeValue(group, no);
             if (fadeTime >= 0.0f)
             {
-                motion.FadeOut = fadeTime;
+                motion.FadeOutSeconds = fadeTime;
             }
             motion.SetEffectIds(_eyeBlinkIds, _lipSyncIds);
         }
@@ -677,14 +677,14 @@ public class LAppModel : CubismUserModel
             float fadeTime = _modelSetting.GetMotionFadeInTimeValue(group, i);
             if (fadeTime >= 0.0f)
             {
-                tmpMotion.FadeIn = fadeTime;
+                tmpMotion.FadeInSeconds = fadeTime;
             }
 
             // フェードアウトの時間を取得
             fadeTime = _modelSetting.GetMotionFadeOutTimeValue(group, i);
             if (fadeTime >= 0.0f)
             {
-                tmpMotion.FadeOut = fadeTime;
+                tmpMotion.FadeOutSeconds = fadeTime;
             }
             tmpMotion.SetEffectIds(_eyeBlinkIds, _lipSyncIds);
 

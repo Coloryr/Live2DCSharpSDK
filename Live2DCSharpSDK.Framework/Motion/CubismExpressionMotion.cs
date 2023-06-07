@@ -32,9 +32,9 @@ public class CubismExpressionMotion : ACubismMotion
     {
         var json = JObject.Parse(buf);
 
-        FadeIn = json.ContainsKey(ExpressionKeyFadeIn)
+        FadeInSeconds = json.ContainsKey(ExpressionKeyFadeIn)
             ? (float)json[ExpressionKeyFadeIn]! : DefaultFadeTime;   // フェードイン
-        FadeOut = json.ContainsKey(ExpressionKeyFadeOut)
+        FadeOutSeconds = json.ContainsKey(ExpressionKeyFadeOut)
             ? (float)json[ExpressionKeyFadeOut]! : DefaultFadeTime; // フェードアウト
 
         // 各パラメータについて

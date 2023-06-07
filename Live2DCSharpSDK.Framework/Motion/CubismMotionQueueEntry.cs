@@ -29,7 +29,7 @@ public class CubismMotionQueueEntry
     /// <summary>
     /// フェードイン開始時刻（ループの時は初回のみ）[秒]
     /// </summary>
-    public float FadeInStart { get; set; }
+    public float FadeInStartTime { get; set; }
     /// <summary>
     /// 終了予定時刻[秒]
     /// </summary>
@@ -37,7 +37,7 @@ public class CubismMotionQueueEntry
     /// <summary>
     /// 時刻の状態[秒]
     /// </summary>
-    public float StateTimeSeconds { get; private set; }
+    public float StateTime { get; private set; }
     /// <summary>
     /// 重みの状態
     /// </summary>
@@ -100,7 +100,7 @@ public class CubismMotionQueueEntry
     /// <param name="weight">モーションの重み</param>
     public void SetState(float timeSeconds, float weight)
     {
-        StateTimeSeconds = timeSeconds;
+        StateTime = timeSeconds;
         StateWeight = weight;
     }
 }

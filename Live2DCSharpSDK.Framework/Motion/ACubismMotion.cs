@@ -16,11 +16,11 @@ public abstract class ACubismMotion
     /// <summary>
     /// フェードインにかかる時間[秒]
     /// </summary>
-    public float FadeIn { get; set; }
+    public float FadeInSeconds { get; set; }
     /// <summary>
     /// フェードアウトにかかる時間[秒]
     /// </summary>
-    public float FadeOut { get; set; }
+    public float FadeOutSeconds { get; set; }
     /// <summary>
     /// モーションの重み
     /// </summary>
@@ -40,8 +40,8 @@ public abstract class ACubismMotion
     /// </summary>
     public ACubismMotion()
     {
-        FadeIn = -1.0f;
-        FadeOut = -1.0f;
+        FadeInSeconds = -1.0f;
+        FadeOutSeconds = -1.0f;
         Weight = 1.0f;
     }
 
@@ -62,7 +62,7 @@ public abstract class ACubismMotion
         {
             motionQueueEntry.Started = true;
             motionQueueEntry.StartTime = userTimeSeconds - Offset;//モーションの開始時刻を記録
-            motionQueueEntry.FadeInStart = userTimeSeconds; //フェードインの開始時刻
+            motionQueueEntry.FadeInStartTime = userTimeSeconds; //フェードインの開始時刻
 
             float duration = GetDuration();
 
@@ -78,11 +78,11 @@ public abstract class ACubismMotion
 
         //---- フェードイン・アウトの処理 ----
         //単純なサイン関数でイージングする
-        float fadeIn = FadeIn == 0.0f ? 1.0f
-                           : CubismMath.GetEasingSine((userTimeSeconds - motionQueueEntry.FadeInStart) / FadeIn);
+        float fadeIn = FadeInSeconds == 0.0f ? 1.0f
+                           : CubismMath.GetEasingSine((userTimeSeconds - motionQueueEntry.FadeInStartTime) / FadeInSeconds);
 
-        float fadeOut = (FadeOut == 0.0f || motionQueueEntry.EndTime < 0.0f)  ? 1.0f
-                            : CubismMath.GetEasingSine((motionQueueEntry.EndTime - userTimeSeconds) / FadeOut);
+        float fadeOut = (FadeOutSeconds == 0.0f || motionQueueEntry.EndTime < 0.0f)  ? 1.0f
+                            : CubismMath.GetEasingSine((motionQueueEntry.EndTime - userTimeSeconds) / FadeOutSeconds);
 
         fadeWeight = fadeWeight * fadeIn * fadeOut;
 
