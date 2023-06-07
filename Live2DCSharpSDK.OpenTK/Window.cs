@@ -21,16 +21,62 @@ public class Window : GameWindow
     {
         base.OnLoad();
         lapp = new(new OpenTKApi(this));
-        //lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
-        //var model = lapp.Live2dManager.GetModel(0);
-        //var list = model.Expressions;
-        //var list1 = model.Motions;
-        //model.ModelMatrix.TranslateX(0.5f);
-        //model.StartMotion(list1[2], MotionPriority.PriorityNormal);
+        var model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        model.ModelMatrix.TranslateX(0.9f);
 
-        lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
-        //model = lapp.Live2dManager.GetModel(1);
-        //model.ModelMatrix.TranslateX(-0.5f);
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        model.ModelMatrix.TranslateX(0.8f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        model.ModelMatrix.TranslateX(0.7f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        model.ModelMatrix.TranslateX(0.6f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        model.ModelMatrix.TranslateX(0.5f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        model.ModelMatrix.TranslateX(0.4f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        model.ModelMatrix.TranslateX(0.3f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        model.ModelMatrix.TranslateX(0.1f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        model.ModelMatrix.TranslateX(0.0f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
+        model.ModelMatrix.TranslateX(-0.0f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
+        model.ModelMatrix.TranslateX(-0.1f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
+        model.ModelMatrix.TranslateX(-0.2f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
+        model.ModelMatrix.TranslateX(-0.3f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
+        model.ModelMatrix.TranslateX(-0.4f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
+        model.ModelMatrix.TranslateX(-0.5f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
+        model.ModelMatrix.TranslateX(-0.6f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
+        model.ModelMatrix.TranslateX(-0.7f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
+        model.ModelMatrix.TranslateX(-0.8f);
+
+        model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
+        model.ModelMatrix.TranslateX(-0.9f);
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
