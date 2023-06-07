@@ -139,12 +139,7 @@ public static class CubismMath
     /// <returns>ラジアン値から変換した方向ベクトル</returns>
     public static Vector2 RadianToDirection(float totalAngle)
     {
-        Vector2 ret;
-
-        ret.X = MathF.Sin(totalAngle);
-        ret.Y = MathF.Cos(totalAngle);
-
-        return ret;
+        return new Vector2(MathF.Sin(totalAngle), MathF.Cos(totalAngle));
     }
 
     /// <summary>
@@ -191,15 +186,17 @@ public static class CubismMath
         float ca = c / a;
         float da = d / a;
 
-
         float p = (3.0f * ca - ba * ba) / 3.0f;
         float p3 = p / 3.0f;
         float q = (2.0f * ba * ba * ba - 9.0f * ba * ca + 27.0f * da) / 27.0f;
         float q2 = q / 2.0f;
         float discriminant = q2 * q2 + p3 * p3 * p3;
 
-        const float center = 0.5f;
-        const float threshold = center + 0.01f;
+        float center = 0.5f;
+        float threshold = center + 0.01f;
+
+        float root1;
+        float u1;
 
         if (discriminant < 0.0f)
         {
@@ -212,7 +209,7 @@ public static class CubismMath
             float crtr = MathF.Cbrt(r);
             float t1 = 2.0f * crtr;
 
-            float root1 = t1 * MathF.Cos(phi / 3.0f) - ba / 3.0f;
+            root1 = t1 * MathF.Cos(phi / 3.0f) - ba / 3.0f;
             if (MathF.Abs(root1 - center) < threshold)
             {
                 return RangeF(root1, 0.0f, 1.0f);
@@ -227,10 +224,8 @@ public static class CubismMath
             float root3 = t1 * MathF.Cos((phi + 4.0f * Pi) / 3.0f) - ba / 3.0f;
             return RangeF(root3, 0.0f, 1.0f);
         }
-
-        if (discriminant == 0.0f)
+        else if (discriminant == 0.0f)
         {
-            float u1;
             if (q2 < 0.0f)
             {
                 u1 = MathF.Cbrt(-q2);
@@ -240,7 +235,7 @@ public static class CubismMath
                 u1 = -MathF.Cbrt(q2);
             }
 
-            float root1 = 2.0f * u1 - ba / 3.0f;
+            root1 = 2.0f * u1 - ba / 3.0f;
             if (MathF.Abs(root1 - center) < threshold)
             {
                 return RangeF(root1, 0.0f, 1.0f);
@@ -250,12 +245,10 @@ public static class CubismMath
             return RangeF(root2, 0.0f, 1.0f);
         }
 
-        {
-            float sd = MathF.Sqrt(discriminant);
-            float u1 = MathF.Cbrt(sd - q2);
-            float v1 = MathF.Cbrt(sd + q2);
-            float root1 = u1 - v1 - ba / 3.0f;
-            return RangeF(root1, 0.0f, 1.0f);
-        }
+        float sd = MathF.Sqrt(discriminant);
+        u1 = MathF.Cbrt(sd - q2);
+        float v1 = MathF.Cbrt(sd + q2);
+        root1 = u1 - v1 - ba / 3.0f;
+        return RangeF(root1, 0.0f, 1.0f);
     }
 }
