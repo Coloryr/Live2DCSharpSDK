@@ -5,6 +5,8 @@ using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Motion;
 using Live2DCSharpSDK.Framework.Rendering.OpenGL;
 using Live2DCSharpSDK.Framework.Type;
+using System;
+using System.IO;
 
 namespace Live2DCSharpSDK.App;
 
@@ -39,8 +41,8 @@ public class LAppModel : CubismUserModel
     /// </summary>
     private readonly Dictionary<string, ACubismMotion> _expressions = new();
 
-    private readonly List<RectF> _hitArea = new();
-    private readonly List<RectF> _userArea = new();
+    public List<string> Motions => new(_motions.Keys);
+    public List<string> Expressions => new(_expressions.Keys);
 
     /// <summary>
     /// パラメータID: ParamAngleX
@@ -72,18 +74,13 @@ public class LAppModel : CubismUserModel
     /// </summary>
     //LAppWavFileHandler _wavFileHandler;
 
-    /// <summary>
-    /// フレームバッファ以外の描画先
-    /// </summary>
-    private CubismOffscreenFrame_OpenGLES2 _renderBuffer;
+    private readonly LAppDelegate Lapp;
 
-    private LAppDelegate Lapp;
-
-    private Random random = new();
+    private readonly Random random = new();
 
     public event Action<LAppModel, string>? Motion;
 
-    public LAppModel(LAppDelegate lapp)
+    public LAppModel(LAppDelegate lapp, string dir, string fileName)
     {
         Lapp = lapp;
 
@@ -109,29 +106,7 @@ public class LAppModel : CubismUserModel
             .GetId(CubismDefaultParameterId.ParamEyeBallX);
         _idParamEyeBallY = CubismFramework.GetIdManager()
             .GetId(CubismDefaultParameterId.ParamEyeBallY);
-    }
 
-    public new void Dispose()
-    {
-        base.Dispose();
-
-        _renderBuffer.DestroyOffscreenFrame();
-
-        ReleaseMotions();
-        ReleaseExpressions();
-
-        for (int i = 0; i < _modelSetting.GetMotionGroupCount(); i++)
-        {
-            var group = _modelSetting.GetMotionGroupName(i);
-            ReleaseMotionGroup(group);
-        }
-    }
-
-    /// <summary>
-    /// model3.jsonが置かれたディレクトリとファイルパスからモデルを生成する
-    /// </summary>
-    public void LoadAssets(string dir, string fileName)
-    {
         _modelHomeDir = dir;
 
         if (_debugMode)
@@ -141,389 +116,6 @@ public class LAppModel : CubismUserModel
 
         var setting = new CubismModelSettingJson(File.ReadAllText(fileName));
 
-        SetupModel(setting);
-
-        if (Model == null)
-        {
-            LAppPal.PrintLog("Failed to LoadAssets().");
-            return;
-        }
-
-        CreateRenderer(new CubismRenderer_OpenGLES2(Lapp.GL));
-
-        SetupTextures();
-    }
-
-    /// <summary>
-    /// レンダラを再構築する
-    /// </summary>
-    public void ReloadRenderer()
-    {
-        DeleteRenderer();
-
-        CreateRenderer(new CubismRenderer_OpenGLES2(Lapp.GL));
-
-        SetupTextures();
-    }
-
-    /// <summary>
-    /// モデルの更新処理。モデルのパラメータから描画状態を決定する。
-    /// </summary>
-    public void Update()
-    {
-        float deltaTimeSeconds = LAppPal.GetDeltaTime();
-        _userTimeSeconds += deltaTimeSeconds;
-
-        _dragManager.Update(deltaTimeSeconds);
-        _dragX = _dragManager.FaceX;
-        _dragY = _dragManager.FaceY;
-
-        // モーションによるパラメータ更新の有無
-        bool motionUpdated = false;
-
-        //-----------------------------------------------------------------
-        Model.LoadParameters(); // 前回セーブされた状態をロード
-        if (_motionManager.IsFinished())
-        {
-            // モーションの再生がない場合、待機モーションの中からランダムで再生する
-            StartRandomMotion(LAppDefine.MotionGroupIdle, LAppDefine.PriorityIdle);
-        }
-        else
-        {
-            motionUpdated = _motionManager.UpdateMotion(Model, deltaTimeSeconds); // モーションを更新
-        }
-        Model.SaveParameters(); // 状態を保存
-
-        //-----------------------------------------------------------------
-
-        // 不透明度
-        Opacity = Model.GetModelOpacity();
-
-        // まばたき
-        if (!motionUpdated)
-        {
-            // メインモーションの更新がないとき
-            _eyeBlink?.UpdateParameters(Model, deltaTimeSeconds); // 目パチ
-        }
-
-        _expressionManager?.UpdateMotion(Model, deltaTimeSeconds); // 表情でパラメータ更新（相対変化）
-
-        //ドラッグによる変化
-        //ドラッグによる顔の向きの調整
-        Model.AddParameterValue(_idParamAngleX, _dragX * 30); // -30から30の値を加える
-        Model.AddParameterValue(_idParamAngleY, _dragY * 30);
-        Model.AddParameterValue(_idParamAngleZ, _dragX * _dragY * -30);
-
-        //ドラッグによる体の向きの調整
-        Model.AddParameterValue(_idParamBodyAngleX, _dragX * 10); // -10から10の値を加える
-
-        //ドラッグによる目の向きの調整
-        Model.AddParameterValue(_idParamEyeBallX, _dragX); // -1から1の値を加える
-        Model.AddParameterValue(_idParamEyeBallY, _dragY);
-
-        // 呼吸など
-        _breath?.UpdateParameters(Model, deltaTimeSeconds);
-
-        // 物理演算の設定
-        _physics?.Evaluate(Model, deltaTimeSeconds);
-
-        // リップシンクの設定
-        if (_lipSync)
-        {
-            // リアルタイムでリップシンクを行う場合、システムから音量を取得して0〜1の範囲で値を入力します。
-            float value = 0.0f;
-
-            // 状態更新/RMS値取得
-            //_wavFileHandler.Update(deltaTimeSeconds);
-            //value = _wavFileHandler.GetRms();
-
-            for (int i = 0; i < _lipSyncIds.Count; ++i)
-            {
-                Model.AddParameterValue(_lipSyncIds[i], value, 0.8f);
-            }
-        }
-
-        // ポーズの設定
-        _pose?.UpdateParameters(Model, deltaTimeSeconds);
-
-        Model.Update();
-    }
-
-    /// <summary>
-    /// モデルを描画する処理。モデルを描画する空間のView-Projection行列を渡す。
-    /// </summary>
-    /// <param name="matrix">View-Projection行列</param>
-    public void Draw(CubismMatrix44 matrix)
-    {
-        if (Model == null)
-        {
-            return;
-        }
-
-        matrix.MultiplyByMatrix(ModelMatrix);
-
-        (Renderer as CubismRenderer_OpenGLES2)?.SetMvpMatrix(matrix);
-
-        DoDraw();
-    }
-
-    /// <summary>
-    /// 引数で指定したモーションの再生を開始する。
-    /// </summary>
-    /// <param name="group">モーショングループ名</param>
-    /// <param name="no">グループ内の番号</param>
-    /// <param name="priority">優先度</param>
-    /// <param name="onFinishedMotionHandler">モーション再生終了時に呼び出されるコールバック関数。NULLの場合、呼び出されない。</param>
-    /// <returns>開始したモーションの識別番号を返す。個別のモーションが終了したか否かを判定するIsFinished()の引数で使用する。開始できない時は「-1」</returns>
-    public dynamic StartMotion(string group, int no, int priority, FinishedMotionCallback onFinishedMotionHandler = null)
-    {
-        if (priority == LAppDefine.PriorityForce)
-        {
-            _motionManager.ReservePriority = priority;
-        }
-        else if (!_motionManager.ReserveMotion(priority))
-        {
-            if (_debugMode)
-            {
-                LAppPal.PrintLog("[APP]can't start motion.");
-            }
-            return null;
-        }
-
-        string fileName = _modelSetting.GetMotionFileName(group, no);
-
-        //ex) idle_0
-        string name = $"{group}_{no}";
-
-        bool autoDelete = false;
-        CubismMotion motion;
-        if (!_motions.ContainsKey(name))
-        {
-            string path = fileName;
-            path = _modelHomeDir + path;
-
-            motion = new CubismMotion(File.ReadAllText(path), onFinishedMotionHandler);
-            float fadeTime = _modelSetting.GetMotionFadeInTimeValue(group, no);
-            if (fadeTime >= 0.0f)
-            {
-                motion.FadeIn = fadeTime;
-            }
-
-            fadeTime = _modelSetting.GetMotionFadeOutTimeValue(group, no);
-            if (fadeTime >= 0.0f)
-            {
-                motion.FadeOut = fadeTime;
-            }
-            motion.SetEffectIds(_eyeBlinkIds, _lipSyncIds);
-            autoDelete = true; // 終了時にメモリから削除
-        }
-        else
-        {
-            motion = (_motions[name] as CubismMotion)!;
-            motion.SetFinishedMotionHandler(onFinishedMotionHandler);
-        }
-
-        //voice
-        string voice = _modelSetting.GetMotionSoundFileName(group, no);
-        if (!string.IsNullOrWhiteSpace(voice))
-        {
-            string path = voice;
-            path = _modelHomeDir + path;
-            //_wavFileHandler.Start(path);
-        }
-
-        if (_debugMode)
-        {
-            LAppPal.PrintLog($"[APP]start motion: [{group}_{no}]");
-        }
-        return _motionManager.StartMotionPriority(motion, autoDelete, priority);
-    }
-
-    /// <summary>
-    /// ランダムに選ばれたモーションの再生を開始する。
-    /// </summary>
-    /// <param name="group">モーショングループ名</param>
-    /// <param name="priority">優先度</param>
-    /// <param name="onFinishedMotionHandler">モーション再生終了時に呼び出されるコールバック関数。NULLの場合、呼び出されない。</param>
-    /// <returns>開始したモーションの識別番号を返す。個別のモーションが終了したか否かを判定するIsFinished()の引数で使用する。開始できない時は「-1」</returns>
-    public dynamic StartRandomMotion(string group, int priority, FinishedMotionCallback onFinishedMotionHandler = null)
-    {
-        if (_modelSetting.GetMotionCount(group) == 0)
-        {
-            return null;
-        }
-
-        int no = random.Next() % _modelSetting.GetMotionCount(group);
-
-        return StartMotion(group, no, priority, onFinishedMotionHandler);
-    }
-
-    /// <summary>
-    /// 引数で指定した表情モーションをセットする
-    /// </summary>
-    /// <param name="expressionID">表情モーションのID</param>
-    public void SetExpression(string expressionID)
-    {
-        ACubismMotion motion = _expressions[expressionID];
-        if (_debugMode)
-        {
-            LAppPal.PrintLog($"[APP]expression: [{expressionID}]");
-        }
-
-        if (motion != null)
-        {
-            _expressionManager.StartMotionPriority(motion, false, LAppDefine.PriorityForce);
-        }
-        else
-        {
-            if (_debugMode) LAppPal.PrintLog($"[APP]expression[{expressionID}] is null ");
-        }
-    }
-
-    /// <summary>
-    /// ランダムに選ばれた表情モーションをセットする
-    /// </summary>
-    public void SetRandomExpression()
-    {
-        if (_expressions.Count == 0)
-        {
-            return;
-        }
-
-        int no = random.Next() % _expressions.Count;
-        int i = 0;
-        foreach (var item in _expressions)
-        {
-            if (i == no)
-            {
-                SetExpression(item.Key);
-                return;
-            }
-            i++;
-        }
-    }
-
-    /// <summary>
-    /// イベントの発火を受け取る
-    /// </summary>
-    /// <param name="eventValue"></param>
-    protected override void MotionEventFired(string eventValue)
-    {
-        CubismLog.CubismLogInfo($"{eventValue} is fired on LAppModel!!");
-        Motion?.Invoke(this, eventValue);
-    }
-
-    /// <summary>
-    /// 当たり判定テスト。
-    /// 指定IDの頂点リストから矩形を計算し、座標が矩形範囲内か判定する。
-    /// </summary>
-    /// <param name="hitAreaName">当たり判定をテストする対象のID</param>
-    /// <param name="x">判定を行うX座標</param>
-    /// <param name="y">判定を行うY座標</param>
-    /// <returns></returns>
-    public bool HitTest(string hitAreaName, float x, float y)
-    {
-        // 透明時は当たり判定なし。
-        if (Opacity < 1)
-        {
-            return false;
-        }
-        int count = _modelSetting.GetHitAreasCount();
-        for (int i = 0; i < count; i++)
-        {
-            if (_modelSetting.GetHitAreaName(i) == hitAreaName)
-            {
-                return IsHit(_modelSetting.GetHitAreaId(i), x, y);
-            }
-        }
-        return false; // 存在しない場合はfalse
-    }
-
-    /// <summary>
-    /// 別ターゲットに描画する際に使用するバッファの取得
-    /// </summary>
-    public CubismOffscreenFrame_OpenGLES2 GetRenderBuffer()
-    {
-        return _renderBuffer;
-    }
-
-    /// <summary>
-    /// .moc3ファイルの整合性をチェックする
-    /// </summary>
-    /// <param name="mocFileName">MOC3ファイル名</param>
-    /// <returns>MOC3に整合性があれば'true'、そうでなければ'false'。</returns>
-    public bool HasMocConsistencyFromFile(string mocFileName)
-    {
-        if (string.IsNullOrWhiteSpace(mocFileName))
-        {
-            throw new ArgumentNullException("mocFileName is empty");
-        }
-        var path = mocFileName;
-        path = _modelHomeDir + path;
-
-        var consistency = CubismMoc.HasMocConsistencyFromUnrevivedMoc(File.ReadAllBytes(path));
-        if (!consistency)
-        {
-            CubismLog.CubismLogInfo("Inconsistent MOC3.");
-        }
-        else
-        {
-            CubismLog.CubismLogInfo("Consistent MOC3.");
-        }
-
-        return consistency;
-    }
-
-    /// <summary>
-    /// モデルを描画する処理。モデルを描画する空間のView-Projection行列を渡す。
-    /// </summary>
-    protected void DoDraw()
-    {
-        if (Model == null)
-        {
-            return;
-        }
-
-        (Renderer as CubismRenderer_OpenGLES2)?.DrawModel();
-    }
-
-    /// <summary>
-    /// すべてのモーションデータを解放する。
-    /// </summary>
-    private void ReleaseMotions()
-    {
-        _motions.Clear();
-    }
-
-    /// <summary>
-    /// すべての表情データを解放する。
-    /// </summary>
-    private void ReleaseExpressions()
-    {
-        _expressions.Clear();
-    }
-
-    /// <summary>
-    /// モーションデータをグループ名から一括で解放する。
-    /// モーションデータの名前は内部でModelSettingから取得する。
-    /// </summary>
-    /// <param name="group">モーションデータのグループ名</param>
-    private void ReleaseMotionGroup(string group)
-    {
-        var count = _modelSetting.GetMotionCount(group);
-        for (int i = 0; i < count; i++)
-        {
-            string voice = _modelSetting.GetMotionSoundFileName(group, i);
-        }
-    }
-
-    /// <summary>
-    /// model3.jsonからモデルを生成する。
-    /// model3.jsonの記述に従ってモデル生成、モーション、物理演算などのコンポーネント生成を行う。
-    /// </summary>
-    /// <param name="setting">ICubismModelSettingのインスタンス</param>
-    private void SetupModel(CubismModelSettingJson setting)
-    {
         Updating = true;
         Initialized = false;
 
@@ -690,6 +282,350 @@ public class LAppModel : CubismUserModel
 
         Updating = false;
         Initialized = true;
+
+        if (Model == null)
+        {
+            LAppPal.PrintLog("Failed to LoadAssets().");
+            return;
+        }
+
+        CreateRenderer(new CubismRenderer_OpenGLES2(Lapp.GL));
+
+        SetupTextures();
+    }
+
+    public new void Dispose()
+    {
+        base.Dispose();
+
+        _motions.Clear();
+        _expressions.Clear();
+
+        for (int i = 0; i < _modelSetting.GetMotionGroupCount(); i++)
+        {
+            var group = _modelSetting.GetMotionGroupName(i);
+            ReleaseMotionGroup(group);
+        }
+    }
+
+    /// <summary>
+    /// レンダラを再構築する
+    /// </summary>
+    public void ReloadRenderer()
+    {
+        DeleteRenderer();
+
+        CreateRenderer(new CubismRenderer_OpenGLES2(Lapp.GL));
+
+        SetupTextures();
+    }
+
+    /// <summary>
+    /// モデルの更新処理。モデルのパラメータから描画状態を決定する。
+    /// </summary>
+    public void Update()
+    {
+        float deltaTimeSeconds = LAppPal.GetDeltaTime();
+        _userTimeSeconds += deltaTimeSeconds;
+
+        _dragManager.Update(deltaTimeSeconds);
+        _dragX = _dragManager.FaceX;
+        _dragY = _dragManager.FaceY;
+
+        // モーションによるパラメータ更新の有無
+        bool motionUpdated = false;
+
+        //-----------------------------------------------------------------
+        Model.LoadParameters(); // 前回セーブされた状態をロード
+        if (_motionManager.IsFinished())
+        {
+            // モーションの再生がない場合、待機モーションの中からランダムで再生する
+            StartRandomMotion(LAppDefine.MotionGroupIdle, MotionPriority.PriorityIdle);
+        }
+        else
+        {
+            motionUpdated = _motionManager.UpdateMotion(Model, deltaTimeSeconds); // モーションを更新
+        }
+        Model.SaveParameters(); // 状態を保存
+
+        //-----------------------------------------------------------------
+
+        // 不透明度
+        Opacity = Model.GetModelOpacity();
+
+        // まばたき
+        if (!motionUpdated)
+        {
+            // メインモーションの更新がないとき
+            _eyeBlink?.UpdateParameters(Model, deltaTimeSeconds); // 目パチ
+        }
+
+        _expressionManager?.UpdateMotion(Model, deltaTimeSeconds); // 表情でパラメータ更新（相対変化）
+
+        //ドラッグによる変化
+        //ドラッグによる顔の向きの調整
+        Model.AddParameterValue(_idParamAngleX, _dragX * 30); // -30から30の値を加える
+        Model.AddParameterValue(_idParamAngleY, _dragY * 30);
+        Model.AddParameterValue(_idParamAngleZ, _dragX * _dragY * -30);
+
+        //ドラッグによる体の向きの調整
+        Model.AddParameterValue(_idParamBodyAngleX, _dragX * 10); // -10から10の値を加える
+
+        //ドラッグによる目の向きの調整
+        Model.AddParameterValue(_idParamEyeBallX, _dragX); // -1から1の値を加える
+        Model.AddParameterValue(_idParamEyeBallY, _dragY);
+
+        // 呼吸など
+        _breath?.UpdateParameters(Model, deltaTimeSeconds);
+
+        // 物理演算の設定
+        _physics?.Evaluate(Model, deltaTimeSeconds);
+
+        // リップシンクの設定
+        if (_lipSync)
+        {
+            // リアルタイムでリップシンクを行う場合、システムから音量を取得して0〜1の範囲で値を入力します。
+            float value = 0.0f;
+
+            // 状態更新/RMS値取得
+            //_wavFileHandler.Update(deltaTimeSeconds);
+            //value = _wavFileHandler.GetRms();
+
+            for (int i = 0; i < _lipSyncIds.Count; ++i)
+            {
+                Model.AddParameterValue(_lipSyncIds[i], value, 0.8f);
+            }
+        }
+
+        // ポーズの設定
+        _pose?.UpdateParameters(Model, deltaTimeSeconds);
+
+        Model.Update();
+    }
+
+    /// <summary>
+    /// モデルを描画する処理。モデルを描画する空間のView-Projection行列を渡す。
+    /// </summary>
+    /// <param name="matrix">View-Projection行列</param>
+    public void Draw(CubismMatrix44 matrix)
+    {
+        if (Model == null)
+        {
+            return;
+        }
+
+        matrix.MultiplyByMatrix(ModelMatrix);
+
+        (Renderer as CubismRenderer_OpenGLES2)?.SetMvpMatrix(matrix);
+
+        DoDraw();
+    }
+
+    /// <summary>
+    /// 引数で指定したモーションの再生を開始する。
+    /// </summary>
+    /// <param name="group">モーショングループ名</param>
+    /// <param name="no">グループ内の番号</param>
+    /// <param name="priority">優先度</param>
+    /// <param name="onFinishedMotionHandler">モーション再生終了時に呼び出されるコールバック関数。NULLの場合、呼び出されない。</param>
+    /// <returns>開始したモーションの識別番号を返す。個別のモーションが終了したか否かを判定するIsFinished()の引数で使用する。開始できない時は「-1」</returns>
+    public CubismMotionQueueEntry? StartMotion(string name, MotionPriority priority, FinishedMotionCallback? onFinishedMotionHandler = null)
+    {
+        var temp = name.Split("_");
+        if (temp.Length != 2)
+        {
+            throw new Exception("motion name error");
+        }
+        return StartMotion(temp[0], int.Parse(temp[1]), priority, onFinishedMotionHandler);
+    }
+
+    public CubismMotionQueueEntry? StartMotion(string group, int no, MotionPriority priority, FinishedMotionCallback? onFinishedMotionHandler = null)
+    {
+        if (priority == MotionPriority.PriorityForce)
+        {
+            _motionManager.ReservePriority = priority;
+        }
+        else if (!_motionManager.ReserveMotion(priority))
+        {
+            if (_debugMode)
+            {
+                LAppPal.PrintLog("[APP]can't start motion.");
+            }
+            return null;
+        }
+
+        string fileName = _modelSetting.GetMotionFileName(group, no);
+
+        //ex) idle_0
+        string name = $"{group}_{no}";
+
+        CubismMotion motion;
+        if (!_motions.ContainsKey(name))
+        {
+            string path = fileName;
+            path = Path.GetFullPath(_modelHomeDir + path);
+
+            motion = new CubismMotion(File.ReadAllText(path), onFinishedMotionHandler);
+            float fadeTime = _modelSetting.GetMotionFadeInTimeValue(group, no);
+            if (fadeTime >= 0.0f)
+            {
+                motion.FadeIn = fadeTime;
+            }
+
+            fadeTime = _modelSetting.GetMotionFadeOutTimeValue(group, no);
+            if (fadeTime >= 0.0f)
+            {
+                motion.FadeOut = fadeTime;
+            }
+            motion.SetEffectIds(_eyeBlinkIds, _lipSyncIds);
+        }
+        else
+        {
+            motion = (_motions[name] as CubismMotion)!;
+            motion.OnFinishedMotion = onFinishedMotionHandler;
+        }
+
+        //voice
+        string voice = _modelSetting.GetMotionSoundFileName(group, no);
+        if (!string.IsNullOrWhiteSpace(voice))
+        {
+            //string path = voice;
+            //path = _modelHomeDir + path;
+            //_wavFileHandler.Start(path);
+        }
+
+        if (_debugMode)
+        {
+            LAppPal.PrintLog($"[APP]start motion: [{group}_{no}]");
+        }
+        return _motionManager.StartMotionPriority(motion, priority);
+    }
+
+    /// <summary>
+    /// ランダムに選ばれたモーションの再生を開始する。
+    /// </summary>
+    /// <param name="group">モーショングループ名</param>
+    /// <param name="priority">優先度</param>
+    /// <param name="onFinishedMotionHandler">モーション再生終了時に呼び出されるコールバック関数。NULLの場合、呼び出されない。</param>
+    /// <returns>開始したモーションの識別番号を返す。個別のモーションが終了したか否かを判定するIsFinished()の引数で使用する。開始できない時は「-1」</returns>
+    public object? StartRandomMotion(string group, MotionPriority priority, FinishedMotionCallback? onFinishedMotionHandler = null)
+    {
+        if (_modelSetting.GetMotionCount(group) == 0)
+        {
+            return null;
+        }
+
+        int no = random.Next() % _modelSetting.GetMotionCount(group);
+
+        return StartMotion(group, no, priority, onFinishedMotionHandler);
+    }
+
+    /// <summary>
+    /// 引数で指定した表情モーションをセットする
+    /// </summary>
+    /// <param name="expressionID">表情モーションのID</param>
+    public void SetExpression(string expressionID)
+    {
+        ACubismMotion motion = _expressions[expressionID];
+        if (_debugMode)
+        {
+            LAppPal.PrintLog($"[APP]expression: [{expressionID}]");
+        }
+
+        if (motion != null)
+        {
+            _expressionManager.StartMotionPriority(motion, MotionPriority.PriorityForce);
+        }
+        else
+        {
+            if (_debugMode) LAppPal.PrintLog($"[APP]expression[{expressionID}] is null ");
+        }
+    }
+
+    /// <summary>
+    /// ランダムに選ばれた表情モーションをセットする
+    /// </summary>
+    public void SetRandomExpression()
+    {
+        if (_expressions.Count == 0)
+        {
+            return;
+        }
+
+        int no = random.Next() % _expressions.Count;
+        int i = 0;
+        foreach (var item in _expressions)
+        {
+            if (i == no)
+            {
+                SetExpression(item.Key);
+                return;
+            }
+            i++;
+        }
+    }
+
+    /// <summary>
+    /// イベントの発火を受け取る
+    /// </summary>
+    /// <param name="eventValue"></param>
+    protected override void MotionEventFired(string eventValue)
+    {
+        CubismLog.CubismLogInfo($"{eventValue} is fired on LAppModel!!");
+        Motion?.Invoke(this, eventValue);
+    }
+
+    /// <summary>
+    /// 当たり判定テスト。
+    /// 指定IDの頂点リストから矩形を計算し、座標が矩形範囲内か判定する。
+    /// </summary>
+    /// <param name="hitAreaName">当たり判定をテストする対象のID</param>
+    /// <param name="x">判定を行うX座標</param>
+    /// <param name="y">判定を行うY座標</param>
+    /// <returns></returns>
+    public bool HitTest(string hitAreaName, float x, float y)
+    {
+        // 透明時は当たり判定なし。
+        if (Opacity < 1)
+        {
+            return false;
+        }
+        int count = _modelSetting.GetHitAreasCount();
+        for (int i = 0; i < count; i++)
+        {
+            if (_modelSetting.GetHitAreaName(i) == hitAreaName)
+            {
+                return IsHit(_modelSetting.GetHitAreaId(i), x, y);
+            }
+        }
+        return false; // 存在しない場合はfalse
+    }
+
+    /// <summary>
+    /// モデルを描画する処理。モデルを描画する空間のView-Projection行列を渡す。
+    /// </summary>
+    protected void DoDraw()
+    {
+        if (Model == null)
+        {
+            return;
+        }
+
+        (Renderer as CubismRenderer_OpenGLES2)?.DrawModel();
+    }
+
+    /// <summary>
+    /// モーションデータをグループ名から一括で解放する。
+    /// モーションデータの名前は内部でModelSettingから取得する。
+    /// </summary>
+    /// <param name="group">モーションデータのグループ名</param>
+    private void ReleaseMotionGroup(string group)
+    {
+        var count = _modelSetting.GetMotionCount(group);
+        for (int i = 0; i < count; i++)
+        {
+            string voice = _modelSetting.GetMotionSoundFileName(group, i);
+        }
     }
 
     /// <summary>
@@ -709,7 +645,7 @@ public class LAppModel : CubismUserModel
             var texturePath = _modelSetting.GetTextureFileName(modelTextureNumber);
             texturePath = Path.GetFullPath(_modelHomeDir + texturePath);
 
-            TextureInfo texture = Lapp.GetTextureManager().CreateTextureFromPngFile(texturePath);
+            TextureInfo texture = Lapp.TextureManager.CreateTextureFromPngFile(texturePath);
             int glTextueNumber = texture.id;
 
             //OpenGL
@@ -724,6 +660,42 @@ public class LAppModel : CubismUserModel
     /// <param name="group">モーションデータのグループ名</param>
     private void PreloadMotionGroup(string group)
     {
+        // グループに登録されているモーション数を取得
+        int count = _modelSetting.GetMotionCount(group);
 
+        for (int i = 0; i < count; i++)
+        {
+            //ex) idle_0
+            // モーションのファイル名とパスの取得
+            string name = $"{group}_{i}";
+            var path = Path.GetFullPath(_modelHomeDir + _modelSetting.GetMotionFileName(group, i));
+
+            // モーションデータの読み込み
+            var tmpMotion = new CubismMotion(File.ReadAllText(path));
+
+            // フェードインの時間を取得
+            float fadeTime = _modelSetting.GetMotionFadeInTimeValue(group, i);
+            if (fadeTime >= 0.0f)
+            {
+                tmpMotion.FadeIn = fadeTime;
+            }
+
+            // フェードアウトの時間を取得
+            fadeTime = _modelSetting.GetMotionFadeOutTimeValue(group, i);
+            if (fadeTime >= 0.0f)
+            {
+                tmpMotion.FadeOut = fadeTime;
+            }
+            tmpMotion.SetEffectIds(_eyeBlinkIds, _lipSyncIds);
+
+            if (_motions.ContainsKey(name))
+            {
+                _motions[name] = tmpMotion;
+            }
+            else
+            {
+                _motions.Add(name, tmpMotion);
+            }
+        }
     }
 }

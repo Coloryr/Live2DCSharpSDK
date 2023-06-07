@@ -9,7 +9,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     public const int ClippingMaskMaxCountOnDefault = 36;  // 通常のフレームバッファ1枚あたりのマスク最大数
     public const int ClippingMaskMaxCountOnMultiRenderTexture = 32;   // フレームバッファが2枚以上ある場合のフレームバッファ1枚あたりのマスク最大数
 
-    private OpenGLApi GL;
+    private readonly OpenGLApi GL;
 
     /// <summary>
     /// モデルが参照するテクスチャとレンダラでバインドしているテクスチャとのマップ
@@ -52,33 +52,11 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         CubismShader_OpenGLES2.DeleteInstance();
     }
 
-    /// <summary>
-    /// Android-Tegra対応. シェーダプログラムをリロードする。
-    /// </summary>
-    public static void ReloadShader()
-    {
-        CubismShader_OpenGLES2.DeleteInstance();
-    }
-
-    /// <summary>
-    /// レンダラが保持する静的なリソースを解放する
-    /// OpenGLES2の静的なシェーダプログラムを解放する
-    /// </summary>
-    public static void DoStaticRelease()
-    {
-        CubismShader_OpenGLES2.DeleteInstance();
-    }
-
     public CubismRenderer_OpenGLES2(OpenGLApi gl)
     {
         GL = gl;
         _rendererProfile = new(gl);
         _textures = new Dictionary<int, int>(32);
-    }
-
-    public new static void StaticRelease()
-    {
-        DoStaticRelease();
     }
 
     /// <summary>

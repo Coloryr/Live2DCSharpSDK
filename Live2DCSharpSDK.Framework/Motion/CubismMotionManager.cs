@@ -10,11 +10,11 @@ public class CubismMotionManager : CubismMotionQueueManager
     /// <summary>
     /// 現在再生中のモーションの優先度
     /// </summary>
-    public int CurrentPriority { get; private set; }
+    public MotionPriority CurrentPriority { get; private set; }
     /// <summary>
     /// 再生予定のモーションの優先度。再生中は0になる。モーションファイルを別スレッドで読み込むときの機能。
     /// </summary>
-    public int ReservePriority { get; set; }
+    public MotionPriority ReservePriority { get; set; }
 
     /// <summary>
     /// 優先度を設定してモーションを開始する。
@@ -23,7 +23,7 @@ public class CubismMotionManager : CubismMotionQueueManager
     /// <param name="autoDelete">再生が終了したモーションのインスタンスを削除するならtrue</param>
     /// <param name="priority">優先度</param>
     /// <returns>開始したモーションの識別番号を返す。個別のモーションが終了したか否かを判定するIsFinished()の引数で使用する。開始できない時は「-1」</returns>
-    public object StartMotionPriority(ACubismMotion motion, bool autoDelete, int priority)
+    public CubismMotionQueueEntry StartMotionPriority(ACubismMotion motion, MotionPriority priority)
     {
         if (priority == ReservePriority)
         {
@@ -32,7 +32,7 @@ public class CubismMotionManager : CubismMotionQueueManager
 
         CurrentPriority = priority;        // 再生中モーションの優先度を設定
 
-        return StartMotion(motion, autoDelete, _userTimeSeconds);
+        return StartMotion(motion, _userTimeSeconds);
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public class CubismMotionManager : CubismMotionQueueManager
     /// <param name="priority">優先度</param>
     /// <returns>true    予約できた
     /// false   予約できなかった</returns>
-    public bool ReserveMotion(int priority)
+    public bool ReserveMotion(MotionPriority priority)
     {
         if ((priority <= ReservePriority) || (priority <= CurrentPriority))
         {

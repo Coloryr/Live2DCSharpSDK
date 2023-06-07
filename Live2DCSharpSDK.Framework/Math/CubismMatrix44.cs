@@ -43,6 +43,11 @@ public class CubismMatrix44
         Array.Copy(tr, _tr, 16);
     }
 
+    public void SetMatrix(CubismMatrix44 tr)
+    {
+        SetMatrix(tr.Tr);
+    }
+
     /// <summary>
     /// X軸の拡大率を取得する。
     /// </summary>

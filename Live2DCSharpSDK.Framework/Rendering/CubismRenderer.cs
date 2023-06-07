@@ -4,78 +4,11 @@ using Live2DCSharpSDK.Framework.Model;
 namespace Live2DCSharpSDK.Framework.Rendering;
 
 /// <summary>
-/// カラーブレンディングのモード
-/// </summary>
-public enum CubismBlendMode
-{
-    /// <summary>
-    /// 通常
-    /// </summary>
-    CubismBlendMode_Normal = 0,
-    /// <summary>
-    /// 加算
-    /// </summary>
-    CubismBlendMode_Additive = 1,
-    /// <summary>
-    /// 乗算
-    /// </summary>
-    CubismBlendMode_Multiplicative = 2,
-};
-
-/// <summary>
-/// テクスチャの色をRGBAで扱うための構造体
-/// </summary>
-public record CubismTextureColor
-{
-    /// <summary>
-    /// 赤チャンネル
-    /// </summary>
-    public float R;
-    /// <summary>
-    /// 緑チャンネル
-    /// </summary>
-    public float G;
-    /// <summary>
-    /// 青チャンネル
-    /// </summary>
-    public float B;
-    /// <summary>
-    /// αチャンネル
-    /// </summary>
-    public float A;
-
-    public CubismTextureColor() 
-    { 
-        R = 1.0f; 
-        G = 1.0f; 
-        B = 1.0f; 
-        A = 1.0f; 
-    }
-
-    public CubismTextureColor(CubismTextureColor old)
-    {
-        R = old.R;
-        G = old.G;
-        B = old.B;
-        A = old.A;
-    }
-
-    public CubismTextureColor(float r, float g, float b, float a)
-    {
-        R = r;
-        G = g;
-        B = b;
-        A = a;
-    }
-}
-
-/// <summary>
 /// モデル描画を処理するレンダラ
 /// サブクラスに環境依存の描画命令を記述する
 /// </summary>
 public abstract class CubismRenderer : IDisposable
 {
-    private static CubismRenderer _render;
     /// <summary>
     /// Model-View-Projection 行列
     /// </summary>
@@ -107,19 +40,10 @@ public abstract class CubismRenderer : IDisposable
     private bool _useHighPrecisionMask;
 
     /// <summary>
-    /// レンダラが保持する静的なリソースを解放する
-    /// </summary>
-    public static void StaticRelease()
-    {
-        _render.Dispose();
-    }
-
-    /// <summary>
     /// レンダラのインスタンスを生成して取得する
     /// </summary>
     public CubismRenderer()
     {
-        _render = this;
         _mvpMatrix4x4 = new();
         _mvpMatrix4x4.LoadIdentity();
     }

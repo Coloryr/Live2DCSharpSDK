@@ -8,6 +8,56 @@
 public delegate float csmMotionSegmentEvaluationFunction(CubismMotionPoint[] points, int start, float time);
 
 /// <summary>
+/// モーションの優先度定数
+/// </summary>
+public enum MotionPriority : int
+{
+    PriorityNone = 0,
+    PriorityIdle = 1,
+    PriorityNormal = 2,
+    PriorityForce = 3
+}
+
+/// <summary>
+/// 表情パラメータ値の計算方式
+/// </summary>
+public enum ExpressionBlendType
+{
+    /// <summary>
+    /// 加算
+    /// </summary>
+    Add = 0,
+    /// <summary>
+    /// 乗算
+    /// </summary>
+    Multiply = 1,
+    /// <summary>
+    /// 上書き
+    /// </summary>
+    Overwrite = 2
+};
+
+/// <summary>
+/// 表情のパラメータ情報の構造体。
+/// </summary>
+public record ExpressionParameter
+{
+    /// <summary>
+    /// パラメータID
+    /// </summary>
+    public required string ParameterId { get; set; }
+    /// <summary>
+    /// パラメータの演算種類
+    /// </summary>
+    public ExpressionBlendType BlendType { get; set; }
+    /// <summary>
+    /// 値
+    /// </summary>
+    public float Value { get; set; }
+}
+
+
+/// <summary>
 /// モーションカーブの種類。
 /// </summary>
 public enum CubismMotionCurveTarget

@@ -33,7 +33,7 @@ public abstract class ACubismMotion
     protected readonly List<string> _firedEventValues = new();
 
     // モーション再生終了コールバック関数
-    protected FinishedMotionCallback? _onFinishedMotion;
+    public FinishedMotionCallback? OnFinishedMotion { get; set; }
 
     /// <summary>
     /// コンストラクタ。
@@ -143,28 +143,6 @@ public abstract class ACubismMotion
     }
 
     /// <summary>
-    /// モーション再生終了コールバックを登録する。
-    /// IsFinishedフラグを設定するタイミングで呼び出される。
-    /// 以下の状態の際には呼び出されない:
-    ///   1. 再生中のモーションが「ループ」として設定されているとき
-    ///   2. コールバックにNULLが登録されているとき
-    /// </summary>
-    /// <param name="onFinishedMotionHandler">モーション再生終了コールバック関数</param>
-    public void SetFinishedMotionHandler(FinishedMotionCallback onFinishedMotionHandler)
-    {
-        _onFinishedMotion = onFinishedMotionHandler;
-    }
-
-    /// <summary>
-    /// モーション再生終了コールバックを取得する。
-    /// </summary>
-    /// <returns>登録されているモーション再生終了コールバック関数。NULLのとき、関数は何も登録されていない。</returns>
-    public FinishedMotionCallback? GetFinishedMotionHandler()
-    {
-        return _onFinishedMotion;
-    }
-
-    /// <summary>
     /// 透明度のカーブが存在するかどうかを確認する
     /// </summary>
     /// <returns>true  . キーが存在する
@@ -189,7 +167,7 @@ public abstract class ACubismMotion
     /// <returns>透明度のId</returns>
     public virtual string GetModelOpacityId(int index)
     {
-        return null;
+        return "";
     }
 
     protected virtual float GetModelOpacityValue()

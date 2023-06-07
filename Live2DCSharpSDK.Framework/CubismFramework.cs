@@ -148,9 +148,6 @@ public static class CubismFramework
             return;
         }
 
-        //レンダラの静的リソース（シェーダプログラム他）を解放する
-        CubismRenderer.StaticRelease();
-
         s_isInitialized = false;
 
         CubismLog.CubismLogInfo("CubismFramework::Dispose() is complete.");
