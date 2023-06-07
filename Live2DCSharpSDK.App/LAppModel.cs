@@ -143,7 +143,7 @@ public class LAppModel : CubismUserModel
 
         SetupModel(setting);
 
-        if (_model == null)
+        if (Model == null)
         {
             LAppPal.PrintLog("Failed to LoadAssets().");
             return;
@@ -182,7 +182,7 @@ public class LAppModel : CubismUserModel
         bool motionUpdated = false;
 
         //-----------------------------------------------------------------
-        _model.LoadParameters(); // 前回セーブされた状態をロード
+        Model.LoadParameters(); // 前回セーブされた状態をロード
         if (_motionManager.IsFinished())
         {
             // モーションの再生がない場合、待機モーションの中からランダムで再生する
@@ -190,42 +190,42 @@ public class LAppModel : CubismUserModel
         }
         else
         {
-            motionUpdated = _motionManager.UpdateMotion(_model, deltaTimeSeconds); // モーションを更新
+            motionUpdated = _motionManager.UpdateMotion(Model, deltaTimeSeconds); // モーションを更新
         }
-        _model.SaveParameters(); // 状態を保存
+        Model.SaveParameters(); // 状態を保存
 
         //-----------------------------------------------------------------
 
         // 不透明度
-        _opacity = _model.GetModelOpacity();
+        Opacity = Model.GetModelOpacity();
 
         // まばたき
         if (!motionUpdated)
         {
             // メインモーションの更新がないとき
-            _eyeBlink?.UpdateParameters(_model, deltaTimeSeconds); // 目パチ
+            _eyeBlink?.UpdateParameters(Model, deltaTimeSeconds); // 目パチ
         }
 
-        _expressionManager?.UpdateMotion(_model, deltaTimeSeconds); // 表情でパラメータ更新（相対変化）
+        _expressionManager?.UpdateMotion(Model, deltaTimeSeconds); // 表情でパラメータ更新（相対変化）
 
         //ドラッグによる変化
         //ドラッグによる顔の向きの調整
-        _model.AddParameterValue(_idParamAngleX, _dragX * 30); // -30から30の値を加える
-        _model.AddParameterValue(_idParamAngleY, _dragY * 30);
-        _model.AddParameterValue(_idParamAngleZ, _dragX * _dragY * -30);
+        Model.AddParameterValue(_idParamAngleX, _dragX * 30); // -30から30の値を加える
+        Model.AddParameterValue(_idParamAngleY, _dragY * 30);
+        Model.AddParameterValue(_idParamAngleZ, _dragX * _dragY * -30);
 
         //ドラッグによる体の向きの調整
-        _model.AddParameterValue(_idParamBodyAngleX, _dragX * 10); // -10から10の値を加える
+        Model.AddParameterValue(_idParamBodyAngleX, _dragX * 10); // -10から10の値を加える
 
         //ドラッグによる目の向きの調整
-        _model.AddParameterValue(_idParamEyeBallX, _dragX); // -1から1の値を加える
-        _model.AddParameterValue(_idParamEyeBallY, _dragY);
+        Model.AddParameterValue(_idParamEyeBallX, _dragX); // -1から1の値を加える
+        Model.AddParameterValue(_idParamEyeBallY, _dragY);
 
         // 呼吸など
-        _breath?.UpdateParameters(_model, deltaTimeSeconds);
+        _breath?.UpdateParameters(Model, deltaTimeSeconds);
 
         // 物理演算の設定
-        _physics?.Evaluate(_model, deltaTimeSeconds);
+        _physics?.Evaluate(Model, deltaTimeSeconds);
 
         // リップシンクの設定
         if (_lipSync)
@@ -239,14 +239,14 @@ public class LAppModel : CubismUserModel
 
             for (int i = 0; i < _lipSyncIds.Count; ++i)
             {
-                _model.AddParameterValue(_lipSyncIds[i], value, 0.8f);
+                Model.AddParameterValue(_lipSyncIds[i], value, 0.8f);
             }
         }
 
         // ポーズの設定
-        _pose?.UpdateParameters(_model, deltaTimeSeconds);
+        _pose?.UpdateParameters(Model, deltaTimeSeconds);
 
-        _model.Update();
+        Model.Update();
     }
 
     /// <summary>
@@ -255,14 +255,14 @@ public class LAppModel : CubismUserModel
     /// <param name="matrix">View-Projection行列</param>
     public void Draw(CubismMatrix44 matrix)
     {
-        if (_model == null)
+        if (Model == null)
         {
             return;
         }
 
-        matrix.MultiplyByMatrix(_modelMatrix);
+        matrix.MultiplyByMatrix(ModelMatrix);
 
-        (GetRenderer() as CubismRenderer_OpenGLES2)?.SetMvpMatrix(matrix);
+        (Renderer as CubismRenderer_OpenGLES2)?.SetMvpMatrix(matrix);
 
         DoDraw();
     }
@@ -302,7 +302,7 @@ public class LAppModel : CubismUserModel
             string path = fileName;
             path = _modelHomeDir + path;
 
-            motion = (LoadMotion(File.ReadAllText(path), null, onFinishedMotionHandler) as CubismMotion)!;
+            motion = new CubismMotion(File.ReadAllText(path), onFinishedMotionHandler);
             float fadeTime = _modelSetting.GetMotionFadeInTimeValue(group, no);
             if (fadeTime >= 0.0f)
             {
@@ -407,7 +407,7 @@ public class LAppModel : CubismUserModel
     /// イベントの発火を受け取る
     /// </summary>
     /// <param name="eventValue"></param>
-    public void MotionEventFired(string eventValue)
+    protected override void MotionEventFired(string eventValue)
     {
         CubismLog.CubismLogInfo($"{eventValue} is fired on LAppModel!!");
         Motion?.Invoke(this, eventValue);
@@ -424,7 +424,7 @@ public class LAppModel : CubismUserModel
     public bool HitTest(string hitAreaName, float x, float y)
     {
         // 透明時は当たり判定なし。
-        if (_opacity < 1)
+        if (Opacity < 1)
         {
             return false;
         }
@@ -479,12 +479,12 @@ public class LAppModel : CubismUserModel
     /// </summary>
     protected void DoDraw()
     {
-        if (_model == null)
+        if (Model == null)
         {
             return;
         }
 
-        (GetRenderer() as CubismRenderer_OpenGLES2)?.DrawModel();
+        (Renderer as CubismRenderer_OpenGLES2)?.DrawModel();
     }
 
     /// <summary>
@@ -524,8 +524,8 @@ public class LAppModel : CubismUserModel
     /// <param name="setting">ICubismModelSettingのインスタンス</param>
     private void SetupModel(CubismModelSettingJson setting)
     {
-        _updating = true;
-        _initialized = false;
+        Updating = true;
+        Initialized = false;
 
         _modelSetting = setting;
 
@@ -553,7 +553,7 @@ public class LAppModel : CubismUserModel
                 string path = _modelSetting.GetExpressionFileName(i);
                 path = Path.GetFullPath(_modelHomeDir + path);
 
-                ACubismMotion motion = LoadExpression(File.ReadAllText(path), name);
+                ACubismMotion motion = new CubismExpressionMotion(File.ReadAllText(path));
 
                 if (_expressions.ContainsKey(name))
                 {
@@ -667,7 +667,7 @@ public class LAppModel : CubismUserModel
             }
         }
 
-        if (_modelSetting == null || _modelMatrix == null)
+        if (_modelSetting == null || ModelMatrix == null)
         {
             LAppPal.PrintLog("Failed to SetupModel().");
             return;
@@ -676,9 +676,9 @@ public class LAppModel : CubismUserModel
         //Layout
         Dictionary<string, float> layout = new();
         _modelSetting.GetLayoutMap(layout);
-        _modelMatrix.SetupFromLayout(layout);
+        ModelMatrix.SetupFromLayout(layout);
 
-        _model.SaveParameters();
+        Model.SaveParameters();
 
         for (int i = 0; i < _modelSetting.GetMotionGroupCount(); i++)
         {
@@ -688,8 +688,8 @@ public class LAppModel : CubismUserModel
 
         _motionManager.StopAllMotions();
 
-        _updating = false;
-        _initialized = true;
+        Updating = false;
+        Initialized = true;
     }
 
     /// <summary>
@@ -713,7 +713,7 @@ public class LAppModel : CubismUserModel
             int glTextueNumber = texture.id;
 
             //OpenGL
-            (GetRenderer() as CubismRenderer_OpenGLES2)?.BindTexture(modelTextureNumber, glTextueNumber);
+            (Renderer as CubismRenderer_OpenGLES2)?.BindTexture(modelTextureNumber, glTextueNumber);
         }
     }
 

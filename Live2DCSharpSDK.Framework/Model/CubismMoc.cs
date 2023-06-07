@@ -1,4 +1,4 @@
-﻿using Live2DCSharpSDK.Core;
+﻿using Live2DCSharpSDK.Framework.Core;
 using System.Runtime.InteropServices;
 
 namespace Live2DCSharpSDK.Framework.Model;
@@ -11,11 +11,11 @@ public class CubismMoc : IDisposable
     /// <summary>
     /// Mocデータ
     /// </summary>
-    private IntPtr _moc;
+    private readonly IntPtr _moc;
     /// <summary>
     /// 読み込んだモデルの.moc3 Version
     /// </summary>
-    private uint _mocVersion;
+    public uint MocVersion { get; }
 
     public CubismModel Model { get; }
 
@@ -43,33 +43,28 @@ public class CubismMoc : IDisposable
             }
         }
 
-        var moc = CubismCore.csmReviveMocInPlace(alignedBuffer, mocBytes.Length);
+        var moc = CubismCore.ReviveMocInPlace(alignedBuffer, mocBytes.Length);
 
-        if (new IntPtr(moc) != IntPtr.Zero)
-        {
-            _moc = moc;
-        }
-        else
+        if (moc == IntPtr.Zero)
         {
             throw new Exception("MOC3 is null");
         }
 
-        _mocVersion = CubismCore.csmGetMocVersion(alignedBuffer, mocBytes.Length);
+        _moc = moc;
 
-        int modelSize = CubismCore.csmGetSizeofModel(_moc);
-        IntPtr modelMemory = CubismFramework.AllocateAligned(modelSize, CsmEnum.csmAlignofModel);
+        MocVersion = CubismCore.GetMocVersion(alignedBuffer, mocBytes.Length);
 
-        var model = CubismCore.csmInitializeModelInPlace(_moc, modelMemory, modelSize);
+        var modelSize = CubismCore.GetSizeofModel(_moc);
+        var modelMemory = CubismFramework.AllocateAligned(modelSize, CsmEnum.CsmAlignofModel);
 
-        if (model != IntPtr.Zero)
-        {
-            Model = new CubismModel(model);
-            Model.Initialize();
-        }
-        else
+        var model = CubismCore.InitializeModelInPlace(_moc, modelMemory, modelSize);
+
+        if (model == IntPtr.Zero)
         {
             throw new Exception("MODEL is null");
         }
+
+        Model = new CubismModel(model);
     }
 
     /// <summary>
@@ -89,7 +84,7 @@ public class CubismMoc : IDisposable
     /// <returns>'1' if Moc is valid; '0' otherwise.</returns>
     public static bool HasMocConsistency(IntPtr address, int size)
     {
-        return CubismCore.csmHasMocConsistency(address, size) != 0;
+        return CubismCore.HasMocConsistency(address, size) != 0;
     }
 
     /// <summary>
@@ -108,15 +103,6 @@ public class CubismMoc : IDisposable
         CubismFramework.DeallocateAligned(alignedBuffer);
 
         return consistency;
-    }
-
-    /// <summary>
-    /// 読み込んだモデルの.moc3 Versionを取得する。
-    /// </summary>
-    /// <returns>読み込んだモデルの.moc3 Version</returns>
-    public uint GetMocVersion()
-    {
-        return _mocVersion;
     }
 
     /// <summary>

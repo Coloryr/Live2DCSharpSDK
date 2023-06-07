@@ -1,4 +1,4 @@
-﻿using Live2DCSharpSDK.Core;
+﻿using Live2DCSharpSDK.Framework.Core;
 using Live2DCSharpSDK.Framework.Id;
 using Live2DCSharpSDK.Framework.Rendering;
 
@@ -45,7 +45,7 @@ public static class CubismFramework
         s_option = option;
         if (s_option != null)
         {
-            CubismCore.csmSetLogFunction(s_option.LogFunction);
+            CubismCore.SetLogFunction(s_option.LogFunction);
         }
 
         if (allocator == null)
@@ -171,7 +171,7 @@ public static class CubismFramework
     /// <param name="data">ログメッセージ</param>
     public static void CoreLogFunction(string data)
     {
-        var fuc = CubismCore.csmGetLogFunction();
+        var fuc = CubismCore.GetLogFunction();
         if (fuc == null)
         {
             return;

@@ -310,7 +310,7 @@ public unsafe class CubismMotion : ACubismMotion
     /// </summary>
     /// <param name="buffer">motion3.jsonが読み込まれているバッファ</param>
     /// <param name="onFinishedMotionHandler">モーション再生終了時に呼び出されるコールバック関数。NULLの場合、呼び出されない。</param>
-    public CubismMotion(string buffer, FinishedMotionCallback onFinishedMotionHandler = null)
+    public CubismMotion(string buffer, FinishedMotionCallback? onFinishedMotionHandler = null)
     {
         _sourceFrameRate = 30.0f;
         _loopDurationSeconds = -1.0f;
