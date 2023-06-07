@@ -143,7 +143,7 @@ public class LAppLive2DManager : IDisposable
         }
     }
 
-    public void LoadModel(string dir, string name)
+    public LAppModel LoadModel(string dir, string name)
     {
         if (LAppDefine.DebugLogEnable)
         {
@@ -154,11 +154,14 @@ public class LAppLive2DManager : IDisposable
         // model3.jsonのパスを決定する.
         // ディレクトリ名とmodel3.jsonの名前を一致させておくこと.
         var modelJsonName = Path.GetFullPath($"{dir}{name}.model3.json");
-        _models.Add(new(Lapp, dir, modelJsonName));
+        var model = new LAppModel(Lapp, dir, modelJsonName);
+        _models.Add(model);
 
         // 別レンダリング先を選択した際の背景クリア色
         float[] clearColor = new[] { 1.0f, 1.0f, 1.0f };
         Lapp.View.SetRenderTargetClearColor(clearColor[0], clearColor[1], clearColor[2]);
+
+        return model;
     }
 
     /// <summary>
