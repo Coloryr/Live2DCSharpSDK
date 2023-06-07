@@ -118,7 +118,7 @@ public abstract class CubismUserModel : IDisposable
     /// <param name="caller">発火したイベントを管理していたモーションマネージャー、比較用</param>
     /// <param name="eventValue">発火したイベントの文字列データ</param>
     /// <param name="customData">CubismUserModelを継承したインスタンスを想定</param>
-    public static void CubismDefaultMotionEventCallback(CubismMotionQueueManager caller, string eventValue, dynamic customData)
+    public static void CubismDefaultMotionEventCallback(CubismMotionQueueManager caller, string eventValue, object? customData)
     {
         (customData as CubismUserModel)?.MotionEventFired(eventValue);
     }
@@ -146,7 +146,7 @@ public abstract class CubismUserModel : IDisposable
 
     public void Dispose()
     {
-        _moc?.Dispose();
+        _moc.Dispose();
 
         DeleteRenderer();
         GC.SuppressFinalize(this);
@@ -168,7 +168,7 @@ public abstract class CubismUserModel : IDisposable
     /// <param name="x">X軸方向の加速度</param>
     /// <param name="y">Y軸方向の加速度</param>
     /// <param name="z">Z軸方向の加速度</param>
-    public void SetAcceleration(float x, float y, float z)
+    protected void SetAcceleration(float x, float y, float z)
     {
         _accelerationX = x;
         _accelerationY = y;
@@ -180,7 +180,7 @@ public abstract class CubismUserModel : IDisposable
     /// </summary>
     /// <param name="buffer">moc3ファイルが読み込まれているバッファ</param>
     /// <param name="shouldCheckMocConsistency">MOCの整合性チェックフラグ(初期値 : false)</param>
-    public void LoadModel(byte[] buffer, bool shouldCheckMocConsistency = false)
+    protected void LoadModel(byte[] buffer, bool shouldCheckMocConsistency = false)
     {
         _moc = new CubismMoc(buffer, shouldCheckMocConsistency);
         Model.SaveParameters();
@@ -191,7 +191,7 @@ public abstract class CubismUserModel : IDisposable
     /// ポーズデータを読み込む。
     /// </summary>
     /// <param name="buffer">pose3.jsonが読み込まれているバッファ</param>
-    public void LoadPose(string buffer)
+    protected void LoadPose(string buffer)
     {
         _pose = new CubismPose(buffer);
     }
@@ -200,7 +200,7 @@ public abstract class CubismUserModel : IDisposable
     /// 物理演算データを読み込む。
     /// </summary>
     /// <param name="buffer">physics3.jsonが読み込まれているバッファ</param>
-    public void LoadPhysics(string buffer)
+    protected void LoadPhysics(string buffer)
     {
         _physics = new CubismPhysics(buffer);
     }
@@ -209,7 +209,7 @@ public abstract class CubismUserModel : IDisposable
     /// ユーザーデータを読み込む。
     /// </summary>
     /// <param name="buffer">userdata3.jsonが読み込まれているバッファ</param>
-    public void LoadUserData(string buffer)
+    protected void LoadUserData(string buffer)
     {
         _modelUserData = new CubismModelUserData(buffer);
     }
@@ -274,7 +274,7 @@ public abstract class CubismUserModel : IDisposable
     /// <summary>
     /// レンダラを生成して初期化を実行する。
     /// </summary>
-    public void CreateRenderer(CubismRenderer renderer, int maskBufferCount = 1)
+    protected void CreateRenderer(CubismRenderer renderer, int maskBufferCount = 1)
     {
         if (Renderer != null)
         {
@@ -287,7 +287,7 @@ public abstract class CubismUserModel : IDisposable
     /// <summary>
     /// レンダラを解放する。
     /// </summary>
-    public void DeleteRenderer()
+    protected void DeleteRenderer()
     {
         if (Renderer != null)
         {

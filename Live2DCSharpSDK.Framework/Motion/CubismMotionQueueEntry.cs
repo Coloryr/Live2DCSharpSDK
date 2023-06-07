@@ -6,10 +6,6 @@
 public class CubismMotionQueueEntry
 {
     /// <summary>
-    /// 自動削除
-    /// </summary>
-    public bool AutoDelete { get; set; }
-    /// <summary>
     /// モーション
     /// </summary>
     public required ACubismMotion Motion { get; set; }
@@ -58,7 +54,7 @@ public class CubismMotionQueueEntry
     /// <summary>
     /// インスタンスごとに一意の値を持つ識別番号
     /// </summary>
-    public object _motionQueueEntryHandle;
+    public CubismMotionQueueEntry _motionQueueEntryHandle;
 
     /// <summary>
     /// コンストラクタ。

@@ -55,12 +55,6 @@ public class LAppDefine
     public const string HitAreaNameHead = "Head";
     public const string HitAreaNameBody = "Body";
 
-    // モーションの優先度定数
-    public const int PriorityNone = 0;
-    public const int PriorityIdle = 1;
-    public const int PriorityNormal = 2;
-    public const int PriorityForce = 3;
-
     // MOC3の整合性検証オプション
     public const bool MocConsistencyValidationEnable = true;
 
@@ -74,6 +68,4 @@ public class LAppDefine
     // デフォルトのレンダーターゲットサイズ
     public const int RenderTargetWidth = 1920;
     public const int RenderTargetHeight = 1080;
-
-    public const SelectTarget RenderTarget = SelectTarget.SelectTarget_None;
 }

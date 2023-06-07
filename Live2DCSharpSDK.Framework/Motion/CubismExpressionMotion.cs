@@ -4,25 +4,6 @@ using Newtonsoft.Json.Linq;
 namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
-/// 表情パラメータ値の計算方式
-/// </summary>
-public enum ExpressionBlendType
-{
-    /// <summary>
-    /// 加算
-    /// </summary>
-    Add = 0,
-    /// <summary>
-    /// 乗算
-    /// </summary>
-    Multiply = 1,
-    /// <summary>
-    /// 上書き
-    /// </summary>
-    Overwrite = 2
-};
-
-/// <summary>
 /// 表情のモーションクラス。
 /// </summary>
 public class CubismExpressionMotion : ACubismMotion

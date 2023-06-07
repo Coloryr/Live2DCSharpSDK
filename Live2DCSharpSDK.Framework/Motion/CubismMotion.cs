@@ -5,43 +5,6 @@ using Newtonsoft.Json;
 namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
-/// ベジェカーブの解釈方法のフラグタイプ
-/// </summary>
-enum EvaluationOptionFlag
-{
-    /// <summary>
-    /// ベジェハンドルの規制状態
-    /// </summary>
-    EvaluationOptionFlag_AreBeziersRistricted = 0,
-};
-
-/// <summary>
-/// motion3.jsonのコンテナ。
-/// </summary>
-public record CubismMotionJson
-{
-    public const string Meta = "Meta";
-    public const string Duration = "Duration";
-    public const string Loop = "Loop";
-    public const string AreBeziersRestricted = "AreBeziersRestricted";
-    public const string CurveCount = "CurveCount";
-    public const string Fps = "Fps";
-    public const string TotalSegmentCount = "TotalSegmentCount";
-    public const string TotalPointCount = "TotalPointCount";
-    public const string Curves = "Curves";
-    public const string Target = "Target";
-    public const string Id = "Id";
-    public const string FadeInTime = "FadeInTime";
-    public const string FadeOutTime = "FadeOutTime";
-    public const string Segments = "Segments";
-    public const string UserData = "UserData";
-    public const string UserDataCount = "UserDataCount";
-    public const string TotalUserDataSize = "TotalUserDataSize";
-    public const string Time = "Time";
-    public const string Value = "Value";
-}
-
-/// <summary>
 /// モーションのクラス。
 /// </summary>
 public unsafe class CubismMotion : ACubismMotion
@@ -79,7 +42,7 @@ public unsafe class CubismMotion : ACubismMotion
     /// <summary>
     /// 実際のモーションデータ本体
     /// </summary>
-    private CubismMotionData _motionData;
+    private readonly CubismMotionData _motionData;
 
     /// <summary>
     /// 自動まばたきを適用するパラメータIDハンドルのリスト。  モデル（モデルセッティング）とパラメータを対応付ける。
@@ -113,7 +76,7 @@ public unsafe class CubismMotion : ACubismMotion
     */
     private readonly bool UseOldBeziersCurveMotion = false;
 
-    private CubismMotionPoint LerpPoints(CubismMotionPoint a, CubismMotionPoint b, float t)
+    private static CubismMotionPoint LerpPoints(CubismMotionPoint a, CubismMotionPoint b, float t)
     {
         return new()
         {
@@ -122,7 +85,7 @@ public unsafe class CubismMotion : ACubismMotion
         };
     }
 
-    private float LinearEvaluate(CubismMotionPoint[] points, int start, float time)
+    private static float LinearEvaluate(CubismMotionPoint[] points, int start, float time)
     {
         float t = (time - points[start].Time) / (points[start + 1].Time - points[start].Time);
 
@@ -134,7 +97,7 @@ public unsafe class CubismMotion : ACubismMotion
         return points[start].Value + ((points[start + 1].Value - points[start].Value) * t);
     }
 
-    private float BezierEvaluate(CubismMotionPoint[] points, int start, float time)
+    private static float BezierEvaluate(CubismMotionPoint[] points, int start, float time)
     {
         float t = (time - points[start].Time) / (points[start + 3].Time - points[start].Time);
 
@@ -153,7 +116,7 @@ public unsafe class CubismMotion : ACubismMotion
         return LerpPoints(p012, p123, t).Value;
     }
 
-    private unsafe float BezierEvaluateBinarySearch(List<CubismMotionPoint> points, int start, float time)
+    private static float BezierEvaluateBinarySearch(List<CubismMotionPoint> points, int start, float time)
     {
         float x_error = 0.01f;
 
@@ -237,7 +200,7 @@ public unsafe class CubismMotion : ACubismMotion
         return LerpPoints(p012, p123, t).Value;
     }
 
-    private float BezierEvaluateCardanoInterpretation(CubismMotionPoint[] points, int start, float time)
+    private static float BezierEvaluateCardanoInterpretation(CubismMotionPoint[] points, int start, float time)
     {
         float x = time;
         float x1 = points[0].Time;
@@ -262,17 +225,17 @@ public unsafe class CubismMotion : ACubismMotion
         return LerpPoints(p012, p123, t).Value;
     }
 
-    private float SteppedEvaluate(CubismMotionPoint[] points, int start, float time)
+    private static float SteppedEvaluate(CubismMotionPoint[] points, int start, float time)
     {
         return points[start].Value;
     }
 
-    private float InverseSteppedEvaluate(CubismMotionPoint[] points, int start, float time)
+    private static float InverseSteppedEvaluate(CubismMotionPoint[] points, int start, float time)
     {
         return points[start + 1].Value;
     }
 
-    private float EvaluateCurve(CubismMotionData motionData, int index, float time)
+    private static float EvaluateCurve(CubismMotionData motionData, int index, float time)
     {
         // Find segment to evaluate.
         var curve = motionData.Curves[index];
@@ -508,7 +471,7 @@ public unsafe class CubismMotion : ACubismMotion
 
         _sourceFrameRate = _motionData.Fps;
         _loopDurationSeconds = _motionData.Duration;
-        _onFinishedMotion = onFinishedMotionHandler;
+        OnFinishedMotion = onFinishedMotionHandler;
     }
 
     /// <summary>
@@ -758,7 +721,7 @@ public unsafe class CubismMotion : ACubismMotion
             }
             else
             {
-                _onFinishedMotion?.Invoke(this);
+                OnFinishedMotion?.Invoke(this);
 
                 motionQueueEntry.Finished = true;
             }

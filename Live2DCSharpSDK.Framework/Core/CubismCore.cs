@@ -143,7 +143,8 @@ public static partial class CubismCore
     /// <param name="size">Size of moc (in bytes).</param>
     /// <returns>'1' if Moc is valid; '0' otherwise.</returns>
     [LibraryImport("Live2DCubismCore", EntryPoint = "csmHasMocConsistency")]
-    internal static partial int HasMocConsistency(IntPtr address, int size);
+    [return: MarshalAs(UnmanagedType.I4)]
+    internal static partial bool HasMocConsistency(IntPtr address, int size);
 
     //LOGGING
 

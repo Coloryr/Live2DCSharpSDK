@@ -8,7 +8,7 @@ namespace Live2DCSharpSDK.Framework.Motion;
 /// <param name="caller">発火したイベントを再生させたCubismMotionQueueManager</param>
 /// <param name="eventValue">発火したイベントの文字列データ</param>
 /// <param name="customData">コールバックに返される登録時に指定されたデータ</param>
-public delegate void CubismMotionEventFunction(CubismMotionQueueManager caller, string eventValue, dynamic customData);
+public delegate void CubismMotionEventFunction(CubismMotionQueueManager caller, string eventValue, object? customData);
 /// <summary>
 /// モーションの識別番号の定義
 /// </summary>
@@ -35,7 +35,7 @@ public class CubismMotionQueueManager
     /// <summary>
     /// コールバックに戻されるデータ
     /// </summary>
-    private object _eventCustomData;
+    private object? _eventCustomData;
 
     /// <summary>
     /// デルタ時間の積算値[秒]
@@ -49,13 +49,8 @@ public class CubismMotionQueueManager
     /// <param name="autoDelete">再生が終了したモーションのインスタンスを削除するなら true</param>
     /// <param name="userTimeSeconds">デルタ時間の積算値[秒]</param>
     /// <returns>開始したモーションの識別番号を返す。個別のモーションが終了したか否かを判定するIsFinished()の引数で使用する。開始できない時は「-1」</returns>
-    public object StartMotion(ACubismMotion motion, bool autoDelete, float userTimeSeconds)
+    public CubismMotionQueueEntry StartMotion(ACubismMotion motion, float userTimeSeconds)
     {
-        if (motion == null)
-        {
-            return null;
-        }
-
         CubismMotionQueueEntry motionQueueEntry;
 
         // 既にモーションがあれば終了フラグを立てる
@@ -72,7 +67,6 @@ public class CubismMotionQueueManager
 
         motionQueueEntry = new CubismMotionQueueEntry
         {
-            AutoDelete = autoDelete,
             Motion = motion
         }; // 終了時に破棄する
 
@@ -93,18 +87,6 @@ public class CubismMotionQueueManager
 
         foreach (var item in new List<CubismMotionQueueEntry>(_motions))
         {
-            if (item == null)
-            {
-                _motions.Remove(item);          // 削除
-                continue;
-            }
-
-            if (item.Motion == null)
-            {
-                _motions.Remove(item);          // 削除
-                continue;
-            }
-
             // ----- 終了済みの処理があれば削除する ------
             if (!item.Finished)
             {
@@ -151,12 +133,6 @@ public class CubismMotionQueueManager
 
         foreach (var item in new List<CubismMotionQueueEntry>(_motions))
         {
-            if (item == null)
-            {
-                _motions.Remove(item);
-                continue;
-            }
-
             // ----- 終了済みの処理があれば削除する ------
             _motions.Remove(item); //削除
         }
@@ -175,11 +151,6 @@ public class CubismMotionQueueManager
 
         foreach (var item in _motions)
         {
-            if (item == null)
-            {
-                continue;
-            }
-
             if (item._motionQueueEntryHandle == motionQueueEntryNumber)
             {
                 return item;
@@ -194,7 +165,7 @@ public class CubismMotionQueueManager
     /// </summary>
     /// <param name="callback">コールバック関数</param>
     /// <param name="customData">コールバックに返されるデータ</param>
-    public void SetEventCallback(CubismMotionEventFunction callback, dynamic customData = null)
+    public void SetEventCallback(CubismMotionEventFunction callback, object? customData = null)
     {
         _eventCallback = callback;
         _eventCustomData = customData;
@@ -216,19 +187,7 @@ public class CubismMotionQueueManager
 
         foreach (var item in new List<CubismMotionQueueEntry>(_motions))
         {
-            if (item == null)
-            {
-                _motions.Remove(item);          // 削除
-                continue;
-            }
-
             var motion = item.Motion;
-
-            if (motion == null)
-            {
-                _motions.Remove(item);          // 削除
-                continue;
-            }
 
             // ------ 値を反映する ------
             motion.UpdateParameters(model, item, userTimeSeconds);

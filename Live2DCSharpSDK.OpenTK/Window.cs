@@ -1,4 +1,5 @@
 ﻿using Live2DCSharpSDK.App;
+using Live2DCSharpSDK.Framework.Motion;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -13,20 +14,23 @@ public class Window : GameWindow
     public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
             : base(gameWindowSettings, nativeWindowSettings)
     {
-        lapp = new(new OpenTKApi(this));
-
         var version = GL.GetString(StringName.Version);
     }
 
     protected override void OnLoad()
     {
         base.OnLoad();
-        var res = lapp.Initialize();
-        if (!res)
-        {
-            throw new Exception();
-        }
-        lapp.GetLive2D().LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        lapp = new(new OpenTKApi(this));
+        //lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        //var model = lapp.Live2dManager.GetModel(0);
+        //var list = model.Expressions;
+        //var list1 = model.Motions;
+        //model.ModelMatrix.TranslateX(0.5f);
+        //model.StartMotion(list1[2], MotionPriority.PriorityNormal);
+
+        lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
+        //model = lapp.Live2dManager.GetModel(1);
+        //model.ModelMatrix.TranslateX(-0.5f);
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)

@@ -3,26 +3,10 @@ using Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
 namespace Live2DCSharpSDK.App;
 
-public enum SelectTarget
-{
-    /// <summary>
-    /// デフォルトのフレームバッファにレンダリング
-    /// </summary>
-    SelectTarget_None,
-    /// <summary>
-    /// LAppModelが各自持つフレームバッファにレンダリング
-    /// </summary>
-    SelectTarget_ModelFrameBuffer,
-    /// <summary>
-    /// LAppViewの持つフレームバッファにレンダリング
-    /// </summary>
-    SelectTarget_ViewFrameBuffer,
-};
-
 /// <summary>
 /// 描画クラス
 /// </summary>
-public class LAppView : IDisposable
+public class LAppView
 {
     /// <summary>
     /// タッチマネージャー
@@ -31,26 +15,18 @@ public class LAppView : IDisposable
     /// <summary>
     /// デバイスからスクリーンへの行列
     /// </summary>
-    private CubismMatrix44 _deviceToScreen;
+    private readonly CubismMatrix44 _deviceToScreen;
     /// <summary>
     /// viewMatrix
     /// </summary>
-    private CubismViewMatrix _viewMatrix;
+    private readonly CubismViewMatrix _viewMatrix;
 
-    /// <summary>
-    /// モードによってはCubismモデル結果をこっちにレンダリング
-    /// </summary>
-    private CubismOffscreenFrame_OpenGLES2 _renderBuffer;
-    /// <summary>
-    /// レンダリング先の選択肢
-    /// </summary>
-    private SelectTarget _renderTarget;
     /// <summary>
     /// レンダリングターゲットのクリアカラー
     /// </summary>
-    private float[] _clearColor = new float[4];
+    private readonly float[] _clearColor = new float[4];
 
-    private LAppDelegate Lapp;
+    private readonly LAppDelegate Lapp;
 
     /// <summary>
     /// コンストラクタ
@@ -58,8 +34,6 @@ public class LAppView : IDisposable
     public LAppView(LAppDelegate lapp)
     {
         Lapp = lapp;
-
-        _renderTarget = LAppDefine.RenderTarget;
 
         _clearColor[0] = 1.0f;
         _clearColor[1] = 1.0f;
@@ -74,14 +48,6 @@ public class LAppView : IDisposable
 
         // 画面の表示の拡大縮小や移動の変換を行う行列
         _viewMatrix = new CubismViewMatrix();
-    }
-
-    /// <summary>
-    /// デストラクタ
-    /// </summary>
-    public void Dispose()
-    {
-        _renderBuffer.DestroyOffscreenFrame();
     }
 
     /// <summary>
@@ -137,9 +103,8 @@ public class LAppView : IDisposable
     /// </summary>
     public void Render()
     {
-        LAppLive2DManager Live2DManager = Lapp.GetLive2D();
-
-        Live2DManager.SetViewMatrix(_viewMatrix);
+        var Live2DManager = Lapp.Live2dManager;
+        Live2DManager.ViewMatrix.SetMatrix(_viewMatrix);
 
         // Cubism更新・描画
         Live2DManager.OnUpdate();
@@ -167,7 +132,7 @@ public class LAppView : IDisposable
 
         _touchManager.TouchesMoved(pointX, pointY);
 
-        Lapp.GetLive2D().OnDrag(viewX, viewY);
+        Lapp.Live2dManager.OnDrag(viewX, viewY);
     }
 
     /// <summary>
@@ -178,19 +143,13 @@ public class LAppView : IDisposable
     public void OnTouchesEnded(float pointX, float pointY)
     {
         // タッチ終了
-        LAppLive2DManager live2DManager = Lapp.GetLive2D();
+        var live2DManager = Lapp.Live2dManager;
         live2DManager.OnDrag(0.0f, 0.0f);
-        {
-
-            // シングルタップ
-            float x = _deviceToScreen.TransformX(_touchManager.GetX()); // 論理座標変換した座標を取得。
-            float y = _deviceToScreen.TransformY(_touchManager.GetY()); // 論理座標変換した座標を取得。
-            if (LAppDefine.DebugTouchLogEnable)
-            {
-                LAppPal.PrintLog($"[APP]touchesEnded x:{x:#.##} y:{y:#.##}");
-            }
-            live2DManager.OnTap(x, y);
-        }
+        // シングルタップ
+        float x = _deviceToScreen.TransformX(_touchManager.GetX()); // 論理座標変換した座標を取得。
+        float y = _deviceToScreen.TransformY(_touchManager.GetY()); // 論理座標変換した座標を取得。
+        LAppPal.PrintLog($"[APP]touchesEnded x:{x:#.##} y:{y:#.##}");
+        live2DManager.OnTap(x, y);
     }
 
     /// <summary>
@@ -249,14 +208,6 @@ public class LAppView : IDisposable
         }
 
         return alpha;
-    }
-
-    /// <summary>
-    /// レンダリング先を切り替える
-    /// </summary>
-    public void SwitchRenderingTarget(SelectTarget targetType)
-    {
-        _renderTarget = targetType;
     }
 
     /// <summary>

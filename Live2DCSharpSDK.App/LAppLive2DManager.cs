@@ -12,13 +12,13 @@ public class LAppLive2DManager : IDisposable
     /// <summary>
     /// モデル描画に用いるView行列
     /// </summary>
-    private CubismMatrix44 _viewMatrix;
+    public CubismMatrix44 ViewMatrix { get; } = new();
     /// <summary>
     /// モデルインスタンスのコンテナ
     /// </summary>
     private readonly List<LAppModel> _models = new();
 
-    private LAppDelegate Lapp;
+    private readonly LAppDelegate Lapp;
 
     public event Action<ACubismMotion>? MotionFinished;
 
@@ -27,7 +27,6 @@ public class LAppLive2DManager : IDisposable
     /// </summary>
     public LAppLive2DManager(LAppDelegate lapp)
     {
-        _viewMatrix = new CubismMatrix44();
         Lapp = lapp;
     }
 
@@ -38,12 +37,7 @@ public class LAppLive2DManager : IDisposable
     /// <returns>モデルのインスタンスを返す。インデックス値が範囲外の場合はNULLを返す。</returns>
     public LAppModel GetModel(int no)
     {
-        if (no < _models.Count)
-        {
-            return _models[no];
-        }
-
-        return null;
+        return _models[no];
     }
 
     /// <summary>
@@ -102,7 +96,7 @@ public class LAppLive2DManager : IDisposable
                 {
                     LAppPal.PrintLog($"[APP]hit area: [{LAppDefine.HitAreaNameBody}]");
                 }
-                _models[i].StartRandomMotion(LAppDefine.MotionGroupTapBody, LAppDefine.PriorityNormal, OnFinishedMotion);
+                _models[i].StartRandomMotion(LAppDefine.MotionGroupTapBody, MotionPriority.PriorityNormal, OnFinishedMotion);
             }
         }
     }
@@ -130,7 +124,7 @@ public class LAppLive2DManager : IDisposable
             if (model.Model.GetCanvasWidth() > 1.0f && width < height)
             {
                 // 横に長いモデルを縦長ウィンドウに表示する際モデルの横サイズでscaleを算出する
-                model.GetModelMatrix().SetWidth(2.0f);
+                model.ModelMatrix.SetWidth(2.0f);
                 projection.Scale(1.0f, (float)width / height);
             }
             else
@@ -139,9 +133,9 @@ public class LAppLive2DManager : IDisposable
             }
 
             // 必要があればここで乗算
-            if (_viewMatrix != null)
+            if (ViewMatrix != null)
             {
-                projection.MultiplyByMatrix(_viewMatrix);
+                projection.MultiplyByMatrix(ViewMatrix);
             }
 
             model.Update();
@@ -160,23 +154,11 @@ public class LAppLive2DManager : IDisposable
         // model3.jsonのパスを決定する.
         // ディレクトリ名とmodel3.jsonの名前を一致させておくこと.
         var modelJsonName = Path.GetFullPath($"{dir}{name}.model3.json");
+        _models.Add(new(Lapp, dir, modelJsonName));
 
-        var model = new LAppModel(Lapp);
-        _models.Add(model);
-        model.LoadAssets(dir, modelJsonName);
-
-        /*
-         * モデル半透明表示を行うサンプルを提示する。
-         * ここでUSE_RENDER_TARGET、USE_MODEL_RENDER_TARGETが定義されている場合
-         * 別のレンダリングターゲットにモデルを描画し、描画結果をテクスチャとして別のスプライトに張り付ける。
-         */
-        {
-            Lapp.GetView().SwitchRenderingTarget(LAppDefine.RenderTarget);
-
-            // 別レンダリング先を選択した際の背景クリア色
-            float[] clearColor = new[] { 1.0f, 1.0f, 1.0f };
-            Lapp.GetView().SetRenderTargetClearColor(clearColor[0], clearColor[1], clearColor[2]);
-        }
+        // 別レンダリング先を選択した際の背景クリア色
+        float[] clearColor = new[] { 1.0f, 1.0f, 1.0f };
+        Lapp.View.SetRenderTargetClearColor(clearColor[0], clearColor[1], clearColor[2]);
     }
 
     /// <summary>
@@ -188,16 +170,9 @@ public class LAppLive2DManager : IDisposable
         return _models.Count;
     }
 
-    /// <summary>
-    /// viewMatrixをセットする
-    /// </summary>
-    public void SetViewMatrix(CubismMatrix44 m)
-    {
-        _viewMatrix.SetMatrix(m.Tr);
-    }
-
     public void Dispose()
     {
         ReleaseAllModel();
+        GC.SuppressFinalize(this);
     }
 }

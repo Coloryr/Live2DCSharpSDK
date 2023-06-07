@@ -84,7 +84,7 @@ public class CubismMoc : IDisposable
     /// <returns>'1' if Moc is valid; '0' otherwise.</returns>
     public static bool HasMocConsistency(IntPtr address, int size)
     {
-        return CubismCore.HasMocConsistency(address, size) != 0;
+        return CubismCore.HasMocConsistency(address, size);
     }
 
     /// <summary>

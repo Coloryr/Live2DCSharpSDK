@@ -9,7 +9,6 @@ namespace Live2DCSharpSDK.App;
 /// </summary>
 public class LAppDelegate : IDisposable
 {
-    private static LAppDelegate? s_instance;
     /// <summary>
     /// Cubism SDK Allocator
     /// </summary>
@@ -21,7 +20,7 @@ public class LAppDelegate : IDisposable
     /// <summary>
     /// View情報
     /// </summary>
-    private LAppView _view;
+    public LAppView View { get; private set; }
     /// <summary>
     /// クリックしているか
     /// </summary>
@@ -37,13 +36,13 @@ public class LAppDelegate : IDisposable
     /// <summary>
     /// APP終了しているか
     /// </summary>
-    private bool _isEnd;
+    private bool IsEnd;
     /// <summary>
     /// テクスチャマネージャー
     /// </summary>
-    private LAppTextureManager _textureManager;
+    public LAppTextureManager TextureManager { get; private set; }
 
-    private LAppLive2DManager _live2dManager;
+    public LAppLive2DManager Live2dManager { get; private set; }
 
     public OpenGLApi GL { get; }
 
@@ -60,20 +59,9 @@ public class LAppDelegate : IDisposable
     {
         GL = gl;
 
-        _view = new LAppView(this);
-        _textureManager = new LAppTextureManager(this);
+        View = new LAppView(this);
+        TextureManager = new LAppTextureManager(this);
         _cubismAllocator = new LAppAllocator();
-    }
-
-    /// <summary>
-    /// APPに必要なものを初期化する。
-    /// </summary>
-    public bool Initialize()
-    {
-        if (LAppDefine.DebugLogEnable)
-        {
-            LAppPal.PrintLog("START");
-        }
 
         //テクスチャサンプリング設定
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
@@ -89,17 +77,9 @@ public class LAppDelegate : IDisposable
         _windowHeight = height;
 
         //AppViewの初期化
-        _view.Initialize();
+        View.Initialize();
 
         // Cubism SDK の初期化
-        InitializeCubism();
-
-        return true;
-    }
-
-    private void InitializeCubism()
-    {
-        //setup cubism
         _cubismOption = new()
         {
             LogFunction = LAppPal.PrintLog,
@@ -111,7 +91,7 @@ public class LAppDelegate : IDisposable
         CubismFramework.Initialize();
 
         //load model
-        _live2dManager = new LAppLive2DManager(this);
+        Live2dManager = new LAppLive2DManager(this);
 
         LAppPal.UpdateTime(0);
     }
@@ -121,13 +101,13 @@ public class LAppDelegate : IDisposable
     /// </summary>
     public void Dispose()
     {
-        _view.Dispose();
-
         // リソースを解放
-        GetLive2D().Dispose();
+        Live2dManager.Dispose();
 
         //Cubism SDK の解放
         CubismFramework.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     public void Resize()
@@ -136,7 +116,7 @@ public class LAppDelegate : IDisposable
         if ((_windowWidth != width || _windowHeight != height) && width > 0 && height > 0)
         {
             //AppViewの初期化
-            _view.Initialize();
+            View.Initialize();
             // スプライトサイズを再設定
             //_view.ResizeSprite();
             // サイズを保存しておく
@@ -161,7 +141,7 @@ public class LAppDelegate : IDisposable
         GL.glClearDepth(1.0f);
 
         //描画更新
-        _view.Render();
+        View.Render();
     }
 
     /// <summary>
@@ -171,7 +151,7 @@ public class LAppDelegate : IDisposable
     /// <param name="action">実行結果</param>
     public void OnMouseCallBack(ButtonType button, ButtonFuntion action)
     {
-        if (_view == null)
+        if (View == null)
         {
             return;
         }
@@ -183,14 +163,14 @@ public class LAppDelegate : IDisposable
         if (action == ButtonFuntion.PRESS)
         {
             _captured = true;
-            _view.OnTouchesBegan(_mouseX, _mouseY);
+            View.OnTouchesBegan(_mouseX, _mouseY);
         }
         else if (action == ButtonFuntion.RELEASE)
         {
             if (_captured)
             {
                 _captured = false;
-                _view.OnTouchesEnded(_mouseX, _mouseY);
+                View.OnTouchesEnded(_mouseX, _mouseY);
             }
         }
     }
@@ -206,46 +186,11 @@ public class LAppDelegate : IDisposable
         {
             return;
         }
-        if (_view == null)
+        if (View == null)
         {
             return;
         }
 
-        _view.OnTouchesMoved(_mouseX, _mouseY);
-    }
-
-    /// <summary>
-    /// View情報を取得する。
-    /// </summary>
-    public LAppView GetView()
-    {
-        return _view;
-    }
-
-    /// <summary>
-    /// アプリケーションを終了するかどうか。
-    /// </summary>
-    /// <returns></returns>
-    public bool GetIsEnd()
-    {
-        return _isEnd;
-    }
-
-    /// <summary>
-    /// アプリケーションを終了する。
-    /// </summary>
-    public void AppEnd()
-    {
-        _isEnd = true;
-    }
-
-    public LAppTextureManager GetTextureManager()
-    {
-        return _textureManager;
-    }
-
-    public LAppLive2DManager GetLive2D()
-    {
-        return _live2dManager;
+        View.OnTouchesMoved(_mouseX, _mouseY);
     }
 }
