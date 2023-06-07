@@ -9,12 +9,12 @@ namespace Live2DCSharpSDK.Framework.Model;
 /// <summary>
 /// ユーザーが実際に使用するモデルの基底クラス。これを継承してユーザーが実装する。
 /// </summary>
-public class CubismUserModel : IDisposable
+public abstract class CubismUserModel : IDisposable
 {
     /// <summary>
     /// レンダラ
     /// </summary>
-    private CubismRenderer _renderer;
+    public CubismRenderer? Renderer { get; private set; }
 
     /// <summary>
     /// Mocデータ
@@ -23,7 +23,7 @@ public class CubismUserModel : IDisposable
     /// <summary>
     /// Modelインスタンス
     /// </summary>
-    protected CubismModel _model;
+    public CubismModel Model => _moc.Model;
 
     /// <summary>
     /// モーション管理
@@ -44,11 +44,11 @@ public class CubismUserModel : IDisposable
     /// <summary>
     /// モデル行列
     /// </summary>
-    protected CubismModelMatrix _modelMatrix;
+    public CubismModelMatrix ModelMatrix { get; protected set; }
     /// <summary>
     /// ポーズ管理
     /// </summary>
-    protected CubismPose _pose;
+    protected CubismPose? _pose;
     /// <summary>
     /// マウスドラッグ
     /// </summary>
@@ -56,24 +56,24 @@ public class CubismUserModel : IDisposable
     /// <summary>
     /// 物理演算
     /// </summary>
-    protected CubismPhysics _physics;
+    protected CubismPhysics? _physics;
     /// <summary>
     /// ユーザデータ
     /// </summary>
-    protected CubismModelUserData _modelUserData;
+    protected CubismModelUserData? _modelUserData;
 
     /// <summary>
     /// 初期化されたかどうか
     /// </summary>
-    protected bool _initialized;
+    public bool Initialized { get; set; }
     /// <summary>
     /// 更新されたかどうか
     /// </summary>
-    protected bool _updating;
+    public bool Updating { get; set; }
     /// <summary>
     /// 不透明度
     /// </summary>
-    protected float _opacity;
+    public float Opacity { get; set; }
     /// <summary>
     /// リップシンクするかどうか
     /// </summary>
@@ -120,11 +120,7 @@ public class CubismUserModel : IDisposable
     /// <param name="customData">CubismUserModelを継承したインスタンスを想定</param>
     public static void CubismDefaultMotionEventCallback(CubismMotionQueueManager caller, string eventValue, dynamic customData)
     {
-        CubismUserModel model = customData as CubismUserModel;
-        if (model != null)
-        {
-            model.MotionEventFired(eventValue);
-        }
+        (customData as CubismUserModel)?.MotionEventFired(eventValue);
     }
 
     /// <summary>
@@ -134,7 +130,7 @@ public class CubismUserModel : IDisposable
     {
         _lipSync = true;
 
-        _opacity = 1.0f;
+        Opacity = 1.0f;
 
         // モーションマネージャーを作成
         // MotionQueueManagerクラスからの継承なので使い方は同じ
@@ -153,44 +149,7 @@ public class CubismUserModel : IDisposable
         _moc?.Dispose();
 
         DeleteRenderer();
-    }
-
-    /// <summary>
-    /// 初期化されている状態か？
-    /// </summary>
-    /// <returns>true    初期化されている
-    /// false   初期化されていない</returns>
-    public bool IsInitialized()
-    {
-        return _initialized;
-    }
-
-    /// <summary>
-    /// 初期化状態を設定する。
-    /// </summary>
-    /// <param name="v">初期化状態</param>
-    public void IsInitialized(bool v)
-    {
-        _initialized = v;
-    }
-
-    /// <summary>
-    /// 更新されている状態か？
-    /// </summary>
-    /// <returns>true    更新されている
-    /// false   更新されていない</returns>
-    public bool IsUpdating()
-    {
-        return _updating;
-    }
-
-    /// <summary>
-    /// 更新状態を設定する。
-    /// </summary>
-    /// <param name="v">更新状態</param>
-    public void IsUpdating(bool v)
-    {
-        _updating = v;
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -217,33 +176,6 @@ public class CubismUserModel : IDisposable
     }
 
     /// <summary>
-    /// モデル行列を取得する。
-    /// </summary>
-    /// <returns>モデル行列</returns>
-    public CubismModelMatrix GetModelMatrix()
-    {
-        return _modelMatrix;
-    }
-
-    /// <summary>
-    /// 不透明度を設定する。
-    /// </summary>
-    /// <param name="a">不透明度</param>
-    public void SetOpacity(float a)
-    {
-        _opacity = a;
-    }
-
-    /// <summary>
-    /// 不透明度を取得する。
-    /// </summary>
-    /// <returns>不透明度</returns>
-    public float GetOpacity()
-    {
-        return _opacity;
-    }
-
-    /// <summary>
     /// モデルデータを読み込む。
     /// </summary>
     /// <param name="buffer">moc3ファイルが読み込まれているバッファ</param>
@@ -251,46 +183,8 @@ public class CubismUserModel : IDisposable
     public void LoadModel(byte[] buffer, bool shouldCheckMocConsistency = false)
     {
         _moc = new CubismMoc(buffer, shouldCheckMocConsistency);
-
-        if (_moc == null)
-        {
-            CubismLog.CubismLogError("Failed to CubismMoc::Create().");
-            return;
-        }
-
-        _model = _moc.Model;
-
-        if (_model == null)
-        {
-            CubismLog.CubismLogError("Failed to CreateModel().");
-            return;
-        }
-
-        _model.SaveParameters();
-        _modelMatrix = new CubismModelMatrix(_model.GetCanvasWidth(), _model.GetCanvasHeight());
-    }
-
-    /// <summary>
-    /// モーションデータを読み込む。
-    /// </summary>
-    /// <param name="buffer">motion3.jsonファイルが読み込まれているバッファ</param>
-    /// <param name="name">モーションの名前</param>
-    /// <param name="onFinishedMotionHandler">モーション再生終了時に呼び出されるコールバック関数。NULLの場合、呼び出されない。</param>
-    /// <returns>モーションクラス</returns>
-    public ACubismMotion LoadMotion(string buffer, string name, FinishedMotionCallback onFinishedMotionHandler = null)
-    {
-        return new CubismMotion(buffer, onFinishedMotionHandler);
-    }
-
-    /// <summary>
-    /// 表情データを読み込む。
-    /// </summary>
-    /// <param name="buffer">expファイルが読み込まれているバッファ</param>
-    /// <param name="name">表情の名前</param>
-    /// <returns>表情データを読み込む。</returns>
-    public ACubismMotion LoadExpression(string buffer, string name)
-    {
-        return new CubismExpressionMotion(buffer);
+        Model.SaveParameters();
+        ModelMatrix = new CubismModelMatrix(Model.GetCanvasWidth(), Model.GetCanvasHeight());
     }
 
     /// <summary>
@@ -330,25 +224,25 @@ public class CubismUserModel : IDisposable
     /// false   ヒットしていない</returns>
     public unsafe bool IsHit(string drawableId, float pointX, float pointY)
     {
-        int drawIndex = _model.GetDrawableIndex(drawableId);
+        var drawIndex = Model.GetDrawableIndex(drawableId);
 
         if (drawIndex < 0)
         {
             return false; // 存在しない場合はfalse
         }
 
-        int count = _model.GetDrawableVertexCount(drawIndex);
-        float* vertices = _model.GetDrawableVertices(drawIndex);
+        var count = Model.GetDrawableVertexCount(drawIndex);
+        var vertices = Model.GetDrawableVertices(drawIndex);
 
-        float left = vertices[0];
-        float right = vertices[0];
-        float top = vertices[1];
-        float bottom = vertices[1];
+        var left = vertices[0];
+        var right = vertices[0];
+        var top = vertices[1];
+        var bottom = vertices[1];
 
         for (int j = 1; j < count; ++j)
         {
-            float x = vertices[CubismFramework.VertexOffset + j * CubismFramework.VertexStep];
-            float y = vertices[CubismFramework.VertexOffset + j * CubismFramework.VertexStep + 1];
+            var x = vertices[CubismFramework.VertexOffset + j * CubismFramework.VertexStep];
+            var y = vertices[CubismFramework.VertexOffset + j * CubismFramework.VertexStep + 1];
 
             if (x < left)
             {
@@ -371,28 +265,10 @@ public class CubismUserModel : IDisposable
             }
         }
 
-        float tx = _modelMatrix.InvertTransformX(pointX);
-        float ty = _modelMatrix.InvertTransformY(pointY);
+        var tx = ModelMatrix.InvertTransformX(pointX);
+        var ty = ModelMatrix.InvertTransformY(pointY);
 
-        return ((left <= tx) && (tx <= right) && (top <= ty) && (ty <= bottom));
-    }
-
-    /// <summary>
-    /// モデルを取得する。
-    /// </summary>
-    /// <returns>モデル</returns>
-    public CubismModel GetModel()
-    {
-        return _model;
-    }
-
-    /// <summary>
-    /// レンダラを取得する。
-    /// </summary>
-    /// <returns>レンダラ</returns>
-    public CubismRenderer GetRenderer()
-    {
-        return _renderer;
+        return (left <= tx) && (tx <= right) && (top <= ty) && (ty <= bottom);
     }
 
     /// <summary>
@@ -400,12 +276,12 @@ public class CubismUserModel : IDisposable
     /// </summary>
     public void CreateRenderer(CubismRenderer renderer, int maskBufferCount = 1)
     {
-        if (_renderer != null)
+        if (Renderer != null)
         {
             DeleteRenderer();
         }
-        _renderer = renderer;
-        _renderer.Initialize(_model, maskBufferCount);
+        Renderer = renderer;
+        Renderer.Initialize(Model, maskBufferCount);
     }
 
     /// <summary>
@@ -413,10 +289,10 @@ public class CubismUserModel : IDisposable
     /// </summary>
     public void DeleteRenderer()
     {
-        if (_renderer != null)
+        if (Renderer != null)
         {
-            _renderer.Dispose();
-            _renderer = null;
+            Renderer.Dispose();
+            Renderer = null;
         }
     }
 
@@ -426,8 +302,5 @@ public class CubismUserModel : IDisposable
     /// 上書きしない場合はログ出力をする。
     /// </summary>
     /// <param name="eventValue">発火したイベントの文字列データ</param>
-    void MotionEventFired(string eventValue)
-    {
-        CubismLog.CubismLogInfo(eventValue);
-    }
+    protected abstract void MotionEventFired(string eventValue);
 }

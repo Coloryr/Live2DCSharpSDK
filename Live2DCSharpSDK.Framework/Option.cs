@@ -1,4 +1,4 @@
-﻿using Live2DCSharpSDK.Core;
+﻿using Live2DCSharpSDK.Framework.Core;
 
 namespace Live2DCSharpSDK.Framework;
 
@@ -41,7 +41,7 @@ public class Option
     /// <summary>
     /// ログ出力の関数ポイ
     /// </summary>
-    public csmLogFunction LogFunction;
+    public LogFunction LogFunction;
     /// <summary>
     /// ログ出力レベル設定
     /// </summary>

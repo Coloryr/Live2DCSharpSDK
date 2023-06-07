@@ -5,30 +5,6 @@ using Live2DCSharpSDK.Framework.Model;
 
 namespace Live2DCSharpSDK.Framework.Effect;
 
-public enum EyeState
-{
-    /// <summary>
-    /// 初期状態
-    /// </summary>
-    EyeState_First = 0,
-    /// <summary>
-    /// まばたきしていない状態
-    /// </summary>
-    EyeState_Interval,
-    /// <summary>
-    /// まぶたが閉じていく途中の状態
-    /// </summary>
-    EyeState_Closing,
-    /// <summary>
-    /// まぶたが閉じている状態
-    /// </summary>
-    EyeState_Closed,
-    /// <summary>
-    /// まぶたが開いていく途中の状態
-    /// </summary>
-    EyeState_Opening
-};
-
 /// <summary>
 /// 自動まばたき機能を提供する。
 /// </summary>

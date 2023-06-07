@@ -127,13 +127,7 @@ public class LAppLive2DManager : IDisposable
             CubismMatrix44 projection = new();
             LAppModel model = GetModel(i);
 
-            if (model.GetModel() == null)
-            {
-                LAppPal.PrintLog("Failed to model->GetModel().");
-                continue;
-            }
-
-            if (model.GetModel().GetCanvasWidth() > 1.0f && width < height)
+            if (model.Model.GetCanvasWidth() > 1.0f && width < height)
             {
                 // 横に長いモデルを縦長ウィンドウに表示する際モデルの横サイズでscaleを算出する
                 model.GetModelMatrix().SetWidth(2.0f);

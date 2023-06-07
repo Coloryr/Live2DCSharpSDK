@@ -19,11 +19,11 @@ public class CubismModelMatrix : CubismMatrix44
     /// <summary>
     /// 横幅
     /// </summary>
-    private float _width;
+    private readonly float _width;
     /// <summary>
     /// 縦幅
     /// </summary>
-    private float _height;
+    private readonly float _height;
 
     public CubismModelMatrix(float w, float h)
     {
