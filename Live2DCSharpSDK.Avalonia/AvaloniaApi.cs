@@ -15,6 +15,7 @@ public class AvaloniaApi : OpenGLApi
     private OpenGlPageControl Con;
     private GlInterface GL;
     public override bool IsES2 => true;
+    public override bool IsPhoneES2 => false;
 
     public delegate void Func1(int a, int b);
     public delegate void Func2(int a, int b, int c, int d);
@@ -24,7 +25,7 @@ public class AvaloniaApi : OpenGLApi
     public delegate void Func6(int a, int b, int c, int d, int e);
     public unsafe delegate void Func7(int a, bool* b);
     public unsafe delegate void Func8(int a, int* b);
-    public delegate void Func9(int a, int b, nint c);
+    public delegate void Func9(int a, int b, out int c);
     public delegate bool Func10(int a);
     public delegate void Func11(int a, int b, float c);
     public delegate void Func12(int a, float b, float c, float d, float e);
@@ -293,11 +294,9 @@ public class AvaloniaApi : OpenGLApi
         return GL.GetUniformLocationString(index, uni);
     }
 
-    public override unsafe void glGetVertexAttribiv(int index, int bit, out int data)
+    public override void glGetVertexAttribiv(int index, int bit, out int data)
     {
-        int temp;
-        GetVertexAttribiv(index, bit, new IntPtr(&temp));
-        data = temp;
+        GetVertexAttribiv(index, bit, out data);
     }
 
     public override bool glIsEnabled(int bit)

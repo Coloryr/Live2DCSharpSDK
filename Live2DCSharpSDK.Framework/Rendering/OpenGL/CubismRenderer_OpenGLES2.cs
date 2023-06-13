@@ -287,7 +287,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         GL.glEnable(GL.GL_BLEND);
         GL.glColorMask(true, true, true, true);
 
-        if (GL.IsES2)
+        if (GL.IsPhoneES2)
         {
             GL.glBindVertexArrayOES(0);
         }

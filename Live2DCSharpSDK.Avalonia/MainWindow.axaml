@@ -13,6 +13,15 @@
     mc:Ignorable="d">
     <Grid>
         <pages:OpenGlPageControl x:Name="GL" />
+        <Button
+            Name="Button1"
+            Width="100"
+            Height="30"
+            Padding="0"
+            VerticalAlignment="Bottom"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            Content="刷新" />
         <StackPanel>
             <TextBlock Text="{Binding #GL.Info}" />
         </StackPanel>
