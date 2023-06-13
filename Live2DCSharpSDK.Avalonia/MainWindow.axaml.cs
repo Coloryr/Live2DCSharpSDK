@@ -12,6 +12,8 @@ using Live2DCSharpSDK.Framework.Rendering.OpenGL;
 using Avalonia.Rendering;
 using System.Threading;
 using Avalonia.Threading;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Documents;
 
 namespace Live2DCSharpSDK.Avalonia;
 
@@ -20,6 +22,13 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        Button1.Click += Button1_Click;
+    }
+
+    private void Button1_Click(object? sender, RoutedEventArgs e)
+    {
+        GL.RequestNextFrameRendering();
     }
 }
 
@@ -62,8 +71,12 @@ public class OpenGlPageControl : OpenGlControlBase
             Console.WriteLine(err);
     }
 
+    private bool init = false;
+
     protected override unsafe void OnOpenGlInit(GlInterface gl)
     {
+        if (init)
+            return;
         CheckError(gl);
 
         Info = $"Renderer: {gl.GetString(GlConsts.GL_RENDERER)} Version: {gl.GetString(GlConsts.GL_VERSION)}";
@@ -71,6 +84,7 @@ public class OpenGlPageControl : OpenGlControlBase
         lapp = new(new AvaloniaApi(this, gl));
         var model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
         CheckError(gl);
+        init = true;
     }
 
     protected override void OnOpenGlDeinit(GlInterface GL)

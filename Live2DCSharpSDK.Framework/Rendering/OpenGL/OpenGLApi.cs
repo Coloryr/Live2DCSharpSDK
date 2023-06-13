@@ -9,6 +9,7 @@ public abstract class OpenGLApi
     public const string CSM_FRAGMENT_SHADER_FP_PRECISION = CSM_FRAGMENT_SHADER_FP_PRECISION_HIGH;
 
     public abstract bool IsES2 { get; }
+    public abstract bool IsPhoneES2 { get; }
 
     public int GL_FALSE = 0;
     public int GL_ZERO = 0;
