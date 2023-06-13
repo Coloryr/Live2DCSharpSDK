@@ -11,8 +11,8 @@
     d:DesignHeight="600"
     d:DesignWidth="600"
     mc:Ignorable="d">
-    <Grid>
-        <pages:OpenGlPageControl x:Name="GL" />
+    <DockPanel>
+        <TextBlock DockPanel.Dock="Top" Text="{Binding #GL.Info}" />
         <Button
             Name="Button1"
             Width="100"
@@ -22,8 +22,6 @@
             HorizontalContentAlignment="Center"
             VerticalContentAlignment="Center"
             Content="刷新" />
-        <StackPanel>
-            <TextBlock Text="{Binding #GL.Info}" />
-        </StackPanel>
-    </Grid>
+        <pages:OpenGlPageControl x:Name="GL" />
+    </DockPanel>
 </Window>

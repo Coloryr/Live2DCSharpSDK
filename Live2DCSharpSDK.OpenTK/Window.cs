@@ -79,8 +79,7 @@ public class Window : GameWindow
         //model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Hiyori\\", "Hiyori");
         //model.ModelMatrix.TranslateX(-0.9f);
 
-        GLFW.GetTimerFrequency();
-        WindowT.SetFather(GLFW.GetWin32Window(WindowPtr));
+        //WindowT.SetFather(GLFW.GetWin32Window(WindowPtr));
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)

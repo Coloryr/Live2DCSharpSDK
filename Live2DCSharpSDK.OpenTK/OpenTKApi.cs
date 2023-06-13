@@ -12,6 +12,8 @@ public class OpenTKApi : OpenGLApi
 
     public override bool IsES2 => false;
 
+    public override bool IsPhoneES2 => false;
+
     public OpenTKApi(NativeWindow window)
     {
         Window = window;
