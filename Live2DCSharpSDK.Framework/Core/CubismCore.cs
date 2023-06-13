@@ -190,8 +190,8 @@ public static partial class CubismCore
     /// <param name="address">Address to place instance at. Address must be aligned to 'csmAlignofModel'.</param>
     /// <param name="size">Size of memory block for instance (in bytes).</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
-    [DllImport("Live2DCubismCore", EntryPoint = "csmInitializeModelInPlace")]
-    internal extern static IntPtr InitializeModelInPlace(IntPtr moc, IntPtr address, int size);
+    [LibraryImport("Live2DCubismCore", EntryPoint = "csmInitializeModelInPlace")]
+    internal static partial IntPtr InitializeModelInPlace(IntPtr moc, IntPtr address, int size);
 
     /// <summary>
     /// Updates a model.
@@ -311,8 +311,8 @@ public static partial class CubismCore
     /// </summary>
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0' otherwise.</returns>
-    [DllImport("Live2DCubismCore", EntryPoint = "csmGetPartOpacities")]
-    internal extern static unsafe float* GetPartOpacities(IntPtr model);
+    [LibraryImport("Live2DCubismCore", EntryPoint = "csmGetPartOpacities")]
+    internal static unsafe partial float* GetPartOpacities(IntPtr model);
 
     /// <summary>
     /// Gets part's parent part indices.

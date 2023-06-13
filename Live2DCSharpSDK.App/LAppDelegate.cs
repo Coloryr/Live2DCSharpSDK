@@ -138,7 +138,7 @@ public class LAppDelegate : IDisposable
         // 画面の初期化
         GL.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-        GL.glClearDepth(1.0f);
+        GL.glClearDepthf(1.0f);
 
         //描画更新
         View.Render();

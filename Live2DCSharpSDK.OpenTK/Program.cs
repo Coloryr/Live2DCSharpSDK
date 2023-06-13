@@ -3,7 +3,6 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Live2DCSharpSDK.OpenTK;
 
@@ -17,7 +16,7 @@ public static class Program
             Title = "Live2D",
             // This is needed to run on macos
             Flags = ContextFlags.ForwardCompatible,
-            Vsync = VSyncMode.On,
+            Vsync = VSyncMode.Adaptive,
             Profile = ContextProfile.Compatability
         };
 
