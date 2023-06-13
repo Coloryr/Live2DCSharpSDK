@@ -74,7 +74,7 @@ public class OpenTKApi : OpenGLApi
         GL.ClearColor(r, g, b, a);
     }
 
-    public override void glClearDepth(float data)
+    public override void glClearDepthf(float data)
     {
         GL.ClearDepth(data);
     }

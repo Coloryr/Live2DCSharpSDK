@@ -115,10 +115,10 @@ public abstract class OpenGLApi
     public abstract int glGenFramebuffer();
     public abstract void glFramebufferTexture2D(int a, int b, int c, int buff, int data);
     public abstract void glDeleteTexture(int data);
-    public abstract void glDeleteFramebuffer(int size);
+    public abstract void glDeleteFramebuffer(int fb);
     public abstract void glBlendFunc(int a, int b);
     public abstract void GetWindowSize(out int w, out int h);
     public abstract void glGenerateMipmap(int a);
-    public abstract void glClearDepth(float data);
+    public abstract void glClearDepthf(float data);
     public abstract int glGetError();
 }
