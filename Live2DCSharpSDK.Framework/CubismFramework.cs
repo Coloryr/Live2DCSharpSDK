@@ -1,6 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework.Core;
 using Live2DCSharpSDK.Framework.Id;
-using Live2DCSharpSDK.Framework.Rendering;
 
 namespace Live2DCSharpSDK.Framework;
 
@@ -205,5 +204,5 @@ public static class CubismFramework
     public static void Deallocate(IntPtr address)
         => s_allocator.Deallocate(address);
     public static void DeallocateAligned(IntPtr address)
-        => s_allocator.Deallocate(address);
+        => s_allocator.DeallocateAligned(address);
 }

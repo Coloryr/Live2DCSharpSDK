@@ -175,14 +175,12 @@ public class CubismModelSettingJson
 
     public string GetPoseFileName()
     {
-        var node = Obj.FileReferences.Pose;
-        return node.ToString();
+        return Obj.FileReferences.Pose;
     }
 
     public string GetDisplayInfoFileName()
     {
-        var node = Obj.FileReferences.DisplayInfo;
-        return node.ToString();
+        return Obj.FileReferences.DisplayInfo;
     }
 
     public int GetExpressionCount()
@@ -209,7 +207,7 @@ public class CubismModelSettingJson
     {
         var node = Obj.FileReferences.Motions;
         if (node == null) return 0;
-        return node.Count();
+        return node.Count;
     }
 
     public string GetMotionGroupName(int index)
@@ -221,11 +219,19 @@ public class CubismModelSettingJson
 
     public int GetMotionCount(string groupName)
     {
+        if (!Obj.FileReferences.Motions.ContainsKey(groupName))
+        {
+            return -1;
+        }
         return Obj.FileReferences.Motions[groupName].Count;
     }
 
     public string GetMotionFileName(string groupName, int index)
     {
+        if (!Obj.FileReferences.Motions.ContainsKey(groupName))
+        {
+            return "";
+        }
         var node = Obj.FileReferences.Motions[groupName][index];
         if (node == null) return "";
         return node.File;
