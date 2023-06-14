@@ -111,6 +111,11 @@ public static partial class CubismCore
 {
     //VERSION
 
+    public static uint Version()
+    {
+        return GetVersion();
+    }
+
     /// <summary>
     /// Queries Core version.
     /// </summary>

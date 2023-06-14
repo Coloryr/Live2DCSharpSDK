@@ -181,7 +181,7 @@ public unsafe class CubismModel : IDisposable
 
     public void Dispose()
     {
-        CubismFramework.DeallocateAligned(new IntPtr(Model));
+        CubismFramework.DeallocateAligned(Model);
         GC.SuppressFinalize(this);
     }
 
