@@ -636,12 +636,11 @@ public class LAppModel : CubismUserModel
     /// <param name="group">モーションデータのグループ名</param>
     private void ReleaseMotionGroup(string group)
     {
-        if (_modelSetting.FileReferences?.Motions?.Count > 0)
+        var list = _modelSetting.FileReferences.Motions[group];
+        for (int i = 0; i < list.Count; i++)
         {
-            for (int i = 0; i < _modelSetting.FileReferences.Motions.Count; i++)
-            {
-                string voice = _modelSetting.FileReferences.Motions[group][i].Sound;
-            }
+            string voice = list[i].Sound;
+
         }
     }
 
