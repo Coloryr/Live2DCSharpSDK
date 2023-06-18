@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.ComponentModel;
 
 namespace Live2DCSharpSDK.Framework;
 
@@ -15,7 +16,9 @@ public record ModelSettingObj
         {
             public string File { get; set; }
             public string Sound { get; set; }
+            [DefaultValue(-1f)]
             public float FadeInTime { get; set; }
+            [DefaultValue(-1f)]
             public float FadeOutTime { get; set; }
         }
         public string Moc { get; set; }
@@ -46,7 +49,7 @@ public record ModelSettingObj
     public List<Parameter> Groups { get; set; }
 }
 
-public class CubismModelSettingJson
+public static class CubismModelSettingJson
 {
     // JSON keys
     public const string Version = "Version";
@@ -98,176 +101,9 @@ public class CubismModelSettingJson
     public const string InitPartsVisible = "init_parts_visible";
     public const string Val = "val";
 
-    private JObject json;
-    private ModelSettingObj Obj;
-
-    /// <summary>
-    /// 引数付きコンストラクタ
-    /// </summary>
-    /// <param name="buffer">Model3Jsonをバイト配列として読み込んだデータバッファ</param>
-    public CubismModelSettingJson(string buffer)
+    public static bool GetLayoutMap(this ModelSettingObj obj, Dictionary<string, float> outLayoutMap)
     {
-        json = JObject.Parse(buffer);
-        Obj = json.ToObject<ModelSettingObj>()!;
-    }
-
-    /// <summary>
-    /// CubismJsonオブジェクトのポインタを取得する
-    /// </summary>
-    /// <returns>CubismJsonのポインタ</returns>
-    public JObject GetJsonPointer()
-    {
-        return json;
-    }
-
-    public string GetModelFileName()
-    {
-        var node = Obj.FileReferences?.Moc;
-        if (node == null) return "";
-        return node;
-    }
-
-    // テクスチャについて
-    public int GetTextureCount()
-    {
-        var node = Obj.FileReferences?.Textures;
-        if (node == null) return 0;
-        return node.Count;
-    }
-
-    public string GetTextureDirectory()
-    {
-        var node = Obj.FileReferences?.Textures;
-        if (node == null) return "";
-
-        var node1 = node.First();
-        return Path.GetDirectoryName(node1);
-    }
-
-    public string GetTextureFileName(int index)
-    {
-        return Obj.FileReferences?.Textures[index];
-    }
-
-    // あたり判定について
-    public int GetHitAreasCount()
-    {
-        var node = Obj.HitAreas;
-        if (node == null) return 0;
-        return node.Count;
-    }
-
-    public string GetHitAreaId(int index)
-    {
-        return CubismFramework.GetIdManager().GetId(Obj.HitAreas[index].Id);
-    }
-
-    public string GetHitAreaName(int index)
-    {
-        return Obj.HitAreas[index].Name;
-    }
-
-    // 物理演算、表示名称、パーツ切り替え、表情ファイルについて
-    public string GetPhysicsFileName()
-    {
-        return Obj.FileReferences.Physics;
-    }
-
-    public string GetPoseFileName()
-    {
-        return Obj.FileReferences.Pose;
-    }
-
-    public string GetDisplayInfoFileName()
-    {
-        return Obj.FileReferences.DisplayInfo;
-    }
-
-    public int GetExpressionCount()
-    {
-        var node = Obj.FileReferences.Expressions;
-        if (node == null) return 0;
-        return node.Count();
-    }
-
-    public string GetExpressionName(int index)
-    {
-        var node = Obj.FileReferences.Expressions;
-        return node[index].Name;
-    }
-
-    public string GetExpressionFileName(int index)
-    {
-        var node = Obj.FileReferences.Expressions;
-        return node[index].File;
-    }
-
-    // モーションについて
-    public int GetMotionGroupCount()
-    {
-        var node = Obj.FileReferences.Motions;
-        if (node == null) return 0;
-        return node.Count;
-    }
-
-    public string GetMotionGroupName(int index)
-    {
-        var node = Obj.FileReferences.Motions;
-        if (node == null) return null;
-        return node.Keys.ToList()[index];
-    }
-
-    public int GetMotionCount(string groupName)
-    {
-        if (!Obj.FileReferences.Motions.ContainsKey(groupName))
-        {
-            return -1;
-        }
-        return Obj.FileReferences.Motions[groupName].Count;
-    }
-
-    public string GetMotionFileName(string groupName, int index)
-    {
-        if (!Obj.FileReferences.Motions.ContainsKey(groupName))
-        {
-            return "";
-        }
-        var node = Obj.FileReferences.Motions[groupName][index];
-        if (node == null) return "";
-        return node.File;
-    }
-
-    public string GetMotionSoundFileName(string groupName, int index)
-    {
-        var node = Obj.FileReferences.Motions[groupName][index];
-        if (node == null) return "";
-        return node.Sound;
-    }
-
-    public float GetMotionFadeInTimeValue(string groupName, int index)
-    {
-        var node = Obj.FileReferences.Motions[groupName][index];
-        if (node == null) return -1.0f;
-        return node.FadeInTime;
-    }
-
-    public float GetMotionFadeOutTimeValue(string groupName, int index)
-    {
-        var node = Obj.FileReferences.Motions[groupName][index];
-        if (node == null) return -1.0f;
-        return node.FadeOutTime;
-    }
-
-    public string GetUserDataFile()
-    {
-        var node = Obj.FileReferences.UserData;
-        if (node == null) return "";
-        return node.ToString();
-    }
-
-    public bool GetLayoutMap(Dictionary<string, float> outLayoutMap)
-    {
-        var node = Obj.Layout;
+        var node = obj.Layout;
         if (node == null)
             return false;
 
@@ -287,103 +123,9 @@ public class CubismModelSettingJson
         return ret;
     }
 
-    public int GetEyeBlinkParameterCount()
+    public static bool IsExistEyeBlinkParameters(this ModelSettingObj obj)
     {
-        if (!IsExistEyeBlinkParameters())
-            return 0;
-
-        int num = 0;
-        var node = Obj.Groups;
-        foreach (var item in node)
-        {
-            if (item == null)
-            {
-                continue;
-            }
-            if (item.Name == EyeBlink)
-            {
-                num = item.Ids.Count;
-                break;
-            }
-        }
-
-        return num;
-    }
-
-    public string? GetEyeBlinkParameterId(int index)
-    {
-        if (!IsExistEyeBlinkParameters())
-        {
-            return null;
-        }
-
-        var node = Obj.Groups;
-        foreach (var item in node)
-        {
-            if (item == null)
-            {
-                continue;
-            }
-            if (item.Name == EyeBlink)
-            {
-                return CubismFramework.GetIdManager().GetId(item.Ids[index]);
-            }
-        }
-
-        return null;
-    }
-
-    public int GetLipSyncParameterCount()
-    {
-        if (!IsExistLipSyncParameters())
-        {
-            return 0;
-        }
-
-        int num = 0;
-        var node = Obj.Groups;
-        foreach (var item in node)
-        {
-            if (item == null)
-            {
-                continue;
-            }
-            if (item.Name == LipSync)
-            {
-                num = item.Ids.Count;
-                break;
-            }
-        }
-
-        return num;
-    }
-
-    public string GetLipSyncParameterId(int index)
-    {
-        if (!IsExistLipSyncParameters())
-        {
-            return null;
-        }
-
-        var node = Obj.Groups;
-        foreach (var item in node)
-        {
-            if (item == null)
-            {
-                continue;
-            }
-            if (item.Name == LipSync)
-            {
-                return CubismFramework.GetIdManager().GetId(item.Ids[index]);
-            }
-        }
-
-        return null;
-    }
-
-    private bool IsExistEyeBlinkParameters()
-    {
-        var node = Obj.Groups;
+        var node = obj.Groups;
         if (node == null)
         {
             return false;
@@ -400,9 +142,9 @@ public class CubismModelSettingJson
         return false;
     }
 
-    private bool IsExistLipSyncParameters()
+    public static bool IsExistLipSyncParameters(this ModelSettingObj obj)
     {
-        var node = Obj.Groups;
+        var node = obj.Groups;
         if (node == null)
         {
             return false;

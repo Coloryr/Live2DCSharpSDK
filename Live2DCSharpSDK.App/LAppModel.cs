@@ -5,8 +5,11 @@ using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Motion;
 using Live2DCSharpSDK.Framework.Rendering.OpenGL;
 using Live2DCSharpSDK.Framework.Type;
+using Newtonsoft.Json;
 using System;
+using System.Drawing;
 using System.IO;
+using System.Reflection;
 
 namespace Live2DCSharpSDK.App;
 
@@ -15,11 +18,11 @@ public class LAppModel : CubismUserModel
     /// <summary>
     /// モデルセッティング情報
     /// </summary>
-    private CubismModelSettingJson _modelSetting;
+    private readonly ModelSettingObj _modelSetting;
     /// <summary>
     /// モデルセッティングが置かれたディレクトリ
     /// </summary>
-    private string _modelHomeDir;
+    private readonly string _modelHomeDir;
     /// <summary>
     /// デルタ時間の積算値[秒]
     /// </summary>
@@ -114,18 +117,20 @@ public class LAppModel : CubismUserModel
             LAppPal.PrintLog($"[APP]load model setting: {fileName}");
         }
 
-        var setting = new CubismModelSettingJson(File.ReadAllText(fileName));
+        _modelSetting = JsonConvert.DeserializeObject<ModelSettingObj>(File.ReadAllText(fileName))!;
 
         Updating = true;
         Initialized = false;
 
-        _modelSetting = setting;
-
         //Cubism Model
-        if (!string.IsNullOrWhiteSpace(_modelSetting.GetModelFileName()))
+        var path = _modelSetting.FileReferences?.Moc;
+        if (!string.IsNullOrWhiteSpace(path))
         {
-            var path = _modelSetting.GetModelFileName();
             path = Path.GetFullPath(_modelHomeDir + path);
+            if (!File.Exists(path))
+            {
+                throw new Exception("model is null");
+            }
 
             if (_debugMode)
             {
@@ -136,14 +141,18 @@ public class LAppModel : CubismUserModel
         }
 
         //Expression
-        if (_modelSetting.GetExpressionCount() > 0)
+        if (_modelSetting.FileReferences?.Expressions?.Count > 0)
         {
-            int count = _modelSetting.GetExpressionCount();
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < _modelSetting.FileReferences.Expressions.Count; i++)
             {
-                string name = _modelSetting.GetExpressionName(i);
-                string path = _modelSetting.GetExpressionFileName(i);
+                var item = _modelSetting.FileReferences.Expressions[i];
+                string name = item.Name;
+                path = item.File;
                 path = Path.GetFullPath(_modelHomeDir + path);
+                if (!File.Exists(path))
+                {
+                    continue;
+                }
 
                 ACubismMotion motion = new CubismExpressionMotion(File.ReadAllText(path));
 
@@ -159,34 +168,37 @@ public class LAppModel : CubismUserModel
         }
 
         //Physics
-        if (!string.IsNullOrWhiteSpace(_modelSetting.GetPhysicsFileName()))
+        path = _modelSetting.FileReferences?.Physics;
+        if (!string.IsNullOrWhiteSpace(path))
         {
-            var path = _modelSetting.GetPhysicsFileName();
             path = Path.GetFullPath(_modelHomeDir + path);
-
-            LoadPhysics(File.ReadAllText(path));
+            if (File.Exists(path))
+            {
+                LoadPhysics(File.ReadAllText(path));
+            }
         }
 
         //Pose
-        if (!string.IsNullOrWhiteSpace(_modelSetting.GetPoseFileName()))
+        path = _modelSetting.FileReferences?.Pose;
+        if (!string.IsNullOrWhiteSpace(path))
         {
-            var path = _modelSetting.GetPoseFileName();
             path = Path.GetFullPath(_modelHomeDir + path);
-
-            LoadPose(File.ReadAllText(path));
+            if (File.Exists(path))
+            {
+                LoadPose(File.ReadAllText(path));
+            }
         }
 
         //EyeBlink
-        if (_modelSetting.GetEyeBlinkParameterCount() > 0)
+        if (_modelSetting.IsExistEyeBlinkParameters())
         {
             _eyeBlink = new CubismEyeBlink(_modelSetting);
         }
 
         //Breath
+        _breath = new CubismBreath()
         {
-            _breath = new CubismBreath()
-            {
-                Parameters = new()
+            Parameters = new()
                 {
                     new BreathParameterData()
                     {
@@ -229,40 +241,32 @@ public class LAppModel : CubismUserModel
                         Weight = 0.5f
                     }
                 }
-            };
-        }
+        };
 
         //UserData
-        if (!string.IsNullOrWhiteSpace(_modelSetting.GetUserDataFile()))
+        path = _modelSetting.FileReferences?.UserData;
+        if (!string.IsNullOrWhiteSpace(path))
         {
-            string path = _modelSetting.GetUserDataFile();
             path = Path.GetFullPath(_modelHomeDir + path);
-
-            LoadUserData(File.ReadAllText(path));
+            if (File.Exists(path))
+            {
+                LoadUserData(File.ReadAllText(path));
+            }
         }
 
         // EyeBlinkIds
-        {
-            int eyeBlinkIdCount = _modelSetting.GetEyeBlinkParameterCount();
-            for (int i = 0; i < eyeBlinkIdCount; ++i)
-            {
-                _eyeBlinkIds.Add(_modelSetting.GetEyeBlinkParameterId(i));
-            }
-        }
+        _eyeBlinkIds.AddRange(_eyeBlink.ParameterIds);
 
         // LipSyncIds
+        if (_modelSetting.IsExistLipSyncParameters())
         {
-            int lipSyncIdCount = _modelSetting.GetLipSyncParameterCount();
-            for (int i = 0; i < lipSyncIdCount; ++i)
+            foreach (var item in _modelSetting.Groups)
             {
-                _lipSyncIds.Add(_modelSetting.GetLipSyncParameterId(i));
+                if (item.Name == CubismModelSettingJson.LipSync)
+                {
+                    _lipSyncIds.AddRange(item.Ids);
+                }
             }
-        }
-
-        if (_modelSetting == null || ModelMatrix == null)
-        {
-            LAppPal.PrintLog("Failed to SetupModel().");
-            return;
         }
 
         //Layout
@@ -272,10 +276,12 @@ public class LAppModel : CubismUserModel
 
         Model.SaveParameters();
 
-        for (int i = 0; i < _modelSetting.GetMotionGroupCount(); i++)
+        if (_modelSetting.FileReferences?.Motions?.Count > 0)
         {
-            var group = _modelSetting.GetMotionGroupName(i);
-            PreloadMotionGroup(group);
+            foreach (var item in _modelSetting.FileReferences.Motions)
+            {
+                PreloadMotionGroup(item.Key);
+            }
         }
 
         _motionManager.StopAllMotions();
@@ -301,10 +307,12 @@ public class LAppModel : CubismUserModel
         _motions.Clear();
         _expressions.Clear();
 
-        for (int i = 0; i < _modelSetting.GetMotionGroupCount(); i++)
+        if (_modelSetting.FileReferences?.Motions.Count > 0)
         {
-            var group = _modelSetting.GetMotionGroupName(i);
-            ReleaseMotionGroup(group);
+            foreach (var item in _modelSetting.FileReferences.Motions)
+            {
+                ReleaseMotionGroup(item.Key);
+            }
         }
     }
 
@@ -454,7 +462,7 @@ public class LAppModel : CubismUserModel
             return null;
         }
 
-        string fileName = _modelSetting.GetMotionFileName(group, no);
+        var item = _modelSetting.FileReferences.Motions[group][no];
 
         //ex) idle_0
         string name = $"{group}_{no}";
@@ -462,17 +470,21 @@ public class LAppModel : CubismUserModel
         CubismMotion motion;
         if (!_motions.ContainsKey(name))
         {
-            string path = fileName;
+            string path = item.File;
             path = Path.GetFullPath(_modelHomeDir + path);
+            if (!File.Exists(path))
+            {
+                return null;
+            }
 
             motion = new CubismMotion(File.ReadAllText(path), onFinishedMotionHandler);
-            float fadeTime = _modelSetting.GetMotionFadeInTimeValue(group, no);
+            float fadeTime = item.FadeInTime;
             if (fadeTime >= 0.0f)
             {
                 motion.FadeInSeconds = fadeTime;
             }
 
-            fadeTime = _modelSetting.GetMotionFadeOutTimeValue(group, no);
+            fadeTime = item.FadeOutTime;
             if (fadeTime >= 0.0f)
             {
                 motion.FadeOutSeconds = fadeTime;
@@ -486,7 +498,7 @@ public class LAppModel : CubismUserModel
         }
 
         //voice
-        string voice = _modelSetting.GetMotionSoundFileName(group, no);
+        string voice = item.Sound;
         if (!string.IsNullOrWhiteSpace(voice))
         {
             //string path = voice;
@@ -510,14 +522,13 @@ public class LAppModel : CubismUserModel
     /// <returns>開始したモーションの識別番号を返す。個別のモーションが終了したか否かを判定するIsFinished()の引数で使用する。開始できない時は「-1」</returns>
     public object? StartRandomMotion(string group, MotionPriority priority, FinishedMotionCallback? onFinishedMotionHandler = null)
     {
-        if (_modelSetting.GetMotionCount(group) == 0)
+        if (_modelSetting.FileReferences?.Motions?.ContainsKey(group) == true)
         {
-            return null;
+            int no = random.Next() % _modelSetting.FileReferences.Motions[group].Count;
+            return StartMotion(group, no, priority, onFinishedMotionHandler);
         }
 
-        int no = random.Next() % _modelSetting.GetMotionCount(group);
-
-        return StartMotion(group, no, priority, onFinishedMotionHandler);
+        return null;
     }
 
     /// <summary>
@@ -590,12 +601,16 @@ public class LAppModel : CubismUserModel
         {
             return false;
         }
-        int count = _modelSetting.GetHitAreasCount();
-        for (int i = 0; i < count; i++)
+        if (_modelSetting.HitAreas?.Count > 0)
         {
-            if (_modelSetting.GetHitAreaName(i) == hitAreaName)
+            for (int i = 0; i < _modelSetting.HitAreas?.Count; i++)
             {
-                return IsHit(_modelSetting.GetHitAreaId(i), x, y);
+                if (_modelSetting.HitAreas[i].Name == hitAreaName)
+                {
+                    var id = CubismFramework.GetIdManager().GetId(_modelSetting.HitAreas[i].Id);
+
+                    return IsHit(id, x, y);
+                }
             }
         }
         return false; // 存在しない場合はfalse
@@ -621,10 +636,12 @@ public class LAppModel : CubismUserModel
     /// <param name="group">モーションデータのグループ名</param>
     private void ReleaseMotionGroup(string group)
     {
-        var count = _modelSetting.GetMotionCount(group);
-        for (int i = 0; i < count; i++)
+        if (_modelSetting.FileReferences?.Motions?.Count > 0)
         {
-            string voice = _modelSetting.GetMotionSoundFileName(group, i);
+            for (int i = 0; i < _modelSetting.FileReferences.Motions.Count; i++)
+            {
+                string voice = _modelSetting.FileReferences.Motions[group][i].Sound;
+            }
         }
     }
 
@@ -633,23 +650,22 @@ public class LAppModel : CubismUserModel
     /// </summary>
     private void SetupTextures()
     {
-        for (int modelTextureNumber = 0; modelTextureNumber < _modelSetting.GetTextureCount(); modelTextureNumber++)
+        if (_modelSetting.FileReferences?.Textures?.Count > 0)
         {
-            // テクスチャ名が空文字だった場合はロード・バインド処理をスキップ
-            if (string.IsNullOrWhiteSpace(_modelSetting.GetTextureFileName(modelTextureNumber)))
+            for (int modelTextureNumber = 0; modelTextureNumber < _modelSetting.FileReferences.Textures.Count; modelTextureNumber++)
             {
-                continue;
+                //OpenGLのテクスチャユニットにテクスチャをロードする
+                var texturePath = _modelSetting.FileReferences.Textures[modelTextureNumber];
+                if (string.IsNullOrWhiteSpace(texturePath))
+                    continue;
+                texturePath = Path.GetFullPath(_modelHomeDir + texturePath);
+
+                var texture = Lapp.TextureManager.CreateTextureFromPngFile(texturePath);
+                int glTextueNumber = texture.id;
+
+                //OpenGL
+                (Renderer as CubismRenderer_OpenGLES2)?.BindTexture(modelTextureNumber, glTextueNumber);
             }
-
-            //OpenGLのテクスチャユニットにテクスチャをロードする
-            var texturePath = _modelSetting.GetTextureFileName(modelTextureNumber);
-            texturePath = Path.GetFullPath(_modelHomeDir + texturePath);
-
-            TextureInfo texture = Lapp.TextureManager.CreateTextureFromPngFile(texturePath);
-            int glTextueNumber = texture.id;
-
-            //OpenGL
-            (Renderer as CubismRenderer_OpenGLES2)?.BindTexture(modelTextureNumber, glTextueNumber);
         }
     }
 
@@ -661,27 +677,28 @@ public class LAppModel : CubismUserModel
     private void PreloadMotionGroup(string group)
     {
         // グループに登録されているモーション数を取得
-        int count = _modelSetting.GetMotionCount(group);
+        var list = _modelSetting.FileReferences.Motions[group];
 
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < list.Count; i++)
         {
+            var item = list[i];
             //ex) idle_0
             // モーションのファイル名とパスの取得
             string name = $"{group}_{i}";
-            var path = Path.GetFullPath(_modelHomeDir + _modelSetting.GetMotionFileName(group, i));
+            var path = Path.GetFullPath(_modelHomeDir + item.File);
 
             // モーションデータの読み込み
             var tmpMotion = new CubismMotion(File.ReadAllText(path));
 
             // フェードインの時間を取得
-            float fadeTime = _modelSetting.GetMotionFadeInTimeValue(group, i);
+            float fadeTime = item.FadeInTime;
             if (fadeTime >= 0.0f)
             {
                 tmpMotion.FadeInSeconds = fadeTime;
             }
 
             // フェードアウトの時間を取得
-            fadeTime = _modelSetting.GetMotionFadeOutTimeValue(group, i);
+            fadeTime = item.FadeOutTime;
             if (fadeTime >= 0.0f)
             {
                 tmpMotion.FadeOutSeconds = fadeTime;
