@@ -17,7 +17,7 @@ public class CubismEyeBlink
     /// <summary>
     /// 操作対象のパラメータのIDのリスト
     /// </summary>
-    private readonly List<string> ParameterIds = new();
+    public readonly List<string> ParameterIds = new();
     /// <summary>
     /// 次のまばたきの時刻[秒]
     /// </summary>
@@ -53,7 +53,7 @@ public class CubismEyeBlink
     /// インスタンスを作成する。
     /// </summary>
     /// <param name="modelSetting">モデルの設定情報</param>
-    public CubismEyeBlink(CubismModelSettingJson modelSetting)
+    public CubismEyeBlink(ModelSettingObj modelSetting)
     {
         _blinkingState = EyeState.EyeState_First;
         _blinkingIntervalSeconds = 4.0f;
@@ -61,12 +61,19 @@ public class CubismEyeBlink
         _closedSeconds = 0.05f;
         _openingSeconds = 0.15f;
 
-        for (int i = 0; i < modelSetting.GetEyeBlinkParameterCount(); ++i)
+        foreach (var item in modelSetting.Groups)
         {
-            var item = modelSetting.GetEyeBlinkParameterId(i);
-            if (item == null)
-                continue;
-            ParameterIds.Add(item);
+            if (item.Name == CubismModelSettingJson.EyeBlink)
+            {
+                foreach (var item1 in item.Ids)
+                {
+                    if (item1 == null)
+                        continue;
+                    var item2 = CubismFramework.GetIdManager().GetId(item1);
+                    ParameterIds.Add(item2);
+                }
+                break;
+            }
         }
     }
 
