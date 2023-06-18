@@ -59,7 +59,7 @@ public class OpenGlPageControl : OpenGlControlBase
                 {
                     Dispatcher.UIThread.Invoke(RequestNextFrameRendering);
                 }
-                Thread.Sleep(20);
+                Thread.Sleep(15);
             }
         }).Start();
     }
@@ -82,6 +82,7 @@ public class OpenGlPageControl : OpenGlControlBase
         Info = $"Renderer: {gl.GetString(GlConsts.GL_RENDERER)} Version: {gl.GetString(GlConsts.GL_VERSION)}";
 
         lapp = new(new AvaloniaApi(this, gl));
+        //var model = lapp.Live2dManager.LoadModel("F:\\live2d\\koharu_haruto\\‚±‚Í‚é\\runtime\\", "koharu");
         var model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
         CheckError(gl);
         init = true;
