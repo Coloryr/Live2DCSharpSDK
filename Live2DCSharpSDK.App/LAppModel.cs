@@ -255,7 +255,10 @@ public class LAppModel : CubismUserModel
         }
 
         // EyeBlinkIds
-        _eyeBlinkIds.AddRange(_eyeBlink.ParameterIds);
+        if (_eyeBlink != null)
+        {
+            _eyeBlinkIds.AddRange(_eyeBlink.ParameterIds);
+        }
 
         // LipSyncIds
         if (_modelSetting.IsExistLipSyncParameters())
