@@ -75,8 +75,6 @@ public class CubismOffscreenFrame_OpenGLES2
 
         // 描画対象を戻す
         GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, _oldFBO);
-        GL.glClearColor(0, 0, 0, 0);
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
     }
 
     /// <summary>

@@ -391,6 +391,9 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
             _sortedDrawableIndexList[order] = i;
         }
 
+        GL.glClearColor(0, 0, 0, 0);
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+
         // 描画
         for (int i = 0; i < drawableCount; ++i)
         {
