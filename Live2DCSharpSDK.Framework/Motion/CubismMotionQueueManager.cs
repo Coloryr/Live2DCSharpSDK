@@ -3,18 +3,6 @@
 namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
-/// イベントのコールバックに登録できる関数の型情報
-/// </summary>
-/// <param name="caller">発火したイベントを再生させたCubismMotionQueueManager</param>
-/// <param name="eventValue">発火したイベントの文字列データ</param>
-/// <param name="customData">コールバックに返される登録時に指定されたデータ</param>
-public delegate void CubismMotionEventFunction(CubismMotionQueueManager caller, string eventValue, object? customData);
-/// <summary>
-/// モーションの識別番号の定義
-/// </summary>
-//typedef void* CubismMotionQueueEntryHandle;
-
-/// <summary>
 /// モーション再生の管理用クラス。CubismMotionモーションなどACubismMotionのサブクラスを再生するために使用する。
 /// 
 /// 再生中に別のモーションが StartMotion()された場合は、新しいモーションに滑らかに変化し旧モーションは中断する。
@@ -35,7 +23,7 @@ public class CubismMotionQueueManager
     /// <summary>
     /// コールバックに戻されるデータ
     /// </summary>
-    private object? _eventCustomData;
+    private CubismUserModel _eventCustomData;
 
     /// <summary>
     /// デルタ時間の積算値[秒]
@@ -87,12 +75,6 @@ public class CubismMotionQueueManager
 
         foreach (var item in new List<CubismMotionQueueEntry>(_motions))
         {
-            if (item == null)
-            {
-                _motions.Remove(item);
-                continue;
-            }
-
             var motion = item.Motion;
             if (motion == null)
             {
@@ -157,7 +139,7 @@ public class CubismMotionQueueManager
     /// <param name="motionQueueEntryNumber">モーションの識別番号</param>
     /// <returns>指定したCubismMotionQueueEntryへのポインタ
     /// NULL   見つからなかった</returns>
-    public CubismMotionQueueEntry GetCubismMotionQueueEntry(object motionQueueEntryNumber)
+    public CubismMotionQueueEntry? GetCubismMotionQueueEntry(object motionQueueEntryNumber)
     {
         //------- 処理を行う --------
         //既にモーションがあれば終了フラグを立てる
@@ -178,7 +160,7 @@ public class CubismMotionQueueManager
     /// </summary>
     /// <param name="callback">コールバック関数</param>
     /// <param name="customData">コールバックに返されるデータ</param>
-    public void SetEventCallback(CubismMotionEventFunction callback, object? customData = null)
+    public void SetEventCallback(CubismMotionEventFunction callback, CubismUserModel customData)
     {
         _eventCallback = callback;
         _eventCustomData = customData;
@@ -208,12 +190,12 @@ public class CubismMotionQueueManager
 
             // ------ ユーザトリガーイベントを検査する ----
             var firedList = motion.GetFiredEvent(
-                item.LastEventCheckSeconds - item.StartTime, 
+                item.LastEventCheckSeconds - item.StartTime,
                 userTimeSeconds - item.StartTime);
 
             for (int i = 0; i < firedList.Count; ++i)
             {
-                _eventCallback?.Invoke(this, firedList[i], _eventCustomData);
+                _eventCallback?.Invoke(_eventCustomData, firedList[i]);
             }
 
             item.LastEventCheckSeconds = userTimeSeconds;

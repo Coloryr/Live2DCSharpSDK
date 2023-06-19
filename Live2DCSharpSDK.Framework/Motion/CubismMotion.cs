@@ -329,12 +329,12 @@ public unsafe class CubismMotion : ACubismMotion
                 BaseSegmentIndex = totalSegmentCount,
                 FadeInTime = item.FadeInTime != null ? (float)item.FadeInTime : -1.0f,
                 FadeOutTime = item.FadeOutTime != null ? (float)item.FadeOutTime : -1.0f,
-                Type = key switch 
+                Type = key switch
                 {
                     TargetNameModel => CubismMotionCurveTarget.Model,
                     TargetNameParameter => CubismMotionCurveTarget.Parameter,
                     TargetNamePartOpacity => CubismMotionCurveTarget.PartOpacity,
-                     _ => throw new Exception("Warning : Unable to get segment type from Curve! The number of \"CurveCount\" may be incorrect!")
+                    _ => throw new Exception("Error: Unable to get segment type from Curve! The number of \"CurveCount\" may be incorrect!")
                 }
             };
 
@@ -507,11 +507,11 @@ public unsafe class CubismMotion : ACubismMotion
         //瞬き、リップシンクのターゲット数が上限を超えている場合
         if (_eyeBlinkParameterIds.Count > MaxTargetSize)
         {
-            CubismLog.CubismLogDebug($"too many eye blink targets : {_eyeBlinkParameterIds.Count}");
+            CubismLog.CubismLogWarning($"[Live2D SDK]too many eye blink targets : {_eyeBlinkParameterIds.Count}");
         }
         if (_lipSyncParameterIds.Count > MaxTargetSize)
         {
-            CubismLog.CubismLogDebug($"too many lip sync targets : {_lipSyncParameterIds.Count}");
+            CubismLog.CubismLogWarning($"[Live2D SDK]too many lip sync targets : {_lipSyncParameterIds.Count}");
         }
 
         float tmpFadeIn = (FadeInSeconds <= 0.0f) ? 1.0f :
@@ -712,7 +712,7 @@ public unsafe class CubismMotion : ACubismMotion
             }
             else
             {
-                OnFinishedMotion?.Invoke(this);
+                OnFinishedMotion?.Invoke(model, this);
 
                 motionQueueEntry.Finished = true;
             }

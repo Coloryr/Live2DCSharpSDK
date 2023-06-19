@@ -1,19 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.OpenGL.Controls;
-using Avalonia.OpenGL;
-using System.Diagnostics;
-using System.IO;
-using System.Numerics;
-using System.Runtime.InteropServices;
-using System;
-using Live2DCSharpSDK.App;
-using Live2DCSharpSDK.Framework.Rendering.OpenGL;
-using Avalonia.Rendering;
-using System.Threading;
-using Avalonia.Threading;
 using Avalonia.Interactivity;
-using Avalonia.Controls.Documents;
+using Avalonia.OpenGL;
+using Avalonia.OpenGL.Controls;
+using Avalonia.Threading;
+using Live2DCSharpSDK.App;
+using System;
+using System.Threading;
 
 namespace Live2DCSharpSDK.Avalonia;
 
@@ -81,16 +74,16 @@ public class OpenGlPageControl : OpenGlControlBase
 
         Info = $"Renderer: {gl.GetString(GlConsts.GL_RENDERER)} Version: {gl.GetString(GlConsts.GL_VERSION)}";
 
-        lapp = new(new AvaloniaApi(this, gl));
+        lapp = new(new AvaloniaApi(this, gl), Console.WriteLine);
         //var model = lapp.Live2dManager.LoadModel("F:\\live2d\\koharu_haruto\\‚±‚Í‚é\\runtime\\", "koharu");
-        var model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Haru\\", "Haru");
         CheckError(gl);
         init = true;
     }
 
     protected override void OnOpenGlDeinit(GlInterface GL)
     {
-       
+
     }
 
     protected override void OnOpenGlRender(GlInterface gl, int fb)

@@ -2,137 +2,15 @@
 using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Numerics;
 
 namespace Live2DCSharpSDK.Framework.Physics;
-
-public record CubismPhysicsObj
-{
-    public record MetaObj
-    {
-        public record EffectiveForce
-        {
-            public Vector2 Gravity { get; set; }
-            public Vector2 Wind { get; set; }
-        }
-
-        public EffectiveForce EffectiveForces { get; set; }
-        public float Fps { get; set; }
-        public int PhysicsSettingCount { get; set; }
-        public int TotalInputCount { get; set; }
-        public int TotalOutputCount { get; set; }
-        public int VertexCount { get; set; }
-    }
-    public record PhysicsSetting
-    {
-        public record NormalizationObj
-        {
-            public record PositionObj
-            {
-                public float Minimum { get; set; }
-                public float Maximum { get; set; }
-                public float Default { get; set; }
-            }
-            public PositionObj Position { get; set; }
-            public PositionObj Angle { get; set; }
-        }
-        public record InputObj
-        {
-            public record SourceObj
-            {
-                public string Id { get; set; }
-            }
-            public float Weight { get; set; }
-            public bool Reflect { get; set; }
-            public string Type { get; set; }
-            public SourceObj Source { get; set; }
-        }
-        public record OutputObj
-        {
-            public record DestinationObj
-            {
-                public string Id { get; set; }
-            }
-            public int VertexIndex { get; set; }
-            public float Scale { get; set; }
-            public float Weight { get; set; }
-            public DestinationObj Destination { get; set; }
-            public string Type { get; set; }
-            public bool Reflect { get; set; }
-        }
-        public record Vertice
-        {
-            public float Mobility { get; set; }
-            public float Delay { get; set; }
-            public float Acceleration { get; set; }
-            public float Radius { get; set; }
-            public Vector2 Position { get; set; }
-        }
-        public NormalizationObj Normalization { get; set; }
-        public List<InputObj> Input { get; set; }
-        public List<OutputObj> Output { get; set; }
-        public List<Vertice> Vertices { get; set; }
-    }
-    public MetaObj Meta { get; set; }
-    public List<PhysicsSetting> PhysicsSettings { get; set; }
-}
-
-/// <summary>
-/// physics3.jsonのコンテナ。
-/// </summary>
-public record CubismPhysicsJson
-{
-    public const string Position = "Position";
-    public const string X = "X";
-    public const string Y = "Y";
-    public const string Angle = "Angle";
-    public const string Type = "Type";
-    public const string Id = "Id";
-
-    // Meta
-    public const string Meta = "Meta";
-    public const string EffectiveForces = "EffectiveForces";
-    public const string TotalInputCount = "TotalInputCount";
-    public const string TotalOutputCount = "TotalOutputCount";
-    public const string PhysicsSettingCount = "PhysicsSettingCount";
-    public const string Gravity = "Gravity";
-    public const string Wind = "Wind";
-    public const string VertexCount = "VertexCount";
-    public const string Fps = "Fps";
-
-    // PhysicsSettings
-    public const string PhysicsSettings = "PhysicsSettings";
-    public const string Normalization = "Normalization";
-    public const string Minimum = "Minimum";
-    public const string Maximum = "Maximum";
-    public const string Default = "Default";
-    public const string Reflect = "Reflect";
-    public const string Weight = "Weight";
-
-    // Input
-    public const string Input = "Input";
-    public const string Source = "Source";
-
-    // Output
-    public const string Output = "Output";
-    public const string Scale = "Scale";
-    public const string VertexIndex = "VertexIndex";
-    public const string Destination = "Destination";
-
-    // Particle
-    public const string Vertices = "Vertices";
-    public const string Mobility = "Mobility";
-    public const string Delay = "Delay";
-    public const string Radius = "Radius";
-    public const string Acceleration = "Acceleration";
-}
 
 /// <summary>
 /// 物理演算のクラス。
 /// </summary>
 public class CubismPhysics
-{ 
+{
     /// physics types tags.
     public const string PhysicsTypeTagX = "X";
     public const string PhysicsTypeTagY = "Y";
@@ -153,7 +31,7 @@ public class CubismPhysics
     /// <summary>
     /// 物理演算のデータ
     /// </summary>
-    private CubismPhysicsRig _physicsRig;
+    private readonly CubismPhysicsRig _physicsRig;
 
     /// <summary>
     /// 重力方向
@@ -188,11 +66,6 @@ public class CubismPhysics
     private float[] _parameterInputCaches = Array.Empty<float>();
 
     /// <summary>
-    /// 正しくJsonデータが取得出来たか
-    /// </summary>
-    private bool _isJsonValid;
-
-    /// <summary>
     /// インスタンスを作成する。
     /// </summary>
     /// <param name="buffer">physics3.jsonが読み込まれいるバッファ</param>
@@ -205,14 +78,8 @@ public class CubismPhysics
         Wind.Y = 0;
         _currentRemainTime = 0.0f;
 
-        var obj = JsonConvert.DeserializeObject<CubismPhysicsObj>(buffer);
-
-        _isJsonValid = obj != null;
-
-        if (obj == null)
-        {
-            return;
-        }
+        var obj = JsonConvert.DeserializeObject<CubismPhysicsObj>(buffer) 
+            ?? throw new Exception("physics3.json error");
 
         _physicsRig = new CubismPhysicsRig
         {
@@ -844,7 +711,7 @@ public class CubismPhysics
     /// @param  value  Evaluation target value.
     ///
     /// @return  Sign of value.
-    private int Sign(float value)
+    private static int Sign(float value)
     {
         int ret = 0;
 
@@ -1172,7 +1039,7 @@ public class CubismPhysics
             strand[i + start].Velocity = new Vector2(0.0f, 0.0f);
 
             force = strand[i + start].Force;
-            force  = Vector2.Normalize(force);
+            force = Vector2.Normalize(force);
 
             force *= strand[i + start].Radius;
             strand[i + start].Position = strand[i - 1].Position + force;

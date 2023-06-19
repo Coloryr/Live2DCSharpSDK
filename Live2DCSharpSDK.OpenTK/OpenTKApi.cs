@@ -1,8 +1,6 @@
-﻿using Live2DCSharpSDK.Framework.Effect;
-using Live2DCSharpSDK.Framework.Rendering.OpenGL;
+﻿using Live2DCSharpSDK.Framework.Rendering.OpenGL;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Desktop;
-using System.Runtime.InteropServices;
 
 namespace Live2DCSharpSDK.OpenTK;
 

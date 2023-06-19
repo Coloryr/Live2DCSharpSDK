@@ -2,7 +2,7 @@
 
 internal class CubismRendererProfile_OpenGLES2
 {
-    private OpenGLApi GL;
+    private readonly OpenGLApi GL;
     /// <summary>
     /// モデル描画直前の頂点バッファ
     /// </summary>

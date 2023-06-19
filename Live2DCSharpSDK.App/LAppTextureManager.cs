@@ -20,7 +20,7 @@ public record TextureInfo
     /// <summary>
     /// ファイル名
     /// </summary>
-    public string fileName;
+    public required string fileName;
 };
 
 /// <summary>
@@ -42,7 +42,7 @@ public class LAppTextureManager
     /// <param name="fileName">読み込む画像ファイルパス名</param>
     /// <returns>画像情報。読み込み失敗時はNULLを返す</returns>
     public unsafe TextureInfo CreateTextureFromPngFile(string fileName)
-    { 
+    {
         //search loaded texture already.
         var item = _textures.FirstOrDefault(a => a.fileName == fileName);
         if (item != null)
@@ -51,7 +51,6 @@ public class LAppTextureManager
         var data = File.ReadAllBytes(fileName);
 
         using var image = Image.Load<Rgba32>(data);
-        //image.Mutate(x => x.Flip(FlipMode.Vertical));
         var pixels = new byte[4 * image.Width * image.Height];
         image.CopyPixelDataTo(pixels);
 
@@ -80,20 +79,6 @@ public class LAppTextureManager
     }
 
     /// <summary>
-    /// 画像の解放
-    /// 配列に存在する画像全てを解放する
-    /// </summary>
-    public void ReleaseTextures()
-    {
-        for (int i = 0; i < _textures.Count; i++)
-        {
-            var item = _textures[i];
-        }
-
-        _textures.Clear();
-    }
-
-    /// <summary>
     /// 指定したテクスチャIDの画像を解放する
     /// </summary>
     /// <param name="textureId">解放するテクスチャID</param>
@@ -114,7 +99,7 @@ public class LAppTextureManager
     /// </summary>
     /// <param name="textureId">取得したいテクスチャID</param>
     /// <returns>テクスチャが存在していればTextureInfoが返る</returns>
-    public TextureInfo GetTextureInfoById(int textureId)
+    public TextureInfo? GetTextureInfoById(int textureId)
     {
         return _textures.FirstOrDefault(a => a.id == textureId);
     }

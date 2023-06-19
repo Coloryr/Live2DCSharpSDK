@@ -1,4 +1,6 @@
-﻿using Live2DCSharpSDK.Framework.Math;
+﻿using Live2DCSharpSDK.Framework;
+using Live2DCSharpSDK.Framework.Math;
+using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Motion;
 
 namespace Live2DCSharpSDK.App;
@@ -20,7 +22,7 @@ public class LAppLive2DManager : IDisposable
 
     private readonly LAppDelegate Lapp;
 
-    public event Action<ACubismMotion>? MotionFinished;
+    public event Action<CubismModel, ACubismMotion>? MotionFinished;
 
     /// <summary>
     /// コンストラクタ
@@ -75,36 +77,27 @@ public class LAppLive2DManager : IDisposable
     /// <param name="y">画面のY座標</param>
     public void OnTap(float x, float y)
     {
-        if (LAppDefine.DebugLogEnable)
-        {
-            LAppPal.PrintLog($"[APP]tap point: x:{x:#.##} y:{y:#.##}");
-        }
+        CubismLog.CubismLogDebug($"[Live2D]tap point: x:{x:#.##} y:{y:#.##}");
 
         for (int i = 0; i < _models.Count; i++)
         {
             if (_models[i].HitTest(LAppDefine.HitAreaNameHead, x, y))
             {
-                if (LAppDefine.DebugLogEnable)
-                {
-                    LAppPal.PrintLog($"[APP]hit area: [{LAppDefine.HitAreaNameHead}]");
-                }
+                CubismLog.CubismLogDebug($"[Live2D]hit area: [{LAppDefine.HitAreaNameHead}]");
                 _models[i].SetRandomExpression();
             }
             else if (_models[i].HitTest(LAppDefine.HitAreaNameBody, x, y))
             {
-                if (LAppDefine.DebugLogEnable)
-                {
-                    LAppPal.PrintLog($"[APP]hit area: [{LAppDefine.HitAreaNameBody}]");
-                }
+                CubismLog.CubismLogDebug($"[Live2D]hit area: [{LAppDefine.HitAreaNameBody}]");
                 _models[i].StartRandomMotion(LAppDefine.MotionGroupTapBody, MotionPriority.PriorityNormal, OnFinishedMotion);
             }
         }
     }
 
-    private void OnFinishedMotion(ACubismMotion self)
+    private void OnFinishedMotion(CubismModel model, ACubismMotion self)
     {
-        LAppPal.PrintLog($"Motion Finished: {self}");
-        MotionFinished?.Invoke(self);
+        CubismLog.CubismLogInfo($"[Live2D]Motion Finished: {self}");
+        MotionFinished?.Invoke(model, self);
     }
 
     /// <summary>
@@ -145,15 +138,16 @@ public class LAppLive2DManager : IDisposable
 
     public LAppModel LoadModel(string dir, string name)
     {
-        if (LAppDefine.DebugLogEnable)
-        {
-            LAppPal.PrintLog($"[APP]model load: {name}");
-        }
+        CubismLog.CubismLogDebug($"[Live2D]model load: {name}");
 
         // ModelDir[]に保持したディレクトリ名から
         // model3.jsonのパスを決定する.
         // ディレクトリ名とmodel3.jsonの名前を一致させておくこと.
         var modelJsonName = Path.GetFullPath($"{dir}{name}.model3.json");
+        if (!File.Exists(modelJsonName))
+        {
+            throw new Exception("File not found");
+        }
         var model = new LAppModel(Lapp, dir, modelJsonName);
         _models.Add(model);
 
@@ -162,6 +156,16 @@ public class LAppLive2DManager : IDisposable
         Lapp.View.SetRenderTargetClearColor(clearColor[0], clearColor[1], clearColor[2]);
 
         return model;
+    }
+
+    public void RemoveModel(int index)
+    {
+        if (_models.Count > index)
+        {
+            var model = _models[index];
+            _models.RemoveAt(index);
+            model.Dispose();
+        }
     }
 
     /// <summary>

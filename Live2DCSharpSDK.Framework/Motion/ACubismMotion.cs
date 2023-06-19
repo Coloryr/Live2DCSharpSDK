@@ -4,11 +4,6 @@ using Live2DCSharpSDK.Framework.Model;
 namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
-/// モーション再生終了コールバック関数定義
-/// </summary>
-public delegate void FinishedMotionCallback(ACubismMotion self);
-
-/// <summary>
 /// モーションの抽象基底クラス。MotionQueueManagerによってモーションの再生を管理する。
 /// </summary>
 public abstract class ACubismMotion
@@ -81,7 +76,7 @@ public abstract class ACubismMotion
         float fadeIn = FadeInSeconds == 0.0f ? 1.0f
                            : CubismMath.GetEasingSine((userTimeSeconds - motionQueueEntry.FadeInStartTime) / FadeInSeconds);
 
-        float fadeOut = (FadeOutSeconds == 0.0f || motionQueueEntry.EndTime < 0.0f)  ? 1.0f
+        float fadeOut = (FadeOutSeconds == 0.0f || motionQueueEntry.EndTime < 0.0f) ? 1.0f
                             : CubismMath.GetEasingSine((motionQueueEntry.EndTime - userTimeSeconds) / FadeOutSeconds);
 
         fadeWeight = fadeWeight * fadeIn * fadeOut;

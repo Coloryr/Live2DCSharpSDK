@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Live2DCSharpSDK.Framework.Motion;
+﻿namespace Live2DCSharpSDK.Framework.Motion;
 
 public record CubismMotionObj
 {

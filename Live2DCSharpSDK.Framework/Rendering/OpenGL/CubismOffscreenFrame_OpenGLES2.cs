@@ -5,15 +5,15 @@
 /// </summary>
 public class CubismOffscreenFrame_OpenGLES2
 {
-    private OpenGLApi GL;
+    private readonly OpenGLApi GL;
     /// <summary>
     /// レンダリングターゲットとしてのアドレス
     /// </summary>
-    private int _renderTexture;
+    public int RenderTexture { get; private set; }
     /// <summary>
     /// 描画の際使用するテクスチャとしてのアドレス
     /// </summary>
-    private int _colorBuffer;
+    public int ColorBuffer { get; private set; }
 
     /// <summary>
     /// 旧フレームバッファ
@@ -23,11 +23,11 @@ public class CubismOffscreenFrame_OpenGLES2
     /// <summary>
     /// Create時に指定された幅
     /// </summary>
-    private int _bufferWidth;
+    public int BufferWidth { get; private set; }
     /// <summary>
     /// Create時に指定された高さ
     /// </summary>
-    private int _bufferHeight;
+    public int BufferHeight { get; private set; }
     /// <summary>
     /// 引数によって設定されたカラーバッファか？
     /// </summary>
@@ -44,7 +44,7 @@ public class CubismOffscreenFrame_OpenGLES2
     /// <param name="restoreFBO">0以上の場合、EndDrawでこの値をglBindFramebufferする</param>
     public void BeginDraw(int restoreFBO = -1)
     {
-        if (_renderTexture == 0)
+        if (RenderTexture == 0)
         {
             return;
         }
@@ -60,7 +60,7 @@ public class CubismOffscreenFrame_OpenGLES2
         }
 
         //マスク用RenderTextureをactiveにセット
-        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, _renderTexture);
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, RenderTexture);
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public class CubismOffscreenFrame_OpenGLES2
     /// </summary>
     public void EndDraw()
     {
-        if (_renderTexture == 0)
+        if (RenderTexture == 0)
         {
             return;
         }
@@ -103,51 +103,43 @@ public class CubismOffscreenFrame_OpenGLES2
         // 一旦削除
         DestroyOffscreenFrame();
 
-        do
+        // 新しく生成する
+        if (colorBuffer == 0)
         {
-            // 新しく生成する
-            if (colorBuffer == 0)
-            {
-                _colorBuffer = GL.glGenTexture();
+            ColorBuffer = GL.glGenTexture();
 
-                GL.glBindTexture(GL.GL_TEXTURE_2D, _colorBuffer);
-                GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, displayBufferWidth, displayBufferHeight, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, 0);
-                GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE);
-                GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE);
-                GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-                GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-                GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
+            GL.glBindTexture(GL.GL_TEXTURE_2D, ColorBuffer);
+            GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, displayBufferWidth, displayBufferHeight, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, 0);
+            GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE);
+            GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE);
+            GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+            GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+            GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
-                _isColorBufferInherited = false;
-            }
-            else
-            {// 指定されたものを使用
-                _colorBuffer = colorBuffer;
+            _isColorBufferInherited = false;
+        }
+        else
+        {
+            // 指定されたものを使用
+            ColorBuffer = colorBuffer;
 
-                _isColorBufferInherited = true;
-            }
+            _isColorBufferInherited = true;
+        }
 
-            GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, out int tmpFramebufferObject);
+        GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, out int tmpFramebufferObject);
 
-            int ret = GL.glGenFramebuffer();
-            GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, ret);
-            GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, _colorBuffer, 0);
-            GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, tmpFramebufferObject);
+        int ret = GL.glGenFramebuffer();
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, ret);
+        GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, ColorBuffer, 0);
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, tmpFramebufferObject);
 
-            _renderTexture = ret;
+        RenderTexture = ret;
 
-            _bufferWidth = displayBufferWidth;
-            _bufferHeight = displayBufferHeight;
+        BufferWidth = displayBufferWidth;
+        BufferHeight = displayBufferHeight;
 
-            // 成功
-            return true;
-
-        } while (false);
-
-        // 失敗したので削除
-        DestroyOffscreenFrame();
-
-        return false;
+        // 成功
+        return true;
     }
 
     /// <summary>
@@ -155,49 +147,17 @@ public class CubismOffscreenFrame_OpenGLES2
     /// </summary>
     public void DestroyOffscreenFrame()
     {
-        if (!_isColorBufferInherited && (_colorBuffer != 0))
+        if (!_isColorBufferInherited && (ColorBuffer != 0))
         {
-            GL.glDeleteTexture(_colorBuffer);
-            _colorBuffer = 0;
+            GL.glDeleteTexture(ColorBuffer);
+            ColorBuffer = 0;
         }
 
-        if (_renderTexture != 0)
+        if (RenderTexture != 0)
         {
-            GL.glDeleteFramebuffer(_renderTexture);
-            _renderTexture = 0;
+            GL.glDeleteFramebuffer(RenderTexture);
+            RenderTexture = 0;
         }
-    }
-
-    /// <summary>
-    /// レンダーテクスチャメンバーへのアクセッサ
-    /// </summary>
-    public int GetRenderTexture()
-    {
-        return _renderTexture;
-    }
-
-    /// <summary>
-    /// カラーバッファメンバーへのアクセッサ
-    /// </summary>
-    public int GetColorBuffer()
-    {
-        return _colorBuffer;
-    }
-
-    /// <summary>
-    /// バッファ幅取得
-    /// </summary>
-    public int GetBufferWidth()
-    {
-        return _bufferWidth;
-    }
-
-    /// <summary>
-    /// バッファ高さ取得
-    /// </summary>
-    public int GetBufferHeight()
-    {
-        return _bufferHeight;
     }
 
     /// <summary>
@@ -205,6 +165,6 @@ public class CubismOffscreenFrame_OpenGLES2
     /// </summary>
     public bool IsValid()
     {
-        return _renderTexture != 0;
+        return RenderTexture != 0;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Live2DCSharpSDK.App;
-using Live2DCSharpSDK.Framework.Motion;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -21,7 +20,7 @@ public class Window : GameWindow
     protected unsafe override void OnLoad()
     {
         base.OnLoad();
-        lapp = new(new OpenTKApi(this));
+        lapp = new(new OpenTKApi(this), Console.WriteLine);
         var model = lapp.Live2dManager.LoadModel("F:\\live2d\\koharu_haruto\\偙偼傞\\runtime\\", "koharu");
         //
 

@@ -1,8 +1,6 @@
-﻿using Live2DCSharpSDK.OpenTK;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Live2DCSharpSDK.OpenTK;
 

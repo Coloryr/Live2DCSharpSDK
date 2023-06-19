@@ -1,4 +1,18 @@
-﻿namespace Live2DCSharpSDK.Framework.Motion;
+﻿using Live2DCSharpSDK.Framework.Model;
+
+namespace Live2DCSharpSDK.Framework.Motion;
+
+/// <summary>
+/// モーション再生終了コールバック関数定義
+/// </summary>
+public delegate void FinishedMotionCallback(CubismModel model, ACubismMotion self);
+
+/// <summary>
+/// イベントのコールバックに登録できる関数の型情報
+/// </summary>
+/// <param name="eventValue">発火したイベントの文字列データ</param>
+/// <param name="customData">コールバックに返される登録時に指定されたデータ</param>
+public delegate void CubismMotionEventFunction(CubismUserModel customData, string eventValue);
 
 /// <summary>
 /// モーションカーブのセグメントの評価関数。

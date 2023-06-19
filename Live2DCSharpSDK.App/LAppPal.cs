@@ -6,8 +6,6 @@
 /// </summary>
 public static class LAppPal
 {
-    private static float s_currentFrame;
-    private static float s_lastFrame;
     private static float s_deltaTime;
 
     /// <summary>
@@ -25,17 +23,5 @@ public static class LAppPal
     public static void UpdateTime(float time)
     {
         s_deltaTime = time;
-        //s_currentFrame = time;
-        //s_deltaTime = s_currentFrame - s_lastFrame;
-        //s_lastFrame = s_currentFrame;
-    }
-
-    /// <summary>
-    /// メッセージを出力する
-    /// </summary>
-    /// <param name="message">文字列</param>
-    public static void PrintLog(string message)
-    {
-        Console.WriteLine(message);
     }
 }

@@ -5,7 +5,7 @@ namespace Live2DCSharpSDK.Framework;
 
 /// <summary>
 /// Live2D Cubism Original Workflow SDKのエントリポイント
-/// 利用開始時はCubismFramework::Initialize()を呼び、CubismFramework::Dispose()で終了する。
+/// 利用開始時はCubismFramework.Initialize()を呼び、CubismFramework.Dispose()で終了する。
 /// </summary>
 public static class CubismFramework
 {
@@ -20,9 +20,9 @@ public static class CubismFramework
 
     private static bool s_isStarted = false;
     private static bool s_isInitialized = false;
-    private static ICubismAllocator s_allocator;
-    private static Option s_option;
-    private static CubismIdManager s_cubismIdManager;
+    private static ICubismAllocator? s_allocator;
+    private static Option? s_option;
+    private static CubismIdManager? s_cubismIdManager;
 
     /// <summary>
     /// Cubism FrameworkのAPIを使用可能にする。
@@ -37,7 +37,7 @@ public static class CubismFramework
     {
         if (s_isStarted)
         {
-            CubismLog.CubismLogInfo("CubismFramework::StartUp() is already done.");
+            CubismLog.CubismLogInfo("[Live2D SDK]CubismFramework.StartUp() is already done.");
             return s_isStarted;
         }
 
@@ -49,7 +49,7 @@ public static class CubismFramework
 
         if (allocator == null)
         {
-            CubismLog.CubismLogWarning("CubismFramework::StartUp() failed, need allocator instance.");
+            CubismLog.CubismLogWarning("[Live2D SDK]CubismFramework.StartUp() failed, need allocator instance.");
             s_isStarted = false;
         }
         else
@@ -68,10 +68,10 @@ public static class CubismFramework
             uint patch = version & 0x0000FFFF;
             uint vesionNumber = version;
 
-            CubismLog.CubismLogInfo($"Live2D Cubism Core version: {major:##}.{minor:#}.{patch:####} ({vesionNumber})");
+            CubismLog.CubismLogInfo($"[Live2D SDK]Cubism Core version: {major:##}.{minor:#}.{patch:####} ({vesionNumber})");
         }
 
-        CubismLog.CubismLogInfo("CubismFramework::StartUp() is complete.");
+        CubismLog.CubismLogInfo("[Live2D SDK]CubismFramework.StartUp() is complete.");
 
         return s_isStarted;
     }
@@ -84,9 +84,6 @@ public static class CubismFramework
     {
         s_isStarted = false;
         s_isInitialized = false;
-        s_allocator = null;
-        s_option = null;
-        s_cubismIdManager = null;
     }
 
     /// <summary>
@@ -106,7 +103,7 @@ public static class CubismFramework
     {
         if (!s_isStarted)
         {
-            CubismLog.CubismLogWarning("CubismFramework is not started.");
+            CubismLog.CubismLogWarning("[Live2D SDK]CubismFramework is not started.");
             return;
         }
 
@@ -115,7 +112,7 @@ public static class CubismFramework
         // 再度Initialize()するには先にDispose()を実行する必要がある。
         if (s_isInitialized)
         {
-            CubismLog.CubismLogWarning("CubismFramework::Initialize() skipped, already initialized.");
+            CubismLog.CubismLogWarning("[Live2D SDK]CubismFramework.Initialize() skipped, already initialized.");
             return;
         }
 
@@ -123,7 +120,7 @@ public static class CubismFramework
 
         s_isInitialized = true;
 
-        CubismLog.CubismLogInfo("CubismFramework::Initialize() is complete.");
+        CubismLog.CubismLogInfo("[Live2D SDK]CubismFramework.Initialize() is complete.");
     }
 
     /// <summary>
@@ -135,7 +132,7 @@ public static class CubismFramework
     {
         if (!s_isStarted)
         {
-            CubismLog.CubismLogWarning("CubismFramework is not started.");
+            CubismLog.CubismLogWarning("[Live2D SDK]CubismFramework is not started.");
             return;
         }
 
@@ -143,13 +140,13 @@ public static class CubismFramework
         // Dispose()するには先にInitialize()を実行する必要がある。
         if (!s_isInitialized) // false...リソース未確保の場合
         {
-            CubismLog.CubismLogWarning("CubismFramework::Dispose() skipped, not initialized.");
+            CubismLog.CubismLogWarning("[Live2D SDK]CubismFramework.Dispose() skipped, not initialized.");
             return;
         }
 
         s_isInitialized = false;
 
-        CubismLog.CubismLogInfo("CubismFramework::Dispose() is complete.");
+        CubismLog.CubismLogInfo("[Live2D SDK]CubismFramework.Dispose() is complete.");
     }
 
     /// <summary>
@@ -180,12 +177,12 @@ public static class CubismFramework
     /// 現在のログ出力レベル設定の値を返す。
     /// </summary>
     /// <returns>現在のログ出力レベル設定の値</returns>
-    public static Option.LogLevel GetLoggingLevel()
+    public static LogLevel GetLoggingLevel()
     {
         if (s_option != null)
             return s_option.LoggingLevel;
 
-        return Option.LogLevel.LogLevel_Off;
+        return LogLevel.Off;
     }
 
     /// <summary>
@@ -194,15 +191,15 @@ public static class CubismFramework
     /// <returns>CubismIdManagerクラスのインスタンス</returns>
     public static CubismIdManager GetIdManager()
     {
-        return s_cubismIdManager;
+        return s_cubismIdManager!;
     }
 
     public static IntPtr Allocate(int size)
-        => s_allocator.Allocate(size);
+        => s_allocator!.Allocate(size);
     public static IntPtr AllocateAligned(int size, int alignment)
-        => s_allocator.AllocateAligned(size, alignment);
+        => s_allocator!.AllocateAligned(size, alignment);
     public static void Deallocate(IntPtr address)
-        => s_allocator.Deallocate(address);
+        => s_allocator!.Deallocate(address);
     public static void DeallocateAligned(IntPtr address)
-        => s_allocator.DeallocateAligned(address);
+        => s_allocator!.DeallocateAligned(address);
 }

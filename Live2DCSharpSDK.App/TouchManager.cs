@@ -163,7 +163,7 @@ public class TouchManager
     /// <param name="x2">2つめのタッチした画面のxの値</param>
     /// <param name="y2">2つめのタッチした画面のyの値</param>
     /// <returns>2点の距離</returns>
-    public float CalculateDistance(float x1, float y1, float x2, float y2)
+    public static float CalculateDistance(float x1, float y1, float x2, float y2)
     {
         return MathF.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
     }
@@ -175,7 +175,7 @@ public class TouchManager
     /// <param name="v1">1つめの移動量</param>
     /// <param name="v2">2つめの移動量</param>
     /// <returns>小さい方の移動量</returns>
-    public float CalculateMovingAmount(float v1, float v2)
+    public static float CalculateMovingAmount(float v1, float v2)
     {
         if ((v1 > 0.0f) != (v2 > 0.0f))
         {
