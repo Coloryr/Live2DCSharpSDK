@@ -7,12 +7,12 @@ namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
 public class CubismClippingManager_OpenGLES2
 {
-    private OpenGLApi GL;
+    private readonly OpenGLApi GL;
 
     /// <summary>
     /// オフスクリーンフレームのアドレス
     /// </summary>
-    internal CubismOffscreenFrame_OpenGLES2 _currentOffscreenFrame;
+    internal CubismOffscreenFrame_OpenGLES2? _currentOffscreenFrame;
     /// <summary>
     /// マスクのクリアフラグの配列
     /// </summary>
@@ -26,7 +26,7 @@ public class CubismClippingManager_OpenGLES2
     /// <summary>
     /// 描画用クリッピングコンテキストのリスト
     /// </summary>
-    internal readonly List<CubismClippingContext> _clippingContextListForDraw = new();
+    internal readonly List<CubismClippingContext?> _clippingContextListForDraw = new();
     /// <summary>
     /// クリッピングマスクのバッファサイズ（初期値:256）
     /// </summary>
@@ -194,7 +194,7 @@ public class CubismClippingManager_OpenGLES2
             }
 
             // 既にあるClipContextと同じかチェックする
-            CubismClippingContext cc = FindSameClip(drawableMasks[i], drawableMaskCounts[i]);
+            var cc = FindSameClip(drawableMasks[i], drawableMaskCounts[i]);
             if (cc == null)
             {
                 // 同一のマスクが存在していない場合は生成する
@@ -291,7 +291,7 @@ public class CubismClippingManager_OpenGLES2
                 if (_currentOffscreenFrame != clipContextOffscreenFrame &&
                     !renderer.IsUsingHighPrecisionMask())
                 {
-                    _currentOffscreenFrame.EndDraw();
+                    _currentOffscreenFrame!.EndDraw();
                     _currentOffscreenFrame = clipContextOffscreenFrame;
                     // マスク用RenderTextureをactiveにセット
                     _currentOffscreenFrame.BeginDraw(lastFBO);
@@ -405,7 +405,7 @@ public class CubismClippingManager_OpenGLES2
 
                         // 今回専用の変換を適用して描く
                         // チャンネルも切り替える必要がある(A,R,G,B)
-                        renderer.SetClippingContextBufferForMask(clipContext);
+                        renderer.ClippingContextBufferForMask = clipContext;
 
                         renderer.DrawMeshOpenGL(
                             model.GetDrawableTextureIndex(clipDrawIndex),
@@ -417,7 +417,7 @@ public class CubismClippingManager_OpenGLES2
                             model.GetMultiplyColor(clipDrawIndex),
                             model.GetScreenColor(clipDrawIndex),
                             model.GetDrawableOpacity(clipDrawIndex),
-                            CubismBlendMode.CubismBlendMode_Normal,   //クリッピングは通常描画を強制
+                            CubismBlendMode.Normal,   //クリッピングは通常描画を強制
                             false   // マスク生成時はクリッピングの反転使用は全く関係がない
                         );
                     }
@@ -427,8 +427,8 @@ public class CubismClippingManager_OpenGLES2
             if (!renderer.IsUsingHighPrecisionMask())
             {
                 // --- 後処理 ---
-                _currentOffscreenFrame.EndDraw();
-                renderer.SetClippingContextBufferForMask(null);
+                _currentOffscreenFrame?.EndDraw();
+                renderer.ClippingContextBufferForMask = null;
                 GL.glViewport(lastViewport[0], lastViewport[1], lastViewport[2], lastViewport[3]);
             }
         }
@@ -442,7 +442,7 @@ public class CubismClippingManager_OpenGLES2
     /// <param name="drawableMasks">描画オブジェクトをマスクする描画オブジェクトのリスト</param>
     /// <param name="drawableMaskCounts">描画オブジェクトをマスクする描画オブジェクトの数</param>
     /// <returns>該当するクリッピングマスクが存在すればインスタンスを返し、なければNULLを返す。</returns>
-    internal unsafe CubismClippingContext FindSameClip(int* drawableMasks, int drawableMaskCounts)
+    internal unsafe CubismClippingContext? FindSameClip(int* drawableMasks, int drawableMaskCounts)
     {
         // 作成済みClippingContextと一致するか確認
         for (int i = 0; i < _clippingContextListForMask.Count; i++)
@@ -491,7 +491,7 @@ public class CubismClippingManager_OpenGLES2
             {
                 // マスクの制限数の警告を出す
                 int count = usingClipCount - useClippingMaskMaxCount;
-                CubismLog.CubismLogError($"not supported mask count : {count}\n[Details] render texture count : {_renderTextureCount}\n, mask count : {usingClipCount}");
+                CubismLog.CubismLogError($"[Live2D SDK]not supported mask count : {count}\n[Details] render texture count : {_renderTextureCount}\n, mask count : {usingClipCount}");
             }
 
             // この場合は一つのマスクターゲットを毎回クリアして使用する
@@ -624,10 +624,8 @@ public class CubismClippingManager_OpenGLES2
                         cc._bufferIndex = 0;
                     }
 
-                    CubismLog.CubismLogError($"not supported mask count : {count}\n[Details] render texture count: {_renderTextureCount}\n, mask count : {usingClipCount}");
-
                     // 開発モードの場合は停止させる
-                    throw new Exception();
+                    throw new Exception($"[Live2D Core]not supported mask count : {count}\n[Details] render texture count: {_renderTextureCount}\n, mask count : {usingClipCount}");
                 }
             }
         }
@@ -637,7 +635,7 @@ public class CubismClippingManager_OpenGLES2
     /// 画面描画に使用するクリッピングマスクのリストを取得する
     /// </summary>
     /// <returns>画面描画に使用するクリッピングマスクのリスト</returns>
-    internal List<CubismClippingContext> GetClippingContextListForDraw()
+    internal List<CubismClippingContext?> GetClippingContextListForDraw()
     {
         return _clippingContextListForDraw;
     }

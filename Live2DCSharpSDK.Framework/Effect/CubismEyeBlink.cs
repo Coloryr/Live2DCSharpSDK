@@ -55,7 +55,7 @@ public class CubismEyeBlink
     /// <param name="modelSetting">モデルの設定情報</param>
     public CubismEyeBlink(ModelSettingObj modelSetting)
     {
-        _blinkingState = EyeState.EyeState_First;
+        _blinkingState = EyeState.First;
         _blinkingIntervalSeconds = 4.0f;
         _closingSeconds = 0.1f;
         _closedSeconds = 0.05f;
@@ -111,57 +111,57 @@ public class CubismEyeBlink
         float t;
         switch (_blinkingState)
         {
-            case EyeState.EyeState_Closing:
+            case EyeState.Closing:
                 t = ((_userTimeSeconds - _stateStartTimeSeconds) / _closingSeconds);
 
                 if (t >= 1.0f)
                 {
                     t = 1.0f;
-                    _blinkingState = EyeState.EyeState_Closed;
+                    _blinkingState = EyeState.Closed;
                     _stateStartTimeSeconds = _userTimeSeconds;
                 }
 
                 parameterValue = 1.0f - t;
 
                 break;
-            case EyeState.EyeState_Closed:
+            case EyeState.Closed:
                 t = ((_userTimeSeconds - _stateStartTimeSeconds) / _closedSeconds);
 
                 if (t >= 1.0f)
                 {
-                    _blinkingState = EyeState.EyeState_Opening;
+                    _blinkingState = EyeState.Opening;
                     _stateStartTimeSeconds = _userTimeSeconds;
                 }
 
                 parameterValue = 0.0f;
 
                 break;
-            case EyeState.EyeState_Opening:
+            case EyeState.Opening:
                 t = ((_userTimeSeconds - _stateStartTimeSeconds) / _openingSeconds);
 
                 if (t >= 1.0f)
                 {
                     t = 1.0f;
-                    _blinkingState = EyeState.EyeState_Interval;
+                    _blinkingState = EyeState.Interval;
                     _nextBlinkingTime = DeterminNextBlinkingTiming();
                 }
 
                 parameterValue = t;
 
                 break;
-            case EyeState.EyeState_Interval:
+            case EyeState.Interval:
                 if (_nextBlinkingTime < _userTimeSeconds)
                 {
-                    _blinkingState = EyeState.EyeState_Closing;
+                    _blinkingState = EyeState.Closing;
                     _stateStartTimeSeconds = _userTimeSeconds;
                 }
 
                 parameterValue = 1.0f;
 
                 break;
-            case EyeState.EyeState_First:
+            case EyeState.First:
             default:
-                _blinkingState = EyeState.EyeState_Interval;
+                _blinkingState = EyeState.Interval;
                 _nextBlinkingTime = DeterminNextBlinkingTiming();
 
                 parameterValue = 1.0f;

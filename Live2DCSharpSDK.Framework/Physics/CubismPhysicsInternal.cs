@@ -247,7 +247,7 @@ public record CubismPhysicsInput
     /// <summary>
     /// 正規化されたパラメータ値の取得関数
     /// </summary>
-    public  NormalizedPhysicsParameterValueGetter GetNormalizedParameterValue;
+    public NormalizedPhysicsParameterValueGetter GetNormalizedParameterValue;
 }
 
 /// <summary>

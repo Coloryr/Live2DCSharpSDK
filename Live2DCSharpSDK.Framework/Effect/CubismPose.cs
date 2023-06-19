@@ -1,6 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 
 namespace Live2DCSharpSDK.Framework.Effect;
 
@@ -44,9 +43,10 @@ public class CubismPose
         var json = JObject.Parse(pose3json);
 
         // フェード時間の指定
-        if (json[FadeIn] != null)
+        if (json.ContainsKey(FadeIn))
         {
-            _fadeTimeSeconds = json.ContainsKey(FadeIn) ? (float)json[FadeIn]! : DefaultFadeInSeconds;
+            var item = json[FadeIn];
+            _fadeTimeSeconds = item == null ? DefaultFadeInSeconds : (float)item;
 
             if (_fadeTimeSeconds < 0.0f)
             {
@@ -55,7 +55,9 @@ public class CubismPose
         }
 
         // パーツグループ
-        var poseListInfo = (json[Groups] as JArray)!;
+        var poseListInfo = json[Groups] as JArray;
+        if (poseListInfo == null)
+            return;
 
         foreach (var item in poseListInfo)
         {

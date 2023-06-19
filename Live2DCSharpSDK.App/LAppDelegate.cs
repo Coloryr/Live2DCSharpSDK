@@ -1,4 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework;
+using Live2DCSharpSDK.Framework.Core;
 using Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
 namespace Live2DCSharpSDK.App;
@@ -12,11 +13,11 @@ public class LAppDelegate : IDisposable
     /// <summary>
     /// Cubism SDK Allocator
     /// </summary>
-    private LAppAllocator _cubismAllocator;
+    private readonly LAppAllocator _cubismAllocator;
     /// <summary>
     /// Cubism SDK Option
     /// </summary>
-    private Option _cubismOption;
+    private readonly Option _cubismOption;
     /// <summary>
     /// View情報
     /// </summary>
@@ -33,10 +34,7 @@ public class LAppDelegate : IDisposable
     /// マウスY座標
     /// </summary>
     private float _mouseY;
-    /// <summary>
-    /// APP終了しているか
-    /// </summary>
-    private bool IsEnd;
+
     /// <summary>
     /// テクスチャマネージャー
     /// </summary>
@@ -55,7 +53,7 @@ public class LAppDelegate : IDisposable
     /// </summary>
     private int _windowHeight;
 
-    public LAppDelegate(OpenGLApi gl)
+    public LAppDelegate(OpenGLApi gl, LogFunction log)
     {
         GL = gl;
 
@@ -82,7 +80,7 @@ public class LAppDelegate : IDisposable
         // Cubism SDK の初期化
         _cubismOption = new()
         {
-            LogFunction = LAppPal.PrintLog,
+            LogFunction = log,
             LoggingLevel = LAppDefine.CubismLoggingLevel
         };
         CubismFramework.StartUp(_cubismAllocator, _cubismOption);
@@ -117,8 +115,6 @@ public class LAppDelegate : IDisposable
         {
             //AppViewの初期化
             View.Initialize();
-            // スプライトサイズを再設定
-            //_view.ResizeSprite();
             // サイズを保存しておく
             _windowWidth = width;
             _windowHeight = height;
@@ -149,23 +145,14 @@ public class LAppDelegate : IDisposable
     /// </summary>
     /// <param name="button">ボタン種類</param>
     /// <param name="action">実行結果</param>
-    public void OnMouseCallBack(ButtonType button, ButtonFuntion action)
+    public void OnMouseCallBack(bool press)
     {
-        if (View == null)
-        {
-            return;
-        }
-        if (button != ButtonType.LEFT)
-        {
-            return;
-        }
-
-        if (action == ButtonFuntion.PRESS)
+        if (press)
         {
             _captured = true;
             View.OnTouchesBegan(_mouseX, _mouseY);
         }
-        else if (action == ButtonFuntion.RELEASE)
+        else
         {
             if (_captured)
             {
@@ -183,10 +170,6 @@ public class LAppDelegate : IDisposable
     public void OnMouseCallBack(float x, float y)
     {
         if (!_captured)
-        {
-            return;
-        }
-        if (View == null)
         {
             return;
         }

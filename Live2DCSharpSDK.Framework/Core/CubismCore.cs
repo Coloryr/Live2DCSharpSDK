@@ -215,7 +215,8 @@ public static partial class CubismCore
     /// <param name="outOriginInPixels">Origin of model on canvas.</param>
     /// <param name="outPixelsPerUnit">Aspect used for scaling pixels to units.</param>
     [DllImport("Live2DCubismCore", EntryPoint = "csmReadCanvasInfo")]
-    internal extern static void ReadCanvasInfo(IntPtr model, out Vector2 outSizeInPixels, out Vector2 outOriginInPixels, out float outPixelsPerUnit);
+    internal extern static void ReadCanvasInfo(IntPtr model, out Vector2 outSizeInPixels, 
+        out Vector2 outOriginInPixels, out float outPixelsPerUnit);
 
     //PARAMETERS
 
@@ -384,7 +385,7 @@ public static partial class CubismCore
     /// </summary>
     /// <param name="model">Model to query.</param>
     /// <returns>Valid pointer on success; '0'otherwise.</returns>
-    [LibraryImport("Live2DCubismCore", EntryPoint = "csmGetDrawableRenderOrders")] 
+    [LibraryImport("Live2DCubismCore", EntryPoint = "csmGetDrawableRenderOrders")]
     internal static unsafe partial int* GetDrawableRenderOrders(IntPtr model);
 
     /// <summary>

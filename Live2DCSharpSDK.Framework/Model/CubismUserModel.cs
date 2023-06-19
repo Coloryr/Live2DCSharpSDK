@@ -36,7 +36,7 @@ public abstract class CubismUserModel : IDisposable
     /// <summary>
     /// 自動まばたき
     /// </summary>
-    protected CubismEyeBlink _eyeBlink;
+    protected CubismEyeBlink? _eyeBlink;
     /// <summary>
     /// 呼吸
     /// </summary>
@@ -106,21 +106,16 @@ public abstract class CubismUserModel : IDisposable
     /// MOC3整合性検証するかどうか
     /// </summary>
     protected bool _mocConsistency;
-    /// <summary>
-    /// デバッグモードかどうか
-    /// </summary>
-    protected bool _debugMode;
 
     /// <summary>
     /// CubismMotionQueueManagerにイベント用に登録するためのCallback。
     /// CubismUserModelの継承先のEventFiredを呼ぶ。
     /// </summary>
-    /// <param name="caller">発火したイベントを管理していたモーションマネージャー、比較用</param>
     /// <param name="eventValue">発火したイベントの文字列データ</param>
     /// <param name="customData">CubismUserModelを継承したインスタンスを想定</param>
-    public static void CubismDefaultMotionEventCallback(CubismMotionQueueManager caller, string eventValue, object? customData)
+    public static void CubismDefaultMotionEventCallback(CubismUserModel customData, string eventValue)
     {
-        (customData as CubismUserModel)?.MotionEventFired(eventValue);
+        customData.MotionEventFired(eventValue);
     }
 
     /// <summary>
@@ -274,14 +269,13 @@ public abstract class CubismUserModel : IDisposable
     /// <summary>
     /// レンダラを生成して初期化を実行する。
     /// </summary>
-    protected void CreateRenderer(CubismRenderer renderer, int maskBufferCount = 1)
+    protected void CreateRenderer(CubismRenderer renderer)
     {
         if (Renderer != null)
         {
             DeleteRenderer();
         }
         Renderer = renderer;
-        Renderer.Initialize(Model, maskBufferCount);
     }
 
     /// <summary>

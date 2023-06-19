@@ -4,12 +4,7 @@ using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Motion;
 using Live2DCSharpSDK.Framework.Rendering.OpenGL;
-using Live2DCSharpSDK.Framework.Type;
 using Newtonsoft.Json;
-using System;
-using System.Drawing;
-using System.IO;
-using System.Reflection;
 
 namespace Live2DCSharpSDK.App;
 
@@ -92,11 +87,6 @@ public class LAppModel : CubismUserModel
             _mocConsistency = true;
         }
 
-        if (LAppDefine.DebugLogEnable)
-        {
-            _debugMode = true;
-        }
-
         _idParamAngleX = CubismFramework.GetIdManager()
             .GetId(CubismDefaultParameterId.ParamAngleX);
         _idParamAngleY = CubismFramework.GetIdManager()
@@ -112,10 +102,7 @@ public class LAppModel : CubismUserModel
 
         _modelHomeDir = dir;
 
-        if (_debugMode)
-        {
-            LAppPal.PrintLog($"[APP]load model setting: {fileName}");
-        }
+        CubismLog.CubismLogDebug($"[Live2D]load model setting: {fileName}");
 
         _modelSetting = JsonConvert.DeserializeObject<ModelSettingObj>(File.ReadAllText(fileName))!;
 
@@ -132,10 +119,7 @@ public class LAppModel : CubismUserModel
                 throw new Exception("model is null");
             }
 
-            if (_debugMode)
-            {
-                LAppPal.PrintLog($"[APP]create model: {path}");
-            }
+            CubismLog.CubismLogDebug($"[Live2D]create model: {path}");
 
             LoadModel(File.ReadAllBytes(path), _mocConsistency);
         }
@@ -292,13 +276,7 @@ public class LAppModel : CubismUserModel
         Updating = false;
         Initialized = true;
 
-        if (Model == null)
-        {
-            LAppPal.PrintLog("Failed to LoadAssets().");
-            return;
-        }
-
-        CreateRenderer(new CubismRenderer_OpenGLES2(Lapp.GL));
+        CreateRenderer(new CubismRenderer_OpenGLES2(Lapp.GL, Model));
 
         SetupTextures();
     }
@@ -326,7 +304,7 @@ public class LAppModel : CubismUserModel
     {
         DeleteRenderer();
 
-        CreateRenderer(new CubismRenderer_OpenGLES2(Lapp.GL));
+        CreateRenderer(new CubismRenderer_OpenGLES2(Lapp.GL, Model));
 
         SetupTextures();
     }
@@ -458,10 +436,7 @@ public class LAppModel : CubismUserModel
         }
         else if (!_motionManager.ReserveMotion(priority))
         {
-            if (_debugMode)
-            {
-                LAppPal.PrintLog("[APP]can't start motion.");
-            }
+            CubismLog.CubismLogDebug("[Live2D]can't start motion.");
             return null;
         }
 
@@ -509,10 +484,7 @@ public class LAppModel : CubismUserModel
             //_wavFileHandler.Start(path);
         }
 
-        if (_debugMode)
-        {
-            LAppPal.PrintLog($"[APP]start motion: [{group}_{no}]");
-        }
+        CubismLog.CubismLogDebug($"[Live2D]start motion: [{group}_{no}]");
         return _motionManager.StartMotionPriority(motion, priority);
     }
 
@@ -541,10 +513,7 @@ public class LAppModel : CubismUserModel
     public void SetExpression(string expressionID)
     {
         ACubismMotion motion = _expressions[expressionID];
-        if (_debugMode)
-        {
-            LAppPal.PrintLog($"[APP]expression: [{expressionID}]");
-        }
+        CubismLog.CubismLogDebug($"[Live2D]expression: [{expressionID}]");
 
         if (motion != null)
         {
@@ -552,7 +521,7 @@ public class LAppModel : CubismUserModel
         }
         else
         {
-            if (_debugMode) LAppPal.PrintLog($"[APP]expression[{expressionID}] is null ");
+            CubismLog.CubismLogDebug($"[Live2D]expression[{expressionID}] is null ");
         }
     }
 
@@ -585,7 +554,7 @@ public class LAppModel : CubismUserModel
     /// <param name="eventValue"></param>
     protected override void MotionEventFired(string eventValue)
     {
-        CubismLog.CubismLogInfo($"{eventValue} is fired on LAppModel!!");
+        CubismLog.CubismLogDebug($"[Live2D]{eventValue} is fired on LAppModel!!");
         Motion?.Invoke(this, eventValue);
     }
 

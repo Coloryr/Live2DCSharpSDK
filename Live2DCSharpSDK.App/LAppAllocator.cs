@@ -41,7 +41,7 @@ public class LAppAllocator : ICubismAllocator
     /// <returns>alignedAddress</returns>
     public unsafe IntPtr AllocateAligned(int size, int alignment)
     {
-        nint offset, shift, alignedAddress;
+        IntPtr offset, shift, alignedAddress;
         IntPtr allocation;
         void** preamble;
 
@@ -55,7 +55,7 @@ public class LAppAllocator : ICubismAllocator
 
         if (shift != 0)
         {
-            alignedAddress += (alignment - shift);
+            alignedAddress += alignment - shift;
         }
 
         preamble = (void**)alignedAddress;
@@ -70,9 +70,7 @@ public class LAppAllocator : ICubismAllocator
     /// <param name="alignedMemory">解放するメモリ。</param>
     public unsafe void DeallocateAligned(IntPtr alignedMemory)
     {
-        void** preamble;
-
-        preamble = (void**)(alignedMemory);
+        var preamble = (void**)alignedMemory;
 
         Deallocate(new IntPtr(preamble[-1]));
     }

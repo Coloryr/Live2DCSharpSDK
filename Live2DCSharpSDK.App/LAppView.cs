@@ -1,5 +1,5 @@
-﻿using Live2DCSharpSDK.Framework.Math;
-using Live2DCSharpSDK.Framework.Rendering.OpenGL;
+﻿using Live2DCSharpSDK.Framework;
+using Live2DCSharpSDK.Framework.Math;
 
 namespace Live2DCSharpSDK.App;
 
@@ -118,6 +118,7 @@ public class LAppView
     public void OnTouchesBegan(float pointX, float pointY)
     {
         _touchManager.TouchesBegan(pointX, pointY);
+        CubismLog.CubismLogDebug($"[Live2D]touchesBegan x:{pointX:#.##} y:{pointY:#.##}");
     }
 
     /// <summary>
@@ -148,7 +149,7 @@ public class LAppView
         // シングルタップ
         float x = _deviceToScreen.TransformX(_touchManager.GetX()); // 論理座標変換した座標を取得。
         float y = _deviceToScreen.TransformY(_touchManager.GetY()); // 論理座標変換した座標を取得。
-        LAppPal.PrintLog($"[APP]touchesEnded x:{x:#.##} y:{y:#.##}");
+        CubismLog.CubismLogDebug($"[Live2D]touchesEnded x:{x:#.##} y:{y:#.##}");
         live2DManager.OnTap(x, y);
     }
 

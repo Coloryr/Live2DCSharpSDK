@@ -12,7 +12,7 @@ public abstract class CubismRenderer : IDisposable
     /// <summary>
     /// Model-View-Projection 行列
     /// </summary>
-    private CubismMatrix44 _mvpMatrix4x4;
+    private readonly CubismMatrix44 _mvpMatrix4x4 = new();
     /// <summary>
     /// モデル自体のカラー(RGBA)
     /// </summary>
@@ -28,7 +28,7 @@ public abstract class CubismRenderer : IDisposable
     /// <summary>
     /// テクスチャの異方性フィルタリングのパラメータ
     /// </summary>
-    private float _anisotropy;
+    internal float Anisotropy { get; set; }
     /// <summary>
     /// レンダリング対象のモデル
     /// </summary>
@@ -42,10 +42,10 @@ public abstract class CubismRenderer : IDisposable
     /// <summary>
     /// レンダラのインスタンスを生成して取得する
     /// </summary>
-    public CubismRenderer()
+    public CubismRenderer(CubismModel model)
     {
-        _mvpMatrix4x4 = new();
         _mvpMatrix4x4.LoadIdentity();
+        Model = model ?? throw new Exception("model is null");
     }
 
     /// <summary>
@@ -54,27 +54,6 @@ public abstract class CubismRenderer : IDisposable
     public void Dispose()
     {
 
-    }
-
-    /// <summary>
-    /// レンダラの初期化処理を実行する
-    /// 引数に渡したモデルからレンダラの初期化処理に必要な情報を取り出すことができる
-    /// </summary>
-    /// <param name="model">モデルのインスタンス</param>
-    public virtual void Initialize(CubismModel model)
-    {
-        Initialize(model, 1);
-    }
-
-    /// <summary>
-    /// レンダラの初期化処理を実行する
-    /// 引数に渡したモデルからレンダラの初期化処理に必要な情報を取り出すことができる
-    /// </summary>
-    /// <param name="model">モデルのインスタンス</param>
-    /// <param name="maskBufferCount">バッファの生成数</param>
-    public virtual void Initialize(CubismModel model, int maskBufferCount)
-    {
-        Model = model ?? throw new Exception("model is null");
     }
 
     /// <summary>
@@ -194,15 +173,6 @@ public abstract class CubismRenderer : IDisposable
     }
 
     /// <summary>
-    /// テクスチャの異方性フィルタリングのパラメータをセットする
-    /// </summary>
-    /// <param name="anisotropy">異方性フィルタリングのパラメータ</param>
-    public void SetAnisotropy(float anisotropy)
-    {
-        _anisotropy = anisotropy;
-    }
-
-    /// <summary>
     /// マスク描画の方式を変更する。
     ///  falseの場合、マスクを1枚のテクスチャに分割してレンダリングする（デフォルトはこちら）。
     ///  高速だが、マスク個数の上限が36に限定され、質も荒くなる。
@@ -248,15 +218,6 @@ public abstract class CubismRenderer : IDisposable
                           , float opacity, CubismBlendMode colorBlendMode, bool invertedMask)
     {
 
-    }
-
-    /// <summary>
-    /// テクスチャの異方性フィルタリングのパラメータをセットする
-    /// </summary>
-    /// <returns>異方性フィルタリングのパラメータ</returns>
-    internal float GetAnisotropy()
-    {
-        return _anisotropy;
     }
 
     /// <summary>

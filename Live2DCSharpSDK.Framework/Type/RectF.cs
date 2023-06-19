@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace Live2DCSharpSDK.Framework.Type;
+﻿namespace Live2DCSharpSDK.Framework.Type;
 
 /// <summary>
 /// 矩形形状(座標・長さはfloat値)を定義するクラス

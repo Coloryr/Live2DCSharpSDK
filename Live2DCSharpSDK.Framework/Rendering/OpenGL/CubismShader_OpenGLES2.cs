@@ -3,88 +3,10 @@ using Live2DCSharpSDK.Framework.Type;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
-public enum ShaderNames : int
-{
-    // SetupMask
-    ShaderNames_SetupMask,
-
-    //Normal
-    ShaderNames_Normal,
-    ShaderNames_NormalMasked,
-    ShaderNames_NormalMaskedInverted,
-    ShaderNames_NormalPremultipliedAlpha,
-    ShaderNames_NormalMaskedPremultipliedAlpha,
-    ShaderNames_NormalMaskedInvertedPremultipliedAlpha,
-
-    //Add
-    ShaderNames_Add,
-    ShaderNames_AddMasked,
-    ShaderNames_AddMaskedInverted,
-    ShaderNames_AddPremultipliedAlpha,
-    ShaderNames_AddMaskedPremultipliedAlpha,
-    ShaderNames_AddMaskedPremultipliedAlphaInverted,
-
-    //Mult
-    ShaderNames_Mult,
-    ShaderNames_MultMasked,
-    ShaderNames_MultMaskedInverted,
-    ShaderNames_MultPremultipliedAlpha,
-    ShaderNames_MultMaskedPremultipliedAlpha,
-    ShaderNames_MultMaskedPremultipliedAlphaInverted,
-};
-
-internal record CubismShaderSet
-{
-    /// <summary>
-    /// シェーダプログラムのアドレス
-    /// </summary>
-    internal int ShaderProgram;
-    /// <summary>
-    /// シェーダプログラムに渡す変数のアドレス(Position)
-    /// </summary>
-    internal int AttributePositionLocation;
-    /// <summary>
-    /// シェーダプログラムに渡す変数のアドレス(TexCoord)
-    /// </summary>
-    internal int AttributeTexCoordLocation;
-    /// <summary>
-    /// シェーダプログラムに渡す変数のアドレス(Matrix)
-    /// </summary>
-    internal int UniformMatrixLocation;
-    /// <summary>
-    /// シェーダプログラムに渡す変数のアドレス(ClipMatrix)
-    /// </summary>
-    internal int UniformClipMatrixLocation;
-    /// <summary>
-    /// シェーダプログラムに渡す変数のアドレス(Texture0)
-    /// </summary>
-    internal int SamplerTexture0Location;
-    /// <summary>
-    /// シェーダプログラムに渡す変数のアドレス(Texture1)
-    /// </summary>
-    internal int SamplerTexture1Location;
-    /// <summary>
-    /// シェーダプログラムに渡す変数のアドレス(BaseColor)
-    /// </summary>
-    internal int UniformBaseColorLocation;
-    /// <summary>
-    /// シェーダプログラムに渡す変数のアドレス(MultiplyColor)
-    /// </summary>
-    internal int UniformMultiplyColorLocation;
-    /// <summary>
-    /// シェーダプログラムに渡す変数のアドレス(ScreenColor)
-    /// </summary>
-    internal int UniformScreenColorLocation;
-    /// <summary>
-    /// シェーダプログラムに渡す変数のアドレス(ChannelFlag)
-    /// </summary>
-    internal int UnifromChannelFlagLocation;
-};
-
 internal class CubismShader_OpenGLES2 : IDisposable
 {
-    private const string ES2 = "#version 100\n";
-    private const string ES2C = ES2 + "precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;";
+    private const string GLES2 = "#version 100\n";
+    private const string GLES2C = GLES2 + "precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;";
     private const string Normal = "#version 120\n";
     private const string Tegra = "#version 100\n" +
         "#extension GL_NV_shader_framebuffer_fetch : enable\n" +
@@ -92,7 +14,7 @@ internal class CubismShader_OpenGLES2 : IDisposable
 
     // SetupMask
     public const string VertShaderSrcSetupMask_ES2 =
-        ES2 + VertShaderSrcSetupMask_Base;
+        GLES2 + VertShaderSrcSetupMask_Base;
     public const string VertShaderSrcSetupMask_Normal =
         Normal + VertShaderSrcSetupMask_Base;
     private const string VertShaderSrcSetupMask_Base =
@@ -109,7 +31,7 @@ v_texCoord = a_texCoord;
 v_texCoord.y = 1.0 - v_texCoord.y;
 }";
 
-    public const string FragShaderSrcSetupMask_ES2 = ES2C + FragShaderSrcSetupMask_Base;
+    public const string FragShaderSrcSetupMask_ES2 = GLES2C + FragShaderSrcSetupMask_Base;
     public const string FragShaderSrcSetupMask_Normal = Normal + FragShaderSrcSetupMask_Base;
     private const string FragShaderSrcSetupMask_Base =
         @"varying vec2 v_texCoord;
@@ -132,7 +54,7 @@ gl_FragColor = u_channelFlag * texture2D(s_texture0 , v_texCoord).a * isInside;
 
     //----- バーテックスシェーダプログラム -----
     // Normal & Add & Mult 共通
-    public const string VertShaderSrc_ES2 = ES2 + VertShaderSrc_Base;
+    public const string VertShaderSrc_ES2 = GLES2 + VertShaderSrc_Base;
     public const string VertShaderSrc_Normal = Normal + VertShaderSrc_Base;
     private const string VertShaderSrc_Base =
         @"attribute vec4 a_position;
@@ -147,7 +69,7 @@ v_texCoord.y = 1.0 - v_texCoord.y;
 }";
 
     // Normal & Add & Mult 共通（クリッピングされたものの描画用）
-    public const string VertShaderSrcMasked_ES2 = ES2 + VertShaderSrcMasked_Base;
+    public const string VertShaderSrcMasked_ES2 = GLES2 + VertShaderSrcMasked_Base;
     public const string VertShaderSrcMasked_Normal = Normal + VertShaderSrcMasked_Base;
     private const string VertShaderSrcMasked_Base =
         @"attribute vec4 a_position;
@@ -166,7 +88,7 @@ v_texCoord.y = 1.0 - v_texCoord.y;
 
     //----- フラグメントシェーダプログラム -----
     // Normal & Add & Mult 共通
-    public const string FragShaderSrc_ES2 = ES2C + FragShaderSrc_Base;
+    public const string FragShaderSrc_ES2 = GLES2C + FragShaderSrc_Base;
     public const string FragShaderSrc_Normal = Normal + FragShaderSrc_Base;
     public const string FragShaderSrc_Base =
     @"varying vec2 v_texCoord;
@@ -186,7 +108,7 @@ gl_FragColor = vec4(color.rgb * color.a,  color.a);
     public const string FragShaderSrcTegra = Tegra + FragShaderSrc_Base;
 
     // Normal & Add & Mult 共通 （PremultipliedAlpha）
-    public const string FragShaderSrcPremultipliedAlpha_ES2 = ES2C + FragShaderSrcPremultipliedAlpha_Base;
+    public const string FragShaderSrcPremultipliedAlpha_ES2 = GLES2C + FragShaderSrcPremultipliedAlpha_Base;
     public const string FragShaderSrcPremultipliedAlpha_Normal = Normal + FragShaderSrcPremultipliedAlpha_Base;
     public const string FragShaderSrcPremultipliedAlpha_Base =
         @"varying vec2 v_texCoord;
@@ -205,7 +127,7 @@ gl_FragColor = texColor * u_baseColor;
     public const string FragShaderSrcPremultipliedAlphaTegra = Tegra + FragShaderSrcPremultipliedAlpha_Base;
 
     // Normal & Add & Mult 共通（クリッピングされたものの描画用）
-    public const string FragShaderSrcMask_ES2 = ES2C + FragShaderSrcMask_Base;
+    public const string FragShaderSrcMask_ES2 = GLES2C + FragShaderSrcMask_Base;
     public const string FragShaderSrcMask_Normal = Normal + FragShaderSrcMask_Base;
     public const string FragShaderSrcMask_Base =
         @"varying vec2 v_texCoord;
@@ -232,7 +154,7 @@ gl_FragColor = col_formask;
     public const string FragShaderSrcMaskTegra = Tegra + FragShaderSrcMask_Base;
 
     // Normal & Add & Mult 共通（クリッピングされて反転使用の描画用）
-    public const string FragShaderSrcMaskInverted_ES2 = ES2C + FragShaderSrcMaskInverted_Base;
+    public const string FragShaderSrcMaskInverted_ES2 = GLES2C + FragShaderSrcMaskInverted_Base;
     public const string FragShaderSrcMaskInverted_Normal = Normal + FragShaderSrcMaskInverted_Base;
     public const string FragShaderSrcMaskInverted_Base =
         @"varying vec2 v_texCoord;
@@ -259,7 +181,7 @@ gl_FragColor = col_formask;
     public const string FragShaderSrcMaskInvertedTegra = Tegra + FragShaderSrcMaskInverted_Base;
 
     // Normal & Add & Mult 共通（クリッピングされたものの描画用、PremultipliedAlphaの場合）
-    public const string FragShaderSrcMaskPremultipliedAlpha_ES2 = ES2C + FragShaderSrcMaskPremultipliedAlpha_Base;
+    public const string FragShaderSrcMaskPremultipliedAlpha_ES2 = GLES2C + FragShaderSrcMaskPremultipliedAlpha_Base;
     public const string FragShaderSrcMaskPremultipliedAlpha_Normal = Normal + FragShaderSrcMaskPremultipliedAlpha_Base;
     public const string FragShaderSrcMaskPremultipliedAlpha_Base =
         @"varying vec2 v_texCoord;
@@ -285,7 +207,7 @@ gl_FragColor = col_formask;
     public const string FragShaderSrcMaskPremultipliedAlphaTegra = Tegra + FragShaderSrcMaskPremultipliedAlpha_Base;
 
     // Normal & Add & Mult 共通（クリッピングされて反転使用の描画用、PremultipliedAlphaの場合）
-    public const string FragShaderSrcMaskInvertedPremultipliedAlpha_ES2 = ES2C + FragShaderSrcMaskInvertedPremultipliedAlpha_Base;
+    public const string FragShaderSrcMaskInvertedPremultipliedAlpha_ES2 = GLES2C + FragShaderSrcMaskInvertedPremultipliedAlpha_Base;
     public const string FragShaderSrcMaskInvertedPremultipliedAlpha_Normal = Normal + FragShaderSrcMaskInvertedPremultipliedAlpha_Base;
     public const string FragShaderSrcMaskInvertedPremultipliedAlpha_Base =
         @"varying vec2 v_texCoord;
@@ -401,9 +323,9 @@ gl_FragColor = col_formask;
         int SRC_ALPHA;
         int DST_ALPHA;
 
-        if (renderer.GetClippingContextBufferForMask() != null) // マスク生成時
+        if (renderer.ClippingContextBufferForMask != null) // マスク生成時
         {
-            var shaderSet = _shaderSets[(int)ShaderNames.ShaderNames_SetupMask];
+            var shaderSet = _shaderSets[(int)ShaderNames.SetupMask];
             GL.glUseProgram(shaderSet.ShaderProgram);
 
             //テクスチャ設定
@@ -420,13 +342,13 @@ gl_FragColor = col_formask;
             GL.glVertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 2, uvArray);
 
             // チャンネル
-            var channelNo = renderer.GetClippingContextBufferForMask()._layoutChannelNo;
-            var colorChannel = renderer.GetClippingContextBufferForMask().GetClippingManager().GetChannelFlagAsColor(channelNo);
+            var channelNo = renderer.ClippingContextBufferForMask._layoutChannelNo;
+            var colorChannel = renderer.ClippingContextBufferForMask.GetClippingManager().GetChannelFlagAsColor(channelNo);
             GL.glUniform4f(shaderSet.UnifromChannelFlagLocation, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
 
-            GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, renderer.GetClippingContextBufferForMask()._matrixForMask.Tr);
+            GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, renderer.ClippingContextBufferForMask._matrixForMask.Tr);
 
-            RectF rect = renderer.GetClippingContextBufferForMask()._layoutBounds;
+            RectF rect = renderer.ClippingContextBufferForMask._layoutBounds;
 
             GL.glUniform4f(shaderSet.UniformBaseColorLocation,
                         rect.X * 2.0f - 1.0f,
@@ -443,31 +365,31 @@ gl_FragColor = col_formask;
         }
         else // マスク生成以外の場合
         {
-            bool masked = renderer.GetClippingContextBufferForDraw() != null;  // この描画オブジェクトはマスク対象か
+            bool masked = renderer.ClippingContextBufferForDraw != null;  // この描画オブジェクトはマスク対象か
             var offset = (masked ? (invertedMask ? 2 : 1) : 0) + (isPremultipliedAlpha ? 3 : 0);
 
             CubismShaderSet shaderSet;
             switch (colorBlendMode)
             {
-                case CubismBlendMode.CubismBlendMode_Normal:
+                case CubismBlendMode.Normal:
                 default:
-                    shaderSet = _shaderSets[(int)ShaderNames.ShaderNames_Normal + offset];
+                    shaderSet = _shaderSets[(int)ShaderNames.Normal + offset];
                     SRC_COLOR = GL.GL_ONE;
                     DST_COLOR = GL.GL_ONE_MINUS_SRC_ALPHA;
                     SRC_ALPHA = GL.GL_ONE;
                     DST_ALPHA = GL.GL_ONE_MINUS_SRC_ALPHA;
                     break;
 
-                case CubismBlendMode.CubismBlendMode_Additive:
-                    shaderSet = _shaderSets[(int)ShaderNames.ShaderNames_Add + offset];
+                case CubismBlendMode.Additive:
+                    shaderSet = _shaderSets[(int)ShaderNames.Add + offset];
                     SRC_COLOR = GL.GL_ONE;
                     DST_COLOR = GL.GL_ONE;
                     SRC_ALPHA = GL.GL_ZERO;
                     DST_ALPHA = GL.GL_ONE;
                     break;
 
-                case CubismBlendMode.CubismBlendMode_Multiplicative:
-                    shaderSet = _shaderSets[(int)ShaderNames.ShaderNames_Mult + offset];
+                case CubismBlendMode.Multiplicative:
+                    shaderSet = _shaderSets[(int)ShaderNames.Mult + offset];
                     SRC_COLOR = GL.GL_DST_COLOR;
                     DST_COLOR = GL.GL_ONE_MINUS_SRC_ALPHA;
                     SRC_ALPHA = GL.GL_ZERO;
@@ -488,18 +410,20 @@ gl_FragColor = col_formask;
             {
                 GL.glActiveTexture(GL.GL_TEXTURE1);
 
+                var draw = renderer.ClippingContextBufferForDraw!;
+
                 // frameBufferに書かれたテクスチャ
-                var tex = renderer.GetMaskBuffer(renderer.GetClippingContextBufferForDraw()._bufferIndex).GetColorBuffer();
+                var tex = renderer.GetMaskBuffer(draw._bufferIndex).ColorBuffer;
 
                 GL.glBindTexture(GL.GL_TEXTURE_2D, tex);
                 GL.glUniform1i(shaderSet.SamplerTexture1Location, 1);
 
                 // View座標をClippingContextの座標に変換するための行列を設定
-                GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, renderer.GetClippingContextBufferForDraw()._matrixForDraw.Tr);
+                GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, draw._matrixForDraw.Tr);
 
                 // 使用するカラーチャンネルを設定
-                var channelNo = renderer.GetClippingContextBufferForDraw()._layoutChannelNo;
-                var colorChannel = renderer.GetClippingContextBufferForDraw().GetClippingManager().GetChannelFlagAsColor(channelNo);
+                var channelNo = draw._layoutChannelNo;
+                var colorChannel = draw.GetClippingManager().GetChannelFlagAsColor(channelNo);
                 GL.glUniform4f(shaderSet.UnifromChannelFlagLocation, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
             }
 
@@ -835,14 +759,14 @@ gl_FragColor = col_formask;
 
         if (!CompileShaderSource(out int vertShader, GL.GL_VERTEX_SHADER, vertShaderSrc))
         {
-            CubismLog.CubismLogError("Vertex shader compile error!");
+            CubismLog.CubismLogError("[Live2D SDK]Vertex shader compile error!");
             return 0;
         }
 
         // Create and compile fragment shader.
         if (!CompileShaderSource(out int fragShader, GL.GL_FRAGMENT_SHADER, fragShaderSrc))
         {
-            CubismLog.CubismLogError("Fragment shader compile error!");
+            CubismLog.CubismLogError("[Live2D SDK]Fragment shader compile error!");
             return 0;
         }
 
@@ -855,7 +779,7 @@ gl_FragColor = col_formask;
         // Link program.
         if (!LinkProgram(shaderProgram))
         {
-            CubismLog.CubismLogError("Failed to link program: %d", shaderProgram);
+            CubismLog.CubismLogError("[Live2D SDK]Failed to link program: %d", shaderProgram);
 
             if (vertShader != 0)
             {
@@ -910,7 +834,7 @@ gl_FragColor = col_formask;
         if (logLength > 0)
         {
             GL.glGetShaderInfoLog(outShader, out string log);
-            CubismLog.CubismLogError($"Shader compile log: {log}");
+            CubismLog.CubismLogError($"[Live2D SDK]Shader compile log: {log}");
         }
 
         GL.glGetShaderiv(outShader, GL.GL_COMPILE_STATUS, &status);
@@ -939,7 +863,7 @@ gl_FragColor = col_formask;
         if (logLength > 0)
         {
             GL.glGetProgramInfoLog(shaderProgram, out string log);
-            CubismLog.CubismLogError($"Program link log: {log}");
+            CubismLog.CubismLogError($"[Live2D SDK]Program link log: {log}");
         }
 
         GL.glGetProgramiv(shaderProgram, GL.GL_LINK_STATUS, &status);
@@ -966,7 +890,7 @@ gl_FragColor = col_formask;
         if (logLength > 0)
         {
             GL.glGetProgramInfoLog(shaderProgram, out string log);
-            CubismLog.CubismLogError($"Validate program log: {log}");
+            CubismLog.CubismLogError($"[Live2D SDK]Validate program log: {log}");
         }
 
         GL.glGetProgramiv(shaderProgram, GL.GL_VALIDATE_STATUS, &status);
