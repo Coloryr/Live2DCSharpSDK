@@ -78,7 +78,7 @@ public class CubismPhysics
         Wind.Y = 0;
         _currentRemainTime = 0.0f;
 
-        var obj = JsonConvert.DeserializeObject<CubismPhysicsObj>(buffer) 
+        var obj = JsonConvert.DeserializeObject<CubismPhysicsObj>(buffer)
             ?? throw new Exception("physics3.json error");
 
         _physicsRig = new CubismPhysicsRig
