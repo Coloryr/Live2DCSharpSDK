@@ -215,7 +215,7 @@ public static partial class CubismCore
     /// <param name="outOriginInPixels">Origin of model on canvas.</param>
     /// <param name="outPixelsPerUnit">Aspect used for scaling pixels to units.</param>
     [DllImport("Live2DCubismCore", EntryPoint = "csmReadCanvasInfo")]
-    internal extern static void ReadCanvasInfo(IntPtr model, out Vector2 outSizeInPixels, 
+    internal extern static void ReadCanvasInfo(IntPtr model, out Vector2 outSizeInPixels,
         out Vector2 outOriginInPixels, out float outPixelsPerUnit);
 
     //PARAMETERS

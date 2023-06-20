@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace Live2DCSharpSDK.Framework;
+﻿namespace Live2DCSharpSDK.Framework;
 
 public class CubismCdiJson
 {

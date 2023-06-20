@@ -1,6 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
 using System.Numerics;
-using System.Reflection;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
