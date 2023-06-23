@@ -1,4 +1,5 @@
 ﻿using Avalonia.OpenGL;
+using Avalonia.OpenGL.Controls;
 using Live2DCSharpSDK.Framework.Rendering.OpenGL;
 using System;
 using System.Runtime.InteropServices;
@@ -8,7 +9,7 @@ namespace Live2DCSharpSDK.Avalonia;
 
 public class AvaloniaApi : OpenGLApi
 {
-    private OpenGlPageControl Con;
+    private readonly OpenGlControlBase Con;
     private readonly GlInterface GL;
     public override bool IsES2 => true;
     public override bool IsPhoneES2 => false;
@@ -45,7 +46,7 @@ public class AvaloniaApi : OpenGLApi
     public Func12 Uniform4f;
     public Func5 ValidateProgram;
 
-    public AvaloniaApi(OpenGlPageControl con, GlInterface gl)
+    public AvaloniaApi(OpenGlControlBase con, GlInterface gl)
     {
         Con = con;
         GL = gl;
