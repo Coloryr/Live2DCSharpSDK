@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Live2DCSharpSDK.OpenTK": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

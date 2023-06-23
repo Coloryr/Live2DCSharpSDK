@@ -351,13 +351,23 @@ public class AvaloniaApi : OpenGLApi
         ValidateProgram(index);
     }
 
-    public override unsafe void glVertexAttribPointer(int index, int length, int type, bool b, int size, float* arr)
+    public override unsafe void glVertexAttribPointer(int index, int length, int type, bool b, int size, nint arr)
     {
-        GL.VertexAttribPointer(index, length, type, b ? 1 : 0, size, new IntPtr(arr));
+        GL.VertexAttribPointer(index, length, type, b ? 1 : 0, size, arr);
     }
 
     public override void glViewport(int x, int y, int w, int h)
     {
         GL.Viewport(x, y, w, h);
+    }
+
+    public override int glGenBuffer()
+    {
+        return GL.GenBuffer();
+    }
+
+    public override void glBufferData(int type, int v1, nint v2, int type1)
+    {
+        GL.BufferData(type, v1, v2, type1);
     }
 }

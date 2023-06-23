@@ -1,5 +1,8 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Type;
+using System.Runtime.InteropServices;
+using static Live2DCSharpSDK.Framework.Physics.CubismPhysicsObj.PhysicsSetting;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
@@ -267,10 +270,7 @@ gl_FragColor = col_formask;
     /// <returns>インスタンスのポインタ</returns>
     internal static CubismShader_OpenGLES2 GetInstance(OpenGLApi gl)
     {
-        if (s_instance == null)
-        {
-            s_instance = new CubismShader_OpenGLES2(gl);
-        }
+        s_instance ??= new CubismShader_OpenGLES2(gl);
         return s_instance;
     }
 
@@ -302,15 +302,12 @@ gl_FragColor = col_formask;
     /// <param name="isPremultipliedAlpha">乗算済みアルファかどうか</param>
     /// <param name="matrix4x4">Model-View-Projection行列</param>
     /// <param name="invertedMask">マスクを反転して使用するフラグ</param>
-    internal unsafe void SetupShaderProgram(CubismRenderer_OpenGLES2 renderer, int textureId
-                            , int vertexCount, float* vertexArray
-                            , float* uvArray, float opacity
-                            , CubismBlendMode colorBlendMode
-                            , CubismTextureColor baseColor
-                            , CubismTextureColor multiplyColor
-                            , CubismTextureColor screenColor
-                            , bool isPremultipliedAlpha, CubismMatrix44 matrix4x4
-                            , bool invertedMask)
+    internal unsafe void SetupShaderProgram(CubismRenderer_OpenGLES2 renderer, int textureId , CubismBlendMode colorBlendMode
+                    , CubismTextureColor baseColor
+                    , CubismTextureColor multiplyColor
+                    , CubismTextureColor screenColor
+                    , bool isPremultipliedAlpha, CubismMatrix44 matrix4x4
+                    , bool invertedMask)
     {
         if (_shaderSets.Count == 0)
         {
@@ -335,11 +332,11 @@ gl_FragColor = col_formask;
 
             // 頂点配列の設定
             GL.glEnableVertexAttribArray(shaderSet.AttributePositionLocation);
-            GL.glVertexAttribPointer(shaderSet.AttributePositionLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 2, vertexArray);
+            GL.glVertexAttribPointer(shaderSet.AttributePositionLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 4, 0);
 
             // テクスチャ頂点の設定
             GL.glEnableVertexAttribArray(shaderSet.AttributeTexCoordLocation);
-            GL.glVertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 2, uvArray);
+            GL.glVertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 4, 2 * sizeof(float));
 
             // チャンネル
             var channelNo = renderer.ClippingContextBufferForMask._layoutChannelNo;
@@ -401,10 +398,11 @@ gl_FragColor = col_formask;
 
             // 頂点配列の設定
             GL.glEnableVertexAttribArray(shaderSet.AttributePositionLocation);
-            GL.glVertexAttribPointer(shaderSet.AttributePositionLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 2, vertexArray);
+            GL.glVertexAttribPointer(shaderSet.AttributePositionLocation, 2, GL.GL_FLOAT, false, 4 * sizeof(float), 0);
+
             // テクスチャ頂点の設定
             GL.glEnableVertexAttribArray(shaderSet.AttributeTexCoordLocation);
-            GL.glVertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, GL.GL_FLOAT, false, sizeof(float) * 2, uvArray);
+            GL.glVertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, GL.GL_FLOAT, false, 4 * sizeof(float), 2 * sizeof(float));
 
             if (masked)
             {
