@@ -134,9 +134,9 @@ public class OpenTKApi : OpenGLApi
         GL.DisableVertexAttribArray(index);
     }
 
-    public override unsafe void glDrawElements(int type, int count, int type1, ushort* arry)
+    public override unsafe void glDrawElements(int type, int count, int type1, nint arry)
     {
-        GL.DrawElements((PrimitiveType)type, count, (DrawElementsType)type1, new IntPtr(arry));
+        GL.DrawElements((PrimitiveType)type, count, (DrawElementsType)type1, (int)arry);
     }
 
     public override void glEnable(int bit)
@@ -280,9 +280,9 @@ public class OpenTKApi : OpenGLApi
         GL.ValidateProgram(index);
     }
 
-    public override unsafe void glVertexAttribPointer(int index, int length, int type, bool b, int size, float* arr)
+    public override unsafe void glVertexAttribPointer(int index, int length, int type, bool b, int size, nint arr)
     {
-        GL.VertexAttribPointer(index, length, (VertexAttribPointerType)type, b, size, new IntPtr(arr));
+        GL.VertexAttribPointer(index, length, (VertexAttribPointerType)type, b, size, arr);
     }
 
     public override void glViewport(int x, int y, int w, int h)
@@ -293,5 +293,25 @@ public class OpenTKApi : OpenGLApi
     public override int glGetError()
     {
         return (int)GL.GetError();
+    }
+
+    public override int glGenBuffer()
+    {
+        return GL.GenBuffer();
+    }
+
+    public override void glBufferData(int type, int v1, nint v2, int type1)
+    {
+        GL.BufferData((BufferTarget)type, v1, v2, (BufferUsageHint)type1);
+    }
+
+    public override int glGenVertexArray()
+    {
+        return GL.GenVertexArray();
+    }
+
+    public override void glBindVertexArray(int vertexArray)
+    {
+        GL.BindVertexArray(vertexArray);
     }
 }

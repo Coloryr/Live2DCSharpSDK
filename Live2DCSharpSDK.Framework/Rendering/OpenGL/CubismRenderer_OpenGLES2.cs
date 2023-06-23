@@ -1,5 +1,8 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
+using System;
 using System.Numerics;
+using System.Runtime.InteropServices;
+using static Live2DCSharpSDK.Framework.Rendering.OpenGL.CubismShader_OpenGLES2;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
@@ -36,6 +39,21 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     /// </summary>
     internal CubismClippingContext? ClippingContextBufferForDraw { get; set; }
 
+    internal int VertexArray { get; private set; }
+    internal int VertexBuffer { get; private set; }
+    internal int IndexBuffer { get; private set; }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    internal struct VBO
+    {
+        public float ver0;
+        public float ver1;
+        public float uv0;
+        public float uv1;
+    }
+
+    internal VBO[] vbo = Array.Empty<VBO>();
+
     /// <summary>
     /// マスク描画用のフレームバッファ
     /// </summary>
@@ -57,6 +75,10 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         GL = gl;
         _rendererProfile = new(gl);
         _textures = new Dictionary<int, int>(32);
+
+        VertexArray = GL.glGenVertexArray();
+        VertexBuffer = GL.glGenBuffer();
+        IndexBuffer = GL.glGenBuffer();
 
         // 1未満は1に補正する
         if (maskBufferCount < 1)
@@ -242,17 +264,47 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
             drawTextureId = -1;
         }
 
-        CubismShader_OpenGLES2.GetInstance(GL).SetupShaderProgram(
-            this, drawTextureId, vertexCount, vertexArray, uvArray
-            , opacity, colorBlendMode, modelColorRGBA, multiplyColor, screenColor, IsPremultipliedAlpha()
-            , GetMvpMatrix(), invertedMask
+        GL.glBindVertexArray(VertexArray);
+
+        if (vbo == null || vbo.Length != vertexCount)
+        {
+            vbo = new VBO[vertexCount];
+        }
+
+        for (int a = 0; a < vertexCount; a++)
+        {
+            vbo[a].ver0 = vertexArray[a * 2];
+            vbo[a].ver1 = vertexArray[a * 2 + 1];
+            vbo[a].uv0 = uvArray[a * 2];
+            vbo[a].uv1 = uvArray[a * 2 + 1];
+        }
+
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, VertexBuffer);
+        fixed (void* p = vbo)
+        {
+            GL.glBufferData(GL.GL_ARRAY_BUFFER, vertexCount * sizeof(VBO), new IntPtr(p), GL.GL_STATIC_DRAW);
+        }
+
+        GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, IndexBuffer);
+
+        GL.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(ushort), new IntPtr(indexArray), GL.GL_STATIC_DRAW);
+
+        GetInstance(GL).SetupShaderProgram(
+            this, drawTextureId, colorBlendMode, modelColorRGBA,
+            multiplyColor, screenColor, IsPremultipliedAlpha(),
+            GetMvpMatrix(), invertedMask
         );
 
+        GL.glBindVertexArray(VertexArray);
+
         // ポリゴンメッシュを描画する
-        GL.glDrawElements(GL.GL_TRIANGLES, indexCount, GL.GL_UNSIGNED_SHORT, indexArray);
+        GL.glDrawElements(GL.GL_TRIANGLES, indexCount, GL.GL_UNSIGNED_SHORT, 0);
 
         // 後処理
         GL.glUseProgram(0);
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
+        GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GL.glBindVertexArray(0);
         ClippingContextBufferForDraw = null;
         ClippingContextBufferForMask = null;
     }
