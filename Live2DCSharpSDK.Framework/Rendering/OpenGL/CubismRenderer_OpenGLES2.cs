@@ -1,5 +1,4 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
-using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using static Live2DCSharpSDK.Framework.Rendering.OpenGL.CubismShader_OpenGLES2;

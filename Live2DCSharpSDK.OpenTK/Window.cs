@@ -21,10 +21,9 @@ public class Window : GameWindow
     {
         base.OnLoad();
         lapp = new(new OpenTKApi(this), Console.WriteLine);
-        var model = lapp.Live2dManager.LoadModel("F:\\live2d\\koharu_haruto\\偙偼傞\\runtime\\", "koharu");
-        //
+        //var model = lapp.Live2dManager.LoadModel("F:\\live2d\\koharu_haruto\\偙偼傞\\runtime\\", "koharu");
 
-        //var model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Haru\\", "Haru");
         //model.ModelMatrix.TranslateX(0.9f);
 
         //model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
