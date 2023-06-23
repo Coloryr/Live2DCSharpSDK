@@ -1,8 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Type;
-using System.Runtime.InteropServices;
-using static Live2DCSharpSDK.Framework.Physics.CubismPhysicsObj.PhysicsSetting;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
@@ -302,7 +299,7 @@ gl_FragColor = col_formask;
     /// <param name="isPremultipliedAlpha">乗算済みアルファかどうか</param>
     /// <param name="matrix4x4">Model-View-Projection行列</param>
     /// <param name="invertedMask">マスクを反転して使用するフラグ</param>
-    internal unsafe void SetupShaderProgram(CubismRenderer_OpenGLES2 renderer, int textureId , CubismBlendMode colorBlendMode
+    internal unsafe void SetupShaderProgram(CubismRenderer_OpenGLES2 renderer, int textureId, CubismBlendMode colorBlendMode
                     , CubismTextureColor baseColor
                     , CubismTextureColor multiplyColor
                     , CubismTextureColor screenColor

@@ -9,7 +9,7 @@ namespace Live2DCSharpSDK.Avalonia;
 public class AvaloniaApi : OpenGLApi
 {
     private OpenGlPageControl Con;
-    private GlInterface GL;
+    private readonly GlInterface GL;
     public override bool IsES2 => true;
     public override bool IsPhoneES2 => false;
 
@@ -186,9 +186,9 @@ public class AvaloniaApi : OpenGLApi
         DisableVertexAttribArray(index);
     }
 
-    public override unsafe void glDrawElements(int type, int count, int type1, ushort* arry)
+    public override unsafe void glDrawElements(int type, int count, int type1, nint arry)
     {
-        GL.DrawElements(type, count, type1, new IntPtr(arry));
+        GL.DrawElements(type, count, type1, arry);
     }
 
     public override void glEnable(int bit)
@@ -369,5 +369,15 @@ public class AvaloniaApi : OpenGLApi
     public override void glBufferData(int type, int v1, nint v2, int type1)
     {
         GL.BufferData(type, v1, v2, type1);
+    }
+
+    public override int glGenVertexArray()
+    {
+        return GL.GenVertexArray();
+    }
+
+    public override void glBindVertexArray(int vertexArray)
+    {
+        GL.BindVertexArray(vertexArray);
     }
 }

@@ -7,6 +7,7 @@ using Avalonia.Threading;
 using Live2DCSharpSDK.App;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Avalonia;
 
@@ -42,21 +43,6 @@ public class OpenGlPageControl : OpenGlControlBase
         private set => SetAndRaise(InfoProperty, ref _info, value);
     }
 
-    public OpenGlPageControl()
-    {
-        new Thread(() =>
-        {
-            while (true)
-            {
-                if (render)
-                {
-                    Dispatcher.UIThread.Invoke(RequestNextFrameRendering);
-                }
-                Thread.Sleep(15);
-            }
-        }).Start();
-    }
-
     private static void CheckError(GlInterface gl)
     {
         int err;
@@ -83,7 +69,7 @@ public class OpenGlPageControl : OpenGlControlBase
 
     protected override void OnOpenGlDeinit(GlInterface GL)
     {
-
+        render = false;
     }
 
     protected override void OnOpenGlRender(GlInterface gl, int fb)
@@ -103,5 +89,14 @@ public class OpenGlPageControl : OpenGlControlBase
         }
         lapp.Run(span);
         CheckError(gl);
+
+        Task.Run(() =>
+        {
+            Thread.Sleep(15);
+            if (render)
+            {
+                Dispatcher.UIThread.Invoke(RequestNextFrameRendering);
+            }
+        });
     }
 }
