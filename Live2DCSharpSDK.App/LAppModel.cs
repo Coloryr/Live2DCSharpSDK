@@ -57,7 +57,7 @@ public class LAppModel : CubismUserModel
     }
     public List<string> Parameters => new(Model._parameterIds);
 
-    public bool RandomMotion { get; set; }
+    public bool RandomMotion { get; set; } = true;
     public bool CustomValueUpdate { get; set; }
 
     public Action<LAppModel>? ValueUpdate;
