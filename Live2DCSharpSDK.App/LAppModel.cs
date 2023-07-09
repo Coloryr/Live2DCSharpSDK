@@ -42,6 +42,11 @@ public class LAppModel : CubismUserModel
     public List<string> Motions => new(_motions.Keys);
     public List<string> Expressions => new(_expressions.Keys);
 
+    public bool RandomMotion { get; set; }
+    public bool CustomValueUpdate { get; set; }
+
+    public Action<LAppModel>? ValueUpdate;
+
     /// <summary>
     /// パラメータID: ParamAngleX
     /// </summary>
@@ -326,7 +331,7 @@ public class LAppModel : CubismUserModel
 
         //-----------------------------------------------------------------
         Model.LoadParameters(); // 前回セーブされた状態をロード
-        if (_motionManager.IsFinished())
+        if (_motionManager.IsFinished() && RandomMotion)
         {
             // モーションの再生がない場合、待機モーションの中からランダムで再生する
             StartRandomMotion(LAppDefine.MotionGroupIdle, MotionPriority.PriorityIdle);
@@ -351,18 +356,25 @@ public class LAppModel : CubismUserModel
 
         _expressionManager?.UpdateMotion(Model, deltaTimeSeconds); // 表情でパラメータ更新（相対変化）
 
-        //ドラッグによる変化
-        //ドラッグによる顔の向きの調整
-        Model.AddParameterValue(_idParamAngleX, _dragX * 30); // -30から30の値を加える
-        Model.AddParameterValue(_idParamAngleY, _dragY * 30);
-        Model.AddParameterValue(_idParamAngleZ, _dragX * _dragY * -30);
+        if (CustomValueUpdate)
+        {
+            ValueUpdate?.Invoke(this);
+        }
+        else
+        {
+            //ドラッグによる変化
+            //ドラッグによる顔の向きの調整
+            Model.AddParameterValue(_idParamAngleX, _dragX * 30); // -30から30の値を加える
+            Model.AddParameterValue(_idParamAngleY, _dragY * 30);
+            Model.AddParameterValue(_idParamAngleZ, _dragX * _dragY * -30);
 
-        //ドラッグによる体の向きの調整
-        Model.AddParameterValue(_idParamBodyAngleX, _dragX * 10); // -10から10の値を加える
+            //ドラッグによる体の向きの調整
+            Model.AddParameterValue(_idParamBodyAngleX, _dragX * 10); // -10から10の値を加える
 
-        //ドラッグによる目の向きの調整
-        Model.AddParameterValue(_idParamEyeBallX, _dragX); // -1から1の値を加える
-        Model.AddParameterValue(_idParamEyeBallY, _dragY);
+            //ドラッグによる目の向きの調整
+            Model.AddParameterValue(_idParamEyeBallX, _dragX); // -1から1の値を加える
+            Model.AddParameterValue(_idParamEyeBallY, _dragY);
+        }
 
         // 呼吸など
         _breath?.UpdateParameters(Model, deltaTimeSeconds);
