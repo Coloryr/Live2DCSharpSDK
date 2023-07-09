@@ -622,6 +622,8 @@ public class CubismModel : IDisposable
     /// <param name="weight">重み</param>
     public void AddParameterValue(int parameterIndex, float value, float weight = 1.0f)
     {
+        if (parameterIndex == -1)
+            return;
         SetParameterValue(parameterIndex, (GetParameterValue(parameterIndex) + (value * weight)));
     }
 
@@ -645,6 +647,8 @@ public class CubismModel : IDisposable
     /// <param name="weight">重み</param>
     public void MultiplyParameterValue(int parameterIndex, float value, float weight = 1.0f)
     {
+        if (parameterIndex == -1)
+            return;
         SetParameterValue(parameterIndex, GetParameterValue(parameterIndex) * (1.0f + (value - 1.0f) * weight));
     }
 
