@@ -22,7 +22,11 @@ public static class CubismFramework
     private static bool s_isInitialized = false;
     private static ICubismAllocator? s_allocator;
     private static Option? s_option;
-    private static CubismIdManager? s_cubismIdManager;
+
+    /// <summary>
+    /// IDマネージャのインスタンスを取得する。
+    /// </summary>
+    public static CubismIdManager CubismIdManager { get; private set; } = null!;
 
     /// <summary>
     /// Cubism FrameworkのAPIを使用可能にする。
@@ -116,7 +120,7 @@ public static class CubismFramework
             return;
         }
 
-        s_cubismIdManager = new CubismIdManager();
+        CubismIdManager = new CubismIdManager();
 
         s_isInitialized = true;
 
@@ -183,15 +187,6 @@ public static class CubismFramework
             return s_option.LoggingLevel;
 
         return LogLevel.Off;
-    }
-
-    /// <summary>
-    /// IDマネージャのインスタンスを取得する。
-    /// </summary>
-    /// <returns>CubismIdManagerクラスのインスタンス</returns>
-    public static CubismIdManager GetIdManager()
-    {
-        return s_cubismIdManager!;
     }
 
     public static IntPtr Allocate(int size)

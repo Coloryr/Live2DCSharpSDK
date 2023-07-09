@@ -55,8 +55,7 @@ public class CubismPose
         }
 
         // パーツグループ
-        var poseListInfo = json[Groups] as JArray;
-        if (poseListInfo == null)
+        if (json[Groups] is not JArray poseListInfo)
             return;
 
         foreach (var item in poseListInfo)
@@ -69,7 +68,7 @@ public class CubismPose
                 var partInfo = item[groupIndex]!;
                 PartData partData = new()
                 {
-                    PartId = CubismFramework.GetIdManager().GetId(partInfo[Id]!.ToString())
+                    PartId = CubismFramework.CubismIdManager.GetId(partInfo[Id]!.ToString())
                 };
 
                 // リンクするパーツの設定
@@ -82,7 +81,7 @@ public class CubismPose
                     {
                         partData.Link.Add(new()
                         {
-                            PartId = CubismFramework.GetIdManager().GetId(linkListInfo[linkIndex]!.ToString())
+                            PartId = CubismFramework.CubismIdManager.GetId(linkListInfo[linkIndex]!.ToString())
                         });
                     }
                 }

@@ -325,7 +325,7 @@ public unsafe class CubismMotion : ACubismMotion
             string key = item.Target;
             _motionData.Curves[curveCount] = new()
             {
-                Id = CubismFramework.GetIdManager().GetId(item.Id),
+                Id = CubismFramework.CubismIdManager.GetId(item.Id),
                 BaseSegmentIndex = totalSegmentCount,
                 FadeInTime = item.FadeInTime != null ? (float)item.FadeInTime : -1.0f,
                 FadeOutTime = item.FadeOutTime != null ? (float)item.FadeOutTime : -1.0f,
@@ -483,11 +483,11 @@ public unsafe class CubismMotion : ACubismMotion
     /// <param name="motionQueueEntry">CubismMotionQueueManagerで管理されているモーション</param>
     public override void DoUpdateParameters(CubismModel model, float userTimeSeconds, float fadeWeight, CubismMotionQueueEntry motionQueueEntry)
     {
-        _modelCurveIdEyeBlink ??= CubismFramework.GetIdManager().GetId(EffectNameEyeBlink);
+        _modelCurveIdEyeBlink ??= CubismFramework.CubismIdManager.GetId(EffectNameEyeBlink);
 
-        _modelCurveIdLipSync ??= CubismFramework.GetIdManager().GetId(EffectNameLipSync);
+        _modelCurveIdLipSync ??= CubismFramework.CubismIdManager.GetId(EffectNameLipSync);
 
-        _modelCurveIdOpacity ??= CubismFramework.GetIdManager().GetId(IdNameOpacity);
+        _modelCurveIdOpacity ??= CubismFramework.CubismIdManager.GetId(IdNameOpacity);
 
         float timeOffsetSeconds = userTimeSeconds - motionQueueEntry.StartTime;
 
@@ -918,7 +918,7 @@ public unsafe class CubismMotion : ACubismMotion
             {
                 if (curve.Id == IdNameOpacity)
                 {
-                    return CubismFramework.GetIdManager().GetId(curve.Id);
+                    return CubismFramework.CubismIdManager.GetId(curve.Id);
                 }
             }
         }
