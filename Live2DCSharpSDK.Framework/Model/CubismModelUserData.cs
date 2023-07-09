@@ -33,7 +33,7 @@ public class CubismModelUserData
     {
         var obj = JsonConvert.DeserializeObject<CubismModelUserDataObj>(data)!;
 
-        string typeOfArtMesh = CubismFramework.GetIdManager().GetId(ArtMesh);
+        string typeOfArtMesh = CubismFramework.CubismIdManager.GetId(ArtMesh);
 
         int nodeCount = obj.Meta.UserDataCount;
 
@@ -42,9 +42,9 @@ public class CubismModelUserData
             var node = obj.UserData[i];
             CubismModelUserDataNode addNode = new()
             {
-                TargetId = CubismFramework.GetIdManager().GetId(node.Id),
-                TargetType = CubismFramework.GetIdManager().GetId(node.Target),
-                Value = CubismFramework.GetIdManager().GetId(node.Value)
+                TargetId = CubismFramework.CubismIdManager.GetId(node.Id),
+                TargetType = CubismFramework.CubismIdManager.GetId(node.Target),
+                Value = CubismFramework.CubismIdManager.GetId(node.Value)
             };
             _userDataNodes.Add(addNode);
 

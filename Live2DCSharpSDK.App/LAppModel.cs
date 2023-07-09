@@ -87,6 +87,9 @@ public class LAppModel : CubismUserModel
     /// </summary>
     public string IdParamEyeBallY { get; set; }
 
+    public string IdParamBreath { get; set; } = CubismFramework.CubismIdManager
+        .GetId(CubismDefaultParameterId.ParamBreath);
+
     /// <summary>
     /// wavファイルハンドラ
     /// </summary>
@@ -107,17 +110,17 @@ public class LAppModel : CubismUserModel
             _mocConsistency = true;
         }
 
-        IdParamAngleX = CubismFramework.GetIdManager()
+        IdParamAngleX = CubismFramework.CubismIdManager
             .GetId(CubismDefaultParameterId.ParamAngleX);
-        IdParamAngleY = CubismFramework.GetIdManager()
+        IdParamAngleY = CubismFramework.CubismIdManager
             .GetId(CubismDefaultParameterId.ParamAngleY);
-        IdParamAngleZ = CubismFramework.GetIdManager().
+        IdParamAngleZ = CubismFramework.CubismIdManager.
             GetId(CubismDefaultParameterId.ParamAngleZ);
-        IdParamBodyAngleX = CubismFramework.GetIdManager()
+        IdParamBodyAngleX = CubismFramework.CubismIdManager
             .GetId(CubismDefaultParameterId.ParamBodyAngleX);
-        IdParamEyeBallX = CubismFramework.GetIdManager()
+        IdParamEyeBallX = CubismFramework.CubismIdManager
             .GetId(CubismDefaultParameterId.ParamEyeBallX);
-        IdParamEyeBallY = CubismFramework.GetIdManager()
+        IdParamEyeBallY = CubismFramework.CubismIdManager
             .GetId(CubismDefaultParameterId.ParamEyeBallY);
 
         _modelHomeDir = dir;
@@ -312,7 +315,7 @@ public class LAppModel : CubismUserModel
                     },
                     new BreathParameterData()
                     {
-                        ParameterId = CubismFramework.GetIdManager().GetId(CubismDefaultParameterId.ParamBreath),
+                        ParameterId = IdParamBreath,
                         Offset = 0.5f,
                         Peak = 0.5f,
                         Cycle = 3.2345f,
@@ -611,7 +614,7 @@ public class LAppModel : CubismUserModel
             {
                 if (_modelSetting.HitAreas[i].Name == hitAreaName)
                 {
-                    var id = CubismFramework.GetIdManager().GetId(_modelSetting.HitAreas[i].Id);
+                    var id = CubismFramework.CubismIdManager.GetId(_modelSetting.HitAreas[i].Id);
 
                     return IsHit(id, x, y);
                 }

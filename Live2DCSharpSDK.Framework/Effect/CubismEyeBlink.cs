@@ -69,7 +69,7 @@ public class CubismEyeBlink
                 {
                     if (item1 == null)
                         continue;
-                    var item2 = CubismFramework.GetIdManager().GetId(item1);
+                    var item2 = CubismFramework.CubismIdManager.GetId(item1);
                     ParameterIds.Add(item2);
                 }
                 break;

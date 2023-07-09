@@ -109,7 +109,7 @@ public class CubismModel : IDisposable
             for (int i = 0; i < parameterCount; ++i)
             {
                 var str = new string(parameterIds[i]);
-                _parameterIds.Add(CubismFramework.GetIdManager().GetId(str));
+                _parameterIds.Add(CubismFramework.CubismIdManager.GetId(str));
             }
         }
 
@@ -120,7 +120,7 @@ public class CubismModel : IDisposable
         for (int i = 0; i < partCount; ++i)
         {
             var str = new string((sbyte*)partIds[i]);
-            _partIds.Add(CubismFramework.GetIdManager().GetId(str));
+            _partIds.Add(CubismFramework.CubismIdManager.GetId(str));
             _partChildDrawables[i] = new();
         }
 
@@ -159,7 +159,7 @@ public class CubismModel : IDisposable
         for (int i = 0; i < drawableCount; ++i)
         {
             var str = new string(drawableIds[i]);
-            _drawableIds.Add(CubismFramework.GetIdManager().GetId(str));
+            _drawableIds.Add(CubismFramework.CubismIdManager.GetId(str));
             _userMultiplyColors.Add(new()
             {
                 IsOverwritten = false,
@@ -352,7 +352,7 @@ public class CubismModel : IDisposable
     {
         var partIds = CubismCore.GetPartIds(Model);
         var str = new string(partIds[partIndex]);
-        return CubismFramework.GetIdManager().GetId(str);
+        return CubismFramework.CubismIdManager.GetId(str);
     }
 
     /// <summary>
@@ -676,7 +676,7 @@ public class CubismModel : IDisposable
     {
         var parameterIds = CubismCore.GetDrawableIds(Model);
         var str = new string(parameterIds[drawableIndex]);
-        return CubismFramework.GetIdManager().GetId(str);
+        return CubismFramework.CubismIdManager.GetId(str);
     }
 
     /// <summary>

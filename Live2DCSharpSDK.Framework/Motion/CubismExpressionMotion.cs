@@ -44,7 +44,7 @@ public class CubismExpressionMotion : ACubismMotion
         for (int i = 0; i < parameterCount; ++i)
         {
             var param = list[i]!;
-            var parameterId = CubismFramework.GetIdManager().GetId(param[ExpressionKeyId]!.ToString()); // パラメータID
+            var parameterId = CubismFramework.CubismIdManager.GetId(param[ExpressionKeyId]!.ToString()); // パラメータID
             var value = (float)param[ExpressionKeyValue]!; // 値
 
             // 計算方法の設定
