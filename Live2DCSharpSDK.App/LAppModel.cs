@@ -41,6 +41,8 @@ public class LAppModel : CubismUserModel
 
     public List<string> Motions => new(_motions.Keys);
     public List<string> Expressions => new(_expressions.Keys);
+    public List<string> Parts => new(Model._partIds);
+    public List<string> Parameters => new(Model._parameterIds);
 
     public bool RandomMotion { get; set; }
     public bool CustomValueUpdate { get; set; }

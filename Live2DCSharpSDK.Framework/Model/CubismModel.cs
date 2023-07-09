@@ -51,9 +51,10 @@ public class CubismModel : IDisposable
     /// </summary>
     private float _modelOpacity;
 
-    private readonly List<string> _parameterIds = new();
-    private readonly List<string> _partIds = new();
-    private readonly List<string> _drawableIds = new();
+    public readonly List<string> _parameterIds = new();
+    public readonly List<string> _partIds = new();
+    public readonly List<string> _drawableIds = new();
+
     /// <summary>
     /// Drawable 乗算色の配列
     /// </summary>
