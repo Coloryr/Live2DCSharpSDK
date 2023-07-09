@@ -41,15 +41,16 @@ public class LAppModel : CubismUserModel
 
     public List<string> Motions => new(_motions.Keys);
     public List<string> Expressions => new(_expressions.Keys);
-    public List<(string, int)> Parts
+    public List<(string, int, float)> Parts
     {
         get
         {
-            var list = new List<(string, int)>();
+            var list = new List<(string, int, float)>();
             var count = Model.GetPartCount();
             for (int a = 0; a < count; a++)
             {
-                list.Add((Model.GetPartId(a), a));
+                list.Add((Model.GetPartId(a), 
+                    a, Model.GetPartOpacity(a)));
             }
             return list;
         }
@@ -64,27 +65,27 @@ public class LAppModel : CubismUserModel
     /// <summary>
     /// パラメータID: ParamAngleX
     /// </summary>
-    private string _idParamAngleX;
+    public string IdParamAngleX { get; set; }
     /// <summary>
     /// パラメータID: ParamAngleY
     /// </summary>
-    private string _idParamAngleY;
+    public string IdParamAngleY { get; set; }
     /// <summary>
     /// パラメータID: ParamAngleZ
     /// </summary>
-    private string _idParamAngleZ;
+    public string IdParamAngleZ { get; set; }
     /// <summary>
     /// パラメータID: ParamBodyAngleX
     /// </summary>
-    private string _idParamBodyAngleX;
+    public string IdParamBodyAngleX { get; set; }
     /// <summary>
     /// パラメータID: ParamEyeBallX
     /// </summary>
-    private string _idParamEyeBallX;
+    public string IdParamEyeBallX { get; set; }
     /// <summary>
     /// パラメータID: ParamEyeBallXY
     /// </summary>
-    private string _idParamEyeBallY;
+    public string IdParamEyeBallY { get; set; }
 
     /// <summary>
     /// wavファイルハンドラ
@@ -106,17 +107,17 @@ public class LAppModel : CubismUserModel
             _mocConsistency = true;
         }
 
-        _idParamAngleX = CubismFramework.GetIdManager()
+        IdParamAngleX = CubismFramework.GetIdManager()
             .GetId(CubismDefaultParameterId.ParamAngleX);
-        _idParamAngleY = CubismFramework.GetIdManager()
+        IdParamAngleY = CubismFramework.GetIdManager()
             .GetId(CubismDefaultParameterId.ParamAngleY);
-        _idParamAngleZ = CubismFramework.GetIdManager().
+        IdParamAngleZ = CubismFramework.GetIdManager().
             GetId(CubismDefaultParameterId.ParamAngleZ);
-        _idParamBodyAngleX = CubismFramework.GetIdManager()
+        IdParamBodyAngleX = CubismFramework.GetIdManager()
             .GetId(CubismDefaultParameterId.ParamBodyAngleX);
-        _idParamEyeBallX = CubismFramework.GetIdManager()
+        IdParamEyeBallX = CubismFramework.GetIdManager()
             .GetId(CubismDefaultParameterId.ParamEyeBallX);
-        _idParamEyeBallY = CubismFramework.GetIdManager()
+        IdParamEyeBallY = CubismFramework.GetIdManager()
             .GetId(CubismDefaultParameterId.ParamEyeBallY);
 
         _modelHomeDir = dir;
@@ -198,53 +199,7 @@ public class LAppModel : CubismUserModel
             _eyeBlink = new CubismEyeBlink(_modelSetting);
         }
 
-        //Breath
-        _breath = new CubismBreath()
-        {
-            Parameters = new()
-                {
-                    new BreathParameterData()
-                    {
-                        ParameterId = _idParamAngleX,
-                        Offset = 0.0f,
-                        Peak = 15.0f,
-                        Cycle = 6.5345f,
-                        Weight = 0.5f
-                    },
-                    new BreathParameterData()
-                    {
-                        ParameterId = _idParamAngleY,
-                        Offset = 0.0f,
-                        Peak = 8.0f,
-                        Cycle = 3.5345f,
-                        Weight = 0.5f
-                    },
-                    new BreathParameterData()
-                    {
-                        ParameterId = _idParamAngleZ,
-                        Offset = 0.0f,
-                        Peak = 10.0f,
-                        Cycle = 5.5345f,
-                        Weight = 0.5f
-                    },
-                    new BreathParameterData()
-                    {
-                        ParameterId = _idParamBodyAngleX,
-                        Offset = 0.0f,
-                        Peak = 4.0f,
-                        Cycle = 15.5345f,
-                        Weight = 0.5f
-                    },
-                    new BreathParameterData()
-                    {
-                        ParameterId = CubismFramework.GetIdManager().GetId(CubismDefaultParameterId.ParamBreath),
-                        Offset = 0.5f,
-                        Peak = 0.5f,
-                        Cycle = 3.2345f,
-                        Weight = 0.5f
-                    }
-                }
-        };
+        LoadBreath();
 
         //UserData
         path = _modelSetting.FileReferences?.UserData;
@@ -316,6 +271,57 @@ public class LAppModel : CubismUserModel
         }
     }
 
+    public void LoadBreath()
+    {
+        //Breath
+        _breath = new CubismBreath()
+        {
+            Parameters = new()
+                {
+                    new BreathParameterData()
+                    {
+                        ParameterId = IdParamAngleX,
+                        Offset = 0.0f,
+                        Peak = 15.0f,
+                        Cycle = 6.5345f,
+                        Weight = 0.5f
+                    },
+                    new BreathParameterData()
+                    {
+                        ParameterId = IdParamAngleY,
+                        Offset = 0.0f,
+                        Peak = 8.0f,
+                        Cycle = 3.5345f,
+                        Weight = 0.5f
+                    },
+                    new BreathParameterData()
+                    {
+                        ParameterId = IdParamAngleZ,
+                        Offset = 0.0f,
+                        Peak = 10.0f,
+                        Cycle = 5.5345f,
+                        Weight = 0.5f
+                    },
+                    new BreathParameterData()
+                    {
+                        ParameterId = IdParamBodyAngleX,
+                        Offset = 0.0f,
+                        Peak = 4.0f,
+                        Cycle = 15.5345f,
+                        Weight = 0.5f
+                    },
+                    new BreathParameterData()
+                    {
+                        ParameterId = CubismFramework.GetIdManager().GetId(CubismDefaultParameterId.ParamBreath),
+                        Offset = 0.5f,
+                        Peak = 0.5f,
+                        Cycle = 3.2345f,
+                        Weight = 0.5f
+                    }
+                }
+        };
+    }
+
     /// <summary>
     /// レンダラを再構築する
     /// </summary>
@@ -378,16 +384,16 @@ public class LAppModel : CubismUserModel
         {
             //ドラッグによる変化
             //ドラッグによる顔の向きの調整
-            Model.AddParameterValue(_idParamAngleX, _dragX * 30); // -30から30の値を加える
-            Model.AddParameterValue(_idParamAngleY, _dragY * 30);
-            Model.AddParameterValue(_idParamAngleZ, _dragX * _dragY * -30);
+            Model.AddParameterValue(IdParamAngleX, _dragX * 30); // -30から30の値を加える
+            Model.AddParameterValue(IdParamAngleY, _dragY * 30);
+            Model.AddParameterValue(IdParamAngleZ, _dragX * _dragY * -30);
 
             //ドラッグによる体の向きの調整
-            Model.AddParameterValue(_idParamBodyAngleX, _dragX * 10); // -10から10の値を加える
+            Model.AddParameterValue(IdParamBodyAngleX, _dragX * 10); // -10から10の値を加える
 
             //ドラッグによる目の向きの調整
-            Model.AddParameterValue(_idParamEyeBallX, _dragX); // -1から1の値を加える
-            Model.AddParameterValue(_idParamEyeBallY, _dragY);
+            Model.AddParameterValue(IdParamEyeBallX, _dragX); // -1から1の値を加える
+            Model.AddParameterValue(IdParamEyeBallY, _dragY);
         }
 
         // 呼吸など
