@@ -12,7 +12,7 @@ public delegate void FinishedMotionCallback(CubismModel model, ACubismMotion sel
 /// </summary>
 /// <param name="eventValue">発火したイベントの文字列データ</param>
 /// <param name="customData">コールバックに返される登録時に指定されたデータ</param>
-public delegate void CubismMotionEventFunction(CubismUserModel customData, string eventValue);
+public delegate void CubismMotionEventFunction(CubismUserModel? customData, string eventValue);
 
 /// <summary>
 /// モーションカーブのセグメントの評価関数。

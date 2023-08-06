@@ -9,11 +9,6 @@ namespace Live2DCSharpSDK.App;
 /// </summary>
 public class LAppAllocator : ICubismAllocator
 {
-    public void Dispose()
-    {
-
-    }
-
     /// <summary>
     /// メモリ領域を割り当てる。
     /// </summary>

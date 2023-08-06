@@ -52,11 +52,6 @@ public class CubismMotionQueueEntry
     public bool IsTriggeredFadeOut { get; private set; }
 
     /// <summary>
-    /// インスタンスごとに一意の値を持つ識別番号
-    /// </summary>
-    public CubismMotionQueueEntry _motionQueueEntryHandle;
-
-    /// <summary>
     /// コンストラクタ。
     /// </summary>
     public CubismMotionQueueEntry()
@@ -64,7 +59,6 @@ public class CubismMotionQueueEntry
         Available = true;
         StartTime = -1.0f;
         EndTime = -1.0f;
-        _motionQueueEntryHandle = this;
     }
 
     /// <summary>

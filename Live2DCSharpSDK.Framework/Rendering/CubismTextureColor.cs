@@ -36,6 +36,7 @@ public record CubismTextureColor
         G = old.G;
         B = old.B;
         A = old.A;
+        Check();
     }
 
     public CubismTextureColor(float r, float g, float b, float a)
@@ -44,5 +45,14 @@ public record CubismTextureColor
         G = g;
         B = b;
         A = a;
+        Check();
+    }
+
+    private void Check()
+    {
+        R = R > 1.0f ? 1f : R;
+        G = G > 1.0f ? 1f : G;
+        R = R > 1.0f ? 1f : R;
+        R = R > 1.0f ? 1f : R;
     }
 }

@@ -11,13 +11,13 @@ namespace Live2DCSharpSDK.Framework.Effect;
 public class CubismEyeBlink
 {
     /// <summary>
-    /// 現在の状態
-    /// </summary>
-    private EyeState _blinkingState;
-    /// <summary>
     /// 操作対象のパラメータのIDのリスト
     /// </summary>
     public readonly List<string> ParameterIds = new();
+    /// <summary>
+    /// 現在の状態
+    /// </summary>
+    private EyeState _blinkingState;
     /// <summary>
     /// 次のまばたきの時刻[秒]
     /// </summary>
@@ -47,7 +47,7 @@ public class CubismEyeBlink
     /// </summary>
     private float _userTimeSeconds;
 
-    private readonly Random random = new();
+    private readonly Random _random = new();
 
     /// <summary>
     /// インスタンスを作成する。
@@ -184,7 +184,7 @@ public class CubismEyeBlink
     /// <returns>次のまばたきを行う時刻[秒]</returns>
     private float DeterminNextBlinkingTiming()
     {
-        float r = random.Next() / int.MaxValue;
+        float r = _random.Next() / int.MaxValue;
 
         return _userTimeSeconds + (r * (2.0f * _blinkingIntervalSeconds - 1.0f));
     }

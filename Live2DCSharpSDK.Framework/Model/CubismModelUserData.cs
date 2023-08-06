@@ -23,7 +23,7 @@ public class CubismModelUserData
     /// <summary>
     /// 閲覧リスト保持
     /// </summary>
-    private readonly List<CubismModelUserDataNode> _artMeshUserDataNodes = new();
+    public readonly List<CubismModelUserDataNode> ArtMeshUserDataNodes = new();
 
     /// <summary>
     /// userdata3.jsonをパースする。
@@ -50,13 +50,8 @@ public class CubismModelUserData
 
             if (addNode.TargetType == typeOfArtMesh)
             {
-                _artMeshUserDataNodes.Add(addNode);
+                ArtMeshUserDataNodes.Add(addNode);
             }
         }
-    }
-
-    public List<CubismModelUserDataNode> GetArtMeshUserDatas()
-    {
-        return _artMeshUserDataNodes;
     }
 }

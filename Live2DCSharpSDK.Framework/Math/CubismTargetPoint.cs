@@ -9,14 +9,6 @@ public class CubismTargetPoint
     public const float Epsilon = 0.01f;
 
     /// <summary>
-    /// 顔の向きのX目標値(この値に近づいていく)
-    /// </summary>
-    private float _faceTargetX;
-    /// <summary>
-    /// 顔の向きのY目標値(この値に近づいていく)
-    /// </summary>
-    private float _faceTargetY;
-    /// <summary>
     /// 顔の向きX(-1.0 - 1.0)
     /// </summary>
     public float FaceX { get; private set; }
@@ -24,6 +16,15 @@ public class CubismTargetPoint
     /// 顔の向きY(-1.0 - 1.0)
     /// </summary>
     public float FaceY { get; private set; }
+
+    /// <summary>
+    /// 顔の向きのX目標値(この値に近づいていく)
+    /// </summary>
+    private float _faceTargetX;
+    /// <summary>
+    /// 顔の向きのY目標値(この値に近づいていく)
+    /// </summary>
+    private float _faceTargetY;
     /// <summary>
     /// 顔の向きの変化速度X
     /// </summary>

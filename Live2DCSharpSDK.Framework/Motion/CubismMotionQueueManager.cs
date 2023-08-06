@@ -23,7 +23,7 @@ public class CubismMotionQueueManager
     /// <summary>
     /// コールバックに戻されるデータ
     /// </summary>
-    private CubismUserModel _eventCustomData;
+    private CubismUserModel? _eventCustomData;
 
     /// <summary>
     /// デルタ時間の積算値[秒]
@@ -60,7 +60,7 @@ public class CubismMotionQueueManager
 
         _motions.Add(motionQueueEntry);
 
-        return motionQueueEntry._motionQueueEntryHandle;
+        return motionQueueEntry;
     }
 
     /// <summary>
@@ -109,7 +109,7 @@ public class CubismMotionQueueManager
                 continue;
             }
 
-            if (item._motionQueueEntryHandle == motionQueueEntryNumber && !item.Finished)
+            if (item == motionQueueEntryNumber && !item.Finished)
             {
                 return false;
             }
@@ -146,7 +146,7 @@ public class CubismMotionQueueManager
 
         foreach (var item in _motions)
         {
-            if (item._motionQueueEntryHandle == motionQueueEntryNumber)
+            if (item == motionQueueEntryNumber)
             {
                 return item;
             }

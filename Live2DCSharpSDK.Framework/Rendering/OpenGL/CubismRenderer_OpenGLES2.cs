@@ -1,7 +1,6 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using static Live2DCSharpSDK.Framework.Rendering.OpenGL.CubismShader_OpenGLES2;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
@@ -38,6 +37,8 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     /// </summary>
     internal CubismClippingContext? ClippingContextBufferForDraw { get; set; }
 
+    internal CubismShader_OpenGLES2 Shader;
+
     internal int VertexArray { get; private set; }
     internal int VertexBuffer { get; private set; }
     internal int IndexBuffer { get; private set; }
@@ -63,15 +64,16 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     /// </summary>
     /// <param name="extMode">trueなら拡張方式で描画する</param>
     /// <param name="extPAMode">trueなら拡張方式のPA設定を有効にする</param>
-    public static void SetExtShaderMode(bool extMode, bool extPAMode = false)
+    public void SetExtShaderMode(bool extMode, bool extPAMode = false)
     {
-        CubismShader_OpenGLES2.SetExtShaderMode(extMode, extPAMode);
-        CubismShader_OpenGLES2.DeleteInstance();
+        Shader.SetExtShaderMode(extMode, extPAMode);
+        Shader.ReleaseShaderProgram();
     }
 
     public unsafe CubismRenderer_OpenGLES2(OpenGLApi gl, CubismModel model, int maskBufferCount = 1) : base(model)
     {
         GL = gl;
+        Shader = new(gl);
         _rendererProfile = new(gl);
         _textures = new Dictionary<int, int>(32);
 
@@ -228,7 +230,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
 
         GL.glFrontFace(GL.GL_CCW);    // Cubism SDK OpenGLはマスク・アートメッシュ共にCCWが表面
 
-        CubismTextureColor modelColorRGBA = GetModelColor();
+        var modelColorRGBA = new CubismTextureColor(ModelColor);
 
         if (opacity > 1)
         {
@@ -288,7 +290,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
 
         GL.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(ushort), new IntPtr(indexArray), GL.GL_STATIC_DRAW);
 
-        GetInstance(GL).SetupShaderProgram(
+        Shader.SetupShaderProgram(
             this, drawTextureId, colorBlendMode, modelColorRGBA,
             multiplyColor, screenColor, IsPremultipliedAlpha(),
             GetMvpMatrix(), invertedMask
@@ -390,8 +392,14 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
             _sortedDrawableIndexList[order] = i;
         }
 
-        GL.glClearColor(0, 0, 0, 0);
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+        if (GL.AlwaysClear)
+        {
+            GL.glClearColor(ClearColor.R,
+                            ClearColor.G,
+                            ClearColor.B,
+                            ClearColor.A);
+            GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+        }
 
         // 描画
         for (int i = 0; i < drawableCount; ++i)
@@ -489,5 +497,10 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
                 Model.GetDrawableInvertedMask(drawableIndex) // マスクを反転使用するか
             );
         }
+    }
+
+    public override void Dispose()
+    {
+        Shader.ReleaseShaderProgram();
     }
 }

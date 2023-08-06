@@ -61,6 +61,7 @@ public class OpenGlPageControl : OpenGlControlBase
         Info = $"Renderer: {gl.GetString(GlConsts.GL_RENDERER)} Version: {gl.GetString(GlConsts.GL_VERSION)}";
 
         lapp = new(new AvaloniaApi(this, gl), Console.WriteLine);
+        lapp.BGColor = new(0, 1, 0, 1);
         //var model = lapp.Live2dManager.LoadModel("F:\\live2d\\koharu_haruto\\‚±‚Í‚é\\runtime\\", "koharu");
         var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Haru\\", "Haru");
         CheckError(gl);

@@ -18,15 +18,16 @@ public static class CubismFramework
     /// </summary>
     public const int VertexStep = 2;
 
-    private static bool s_isStarted = false;
-    private static bool s_isInitialized = false;
-    private static ICubismAllocator? s_allocator;
-    private static Option? s_option;
-
     /// <summary>
     /// IDマネージャのインスタンスを取得する。
     /// </summary>
-    public static CubismIdManager CubismIdManager { get; private set; } = null!;
+    public static CubismIdManager CubismIdManager { get; private set; } = new CubismIdManager();
+
+    public static bool IsInitialized { get; private set; }
+    public static bool IsStarted { get; private set; }
+
+    private static ICubismAllocator? s_allocator;
+    private static Option? s_option;
 
     /// <summary>
     /// Cubism FrameworkのAPIを使用可能にする。
@@ -39,10 +40,10 @@ public static class CubismFramework
     /// <returns>準備処理が完了したらtrueが返ります。</returns>
     public static bool StartUp(ICubismAllocator allocator, Option option)
     {
-        if (s_isStarted)
+        if (IsStarted)
         {
             CubismLog.CubismLogInfo("[Live2D SDK]CubismFramework.StartUp() is already done.");
-            return s_isStarted;
+            return IsStarted;
         }
 
         s_option = option;
@@ -54,16 +55,16 @@ public static class CubismFramework
         if (allocator == null)
         {
             CubismLog.CubismLogWarning("[Live2D SDK]CubismFramework.StartUp() failed, need allocator instance.");
-            s_isStarted = false;
+            IsStarted = false;
         }
         else
         {
             s_allocator = allocator;
-            s_isStarted = true;
+            IsStarted = true;
         }
 
         //Live2D Cubism Coreバージョン情報を表示
-        if (s_isStarted)
+        if (IsStarted)
         {
             var version = CubismCore.GetVersion();
 
@@ -77,7 +78,7 @@ public static class CubismFramework
 
         CubismLog.CubismLogInfo("[Live2D SDK]CubismFramework.StartUp() is complete.");
 
-        return s_isStarted;
+        return IsStarted;
     }
 
     /// <summary>
@@ -86,17 +87,8 @@ public static class CubismFramework
     /// </summary>
     public static void CleanUp()
     {
-        s_isStarted = false;
-        s_isInitialized = false;
-    }
-
-    /// <summary>
-    /// Cubism FrameworkのAPIを使用する準備が完了したかどうか？
-    /// </summary>
-    /// <returns>APIを使用する準備が完了していればtrueが返ります。</returns>
-    public static bool IsStarted()
-    {
-        return s_isStarted;
+        IsStarted = false;
+        IsInitialized = false;
     }
 
     /// <summary>
@@ -105,7 +97,7 @@ public static class CubismFramework
     /// </summary>
     public static void Initialize()
     {
-        if (!s_isStarted)
+        if (!IsStarted)
         {
             CubismLog.CubismLogWarning("[Live2D SDK]CubismFramework is not started.");
             return;
@@ -114,15 +106,13 @@ public static class CubismFramework
         // --- s_isInitializedによる連続初期化ガード ---
         // 連続してリソース確保が行われないようにする。
         // 再度Initialize()するには先にDispose()を実行する必要がある。
-        if (s_isInitialized)
+        if (IsInitialized)
         {
             CubismLog.CubismLogWarning("[Live2D SDK]CubismFramework.Initialize() skipped, already initialized.");
             return;
         }
 
-        CubismIdManager = new CubismIdManager();
-
-        s_isInitialized = true;
+        IsInitialized = true;
 
         CubismLog.CubismLogInfo("[Live2D SDK]CubismFramework.Initialize() is complete.");
     }
@@ -134,7 +124,7 @@ public static class CubismFramework
     /// </summary>
     public static void Dispose()
     {
-        if (!s_isStarted)
+        if (!IsStarted)
         {
             CubismLog.CubismLogWarning("[Live2D SDK]CubismFramework is not started.");
             return;
@@ -142,24 +132,15 @@ public static class CubismFramework
 
         // --- s_isInitializedによる未初期化解放ガード ---
         // Dispose()するには先にInitialize()を実行する必要がある。
-        if (!s_isInitialized) // false...リソース未確保の場合
+        if (!IsInitialized) // false...リソース未確保の場合
         {
             CubismLog.CubismLogWarning("[Live2D SDK]CubismFramework.Dispose() skipped, not initialized.");
             return;
         }
 
-        s_isInitialized = false;
+        IsInitialized = false;
 
         CubismLog.CubismLogInfo("[Live2D SDK]CubismFramework.Dispose() is complete.");
-    }
-
-    /// <summary>
-    /// Cubism Frameworkのリソース初期化が既に行われているかどうか？
-    /// </summary>
-    /// <returns>リソース確保が完了していればtrueが返ります。</returns>
-    public static bool IsInitialized()
-    {
-        return s_isInitialized;
     }
 
     /// <summary>
@@ -168,13 +149,7 @@ public static class CubismFramework
     /// <param name="data">ログメッセージ</param>
     public static void CoreLogFunction(string data)
     {
-        var fuc = CubismCore.GetLogFunction();
-        if (fuc == null)
-        {
-            return;
-        }
-
-        fuc(data);
+        CubismCore.GetLogFunction()?.Invoke(data);
     }
 
     /// <summary>

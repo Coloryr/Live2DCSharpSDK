@@ -11,7 +11,7 @@ public class LAppView
     /// <summary>
     /// タッチマネージャー
     /// </summary>
-    private TouchManager _touchManager;
+    private readonly TouchManager _touchManager;
     /// <summary>
     /// デバイスからスクリーンへの行列
     /// </summary>
@@ -21,24 +21,14 @@ public class LAppView
     /// </summary>
     private readonly CubismViewMatrix _viewMatrix;
 
-    /// <summary>
-    /// レンダリングターゲットのクリアカラー
-    /// </summary>
-    private readonly float[] _clearColor = new float[4];
-
-    private readonly LAppDelegate Lapp;
+    private readonly LAppDelegate _lapp;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     public LAppView(LAppDelegate lapp)
     {
-        Lapp = lapp;
-
-        _clearColor[0] = 1.0f;
-        _clearColor[1] = 1.0f;
-        _clearColor[2] = 1.0f;
-        _clearColor[3] = 0.0f;
+        _lapp = lapp;
 
         // タッチ関係のイベント管理
         _touchManager = new TouchManager();
@@ -55,7 +45,7 @@ public class LAppView
     /// </summary>
     public void Initialize()
     {
-        Lapp.GL.GetWindowSize(out int width, out int height);
+        _lapp.GL.GetWindowSize(out int width, out int height);
 
         if (width == 0 || height == 0)
         {
@@ -103,7 +93,7 @@ public class LAppView
     /// </summary>
     public void Render()
     {
-        var Live2DManager = Lapp.Live2dManager;
+        var Live2DManager = _lapp.Live2dManager;
         Live2DManager.ViewMatrix.SetMatrix(_viewMatrix);
 
         // Cubism更新・描画
@@ -133,7 +123,7 @@ public class LAppView
 
         _touchManager.TouchesMoved(pointX, pointY);
 
-        Lapp.Live2dManager.OnDrag(viewX, viewY);
+        _lapp.Live2dManager.OnDrag(viewX, viewY);
     }
 
     /// <summary>
@@ -144,7 +134,7 @@ public class LAppView
     public void OnTouchesEnded(float pointX, float pointY)
     {
         // タッチ終了
-        var live2DManager = Lapp.Live2dManager;
+        var live2DManager = _lapp.Live2dManager;
         live2DManager.OnDrag(0.0f, 0.0f);
         // シングルタップ
         float x = _deviceToScreen.TransformX(_touchManager.GetX()); // 論理座標変換した座標を取得。
@@ -195,7 +185,7 @@ public class LAppView
     /// 別レンダリングターゲットにモデルを描画するサンプルで
     /// 描画時のαを決定する
     /// </summary>
-    public float GetSpriteAlpha(int assign)
+    public static float GetSpriteAlpha(int assign)
     {
         // assignの数値に応じて適当に決定
         float alpha = 0.25f + assign * 0.5f; // サンプルとしてαに適当な差をつける
@@ -209,18 +199,5 @@ public class LAppView
         }
 
         return alpha;
-    }
-
-    /// <summary>
-    /// レンダリング先をデフォルト以外に切り替えた際の背景クリア色設定
-    /// </summary>
-    /// <param name="r">赤(0.0~1.0)</param>
-    /// <param name="g">緑(0.0~1.0)</param>
-    /// <param name="b">青(0.0~1.0)</param>
-    public void SetRenderTargetClearColor(float r, float g, float b)
-    {
-        _clearColor[0] = r;
-        _clearColor[1] = g;
-        _clearColor[2] = b;
     }
 }

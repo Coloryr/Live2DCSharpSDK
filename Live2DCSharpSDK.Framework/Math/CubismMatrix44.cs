@@ -3,7 +3,7 @@
 /// <summary>
 /// 4x4行列の便利クラス。
 /// </summary>
-public class CubismMatrix44
+public record CubismMatrix44
 {
     /// <summary>
     /// 4x4行列データ

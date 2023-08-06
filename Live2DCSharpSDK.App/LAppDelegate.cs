@@ -1,5 +1,6 @@
 ﻿using Live2DCSharpSDK.Framework;
 using Live2DCSharpSDK.Framework.Core;
+using Live2DCSharpSDK.Framework.Rendering;
 using Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
 namespace Live2DCSharpSDK.App;
@@ -11,6 +12,21 @@ namespace Live2DCSharpSDK.App;
 public class LAppDelegate : IDisposable
 {
     /// <summary>
+    /// テクスチャマネージャー
+    /// </summary>
+    public LAppTextureManager TextureManager { get; private set; }
+
+    public LAppLive2DManager Live2dManager { get; private set; }
+
+    public OpenGLApi GL { get; }
+    /// <summary>
+    /// View情報
+    /// </summary>
+    public LAppView View { get; private set; }
+
+    public CubismTextureColor BGColor { get; set; } = new(0, 0, 0, 0);
+
+    /// <summary>
     /// Cubism SDK Allocator
     /// </summary>
     private readonly LAppAllocator _cubismAllocator;
@@ -18,10 +34,6 @@ public class LAppDelegate : IDisposable
     /// Cubism SDK Option
     /// </summary>
     private readonly Option _cubismOption;
-    /// <summary>
-    /// View情報
-    /// </summary>
-    public LAppView View { get; private set; }
     /// <summary>
     /// クリックしているか
     /// </summary>
@@ -34,15 +46,6 @@ public class LAppDelegate : IDisposable
     /// マウスY座標
     /// </summary>
     private float _mouseY;
-
-    /// <summary>
-    /// テクスチャマネージャー
-    /// </summary>
-    public LAppTextureManager TextureManager { get; private set; }
-
-    public LAppLive2DManager Live2dManager { get; private set; }
-
-    public OpenGLApi GL { get; }
 
     /// <summary>
     /// Initialize関数で設定したウィンドウ幅
@@ -70,9 +73,7 @@ public class LAppDelegate : IDisposable
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
         // ウィンドウサイズ記憶
-        GL.GetWindowSize(out int width, out int height);
-        _windowWidth = width;
-        _windowHeight = height;
+        GL.GetWindowSize(out _windowWidth, out _windowHeight);
 
         //AppViewの初期化
         View.Initialize();
@@ -91,7 +92,7 @@ public class LAppDelegate : IDisposable
         //load model
         Live2dManager = new LAppLive2DManager(this);
 
-        LAppPal.UpdateTime(0);
+        LAppPal.DeltaTime = 0;
     }
 
     /// <summary>
@@ -129,10 +130,10 @@ public class LAppDelegate : IDisposable
         Resize();
 
         // 時間更新
-        LAppPal.UpdateTime(tick);
+        LAppPal.DeltaTime = tick;
 
         // 画面の初期化
-        GL.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        GL.glClearColor(BGColor.R, BGColor.G, BGColor.B, BGColor.A);
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         GL.glClearDepthf(1.0f);
 

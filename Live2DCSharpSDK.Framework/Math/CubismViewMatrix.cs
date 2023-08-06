@@ -3,7 +3,7 @@
 /// <summary>
 /// カメラの位置変更に使うと便利な4x4行列のクラス。
 /// </summary>
-public class CubismViewMatrix : CubismMatrix44
+public record CubismViewMatrix : CubismMatrix44
 {
     /// <summary>
     /// デバイスに対応する論理座標上の範囲（左辺X軸位置）

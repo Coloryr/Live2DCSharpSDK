@@ -908,7 +908,7 @@ public unsafe class CubismMotion : ACubismMotion
     /// 透明度のIdを返す
     /// </summary>
     /// <returns>透明度のId</returns>
-    public override string GetModelOpacityId(int index)
+    public override string? GetModelOpacityId(int index)
     {
         if (index != -1)
         {

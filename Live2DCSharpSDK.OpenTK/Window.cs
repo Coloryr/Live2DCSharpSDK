@@ -21,6 +21,7 @@ public class Window : GameWindow
     {
         base.OnLoad();
         lapp = new(new OpenTKApi(this), Console.WriteLine);
+        lapp.BGColor = new(0, 1, 0, 1);
         //var model = lapp.Live2dManager.LoadModel("F:\\live2d\\koharu_haruto\\偙偼傞\\runtime\\", "koharu");
 
         var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Haru\\", "Haru");

@@ -160,7 +160,7 @@ public abstract class ACubismMotion
     /// 透明度のIdを返す
     /// </summary>
     /// <returns>透明度のId</returns>
-    public virtual string GetModelOpacityId(int index)
+    public virtual string? GetModelOpacityId(int index)
     {
         return "";
     }

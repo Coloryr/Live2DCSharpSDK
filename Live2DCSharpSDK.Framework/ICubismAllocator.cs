@@ -9,10 +9,6 @@
 public interface ICubismAllocator
 {
     /// <summary>
-    /// デストラクタ
-    /// </summary>
-    void Dispose();
-    /// <summary>
     /// アラインメント制約なしのヒープ・メモリーを確保します。
     /// </summary>
     /// <param name="size">確保するバイト数</param>

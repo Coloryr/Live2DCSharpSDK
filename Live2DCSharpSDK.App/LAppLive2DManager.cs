@@ -20,7 +20,7 @@ public class LAppLive2DManager : IDisposable
     /// </summary>
     private readonly List<LAppModel> _models = new();
 
-    private readonly LAppDelegate Lapp;
+    private readonly LAppDelegate _lapp;
 
     public event Action<CubismModel, ACubismMotion>? MotionFinished;
 
@@ -29,7 +29,7 @@ public class LAppLive2DManager : IDisposable
     /// </summary>
     public LAppLive2DManager(LAppDelegate lapp)
     {
-        Lapp = lapp;
+        _lapp = lapp;
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public class LAppLive2DManager : IDisposable
     /// </summary>
     public void OnUpdate()
     {
-        Lapp.GL.GetWindowSize(out int width, out int height);
+        _lapp.GL.GetWindowSize(out int width, out int height);
 
         int modelCount = _models.Count;
         for (int i = 0; i < modelCount; ++i)
@@ -146,14 +146,10 @@ public class LAppLive2DManager : IDisposable
         var modelJsonName = Path.GetFullPath($"{dir}{name}.model3.json");
         if (!File.Exists(modelJsonName))
         {
-            throw new Exception("File not found");
+            throw new Exception($"[Live2D]File not found: {modelJsonName}");
         }
-        var model = new LAppModel(Lapp, dir, modelJsonName);
+        var model = new LAppModel(_lapp, dir, modelJsonName);
         _models.Add(model);
-
-        // 別レンダリング先を選択した際の背景クリア色
-        float[] clearColor = new[] { 1.0f, 1.0f, 1.0f };
-        Lapp.View.SetRenderTargetClearColor(clearColor[0], clearColor[1], clearColor[2]);
 
         return model;
     }
@@ -180,6 +176,5 @@ public class LAppLive2DManager : IDisposable
     public void Dispose()
     {
         ReleaseAllModel();
-        GC.SuppressFinalize(this);
     }
 }

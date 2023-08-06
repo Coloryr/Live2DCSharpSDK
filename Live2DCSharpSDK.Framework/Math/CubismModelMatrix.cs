@@ -3,7 +3,7 @@
 /// <summary>
 /// モデル座標設定用の4x4行列クラス。
 /// </summary>
-public class CubismModelMatrix : CubismMatrix44
+public record CubismModelMatrix : CubismMatrix44
 {
     public const string KeyWidth = "width";
     public const string KeyHeight = "height";

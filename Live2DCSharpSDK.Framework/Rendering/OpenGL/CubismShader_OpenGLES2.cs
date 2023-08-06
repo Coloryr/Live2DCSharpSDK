@@ -3,7 +3,7 @@ using Live2DCSharpSDK.Framework.Type;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
-internal class CubismShader_OpenGLES2 : IDisposable
+internal class CubismShader_OpenGLES2
 {
     private const string GLES2 = "#version 100\n";
     private const string GLES2C = GLES2 + "precision " + OpenGLApi.CSM_FRAGMENT_SHADER_FP_PRECISION + " float;";
@@ -233,18 +233,17 @@ gl_FragColor = col_formask;
     public const string FragShaderSrcMaskInvertedPremultipliedAlphaTegra = Tegra + FragShaderSrcMaskInvertedPremultipliedAlpha_Base;
 
     public const int ShaderCount = 19; // シェーダの数 = マスク生成用 + (通常 + 加算 + 乗算) * (マスク無 + マスク有 + マスク有反転 + マスク無の乗算済アルファ対応版 + マスク有の乗算済アルファ対応版 + マスク有反転の乗算済アルファ対応版)
-    public static CubismShader_OpenGLES2? s_instance;
 
     private readonly OpenGLApi GL;
     /// <summary>
     /// Tegra対応.拡張方式で描画
     /// </summary>
-    internal static bool s_extMode;
+    internal bool s_extMode;
 
     /// <summary>
     /// 拡張方式のPA設定用の変数
     /// </summary>
-    internal static bool s_extPAMode;
+    internal bool s_extPAMode;
 
     /// <summary>
     /// ロードしたシェーダプログラムを保持する変数
@@ -254,33 +253,6 @@ gl_FragColor = col_formask;
     public CubismShader_OpenGLES2(OpenGLApi gl)
     {
         GL = gl;
-    }
-
-    public void Dispose()
-    {
-        ReleaseShaderProgram();
-    }
-
-    /// <summary>
-    /// インスタンスを取得する（シングルトン）。
-    /// </summary>
-    /// <returns>インスタンスのポインタ</returns>
-    internal static CubismShader_OpenGLES2 GetInstance(OpenGLApi gl)
-    {
-        s_instance ??= new CubismShader_OpenGLES2(gl);
-        return s_instance;
-    }
-
-    /// <summary>
-    /// インスタンスを解放する（シングルトン）。
-    /// </summary>
-    internal static void DeleteInstance()
-    {
-        if (s_instance != null)
-        {
-            s_instance.Dispose();
-            s_instance = null;
-        }
     }
 
     /// <summary>
@@ -902,7 +874,7 @@ gl_FragColor = col_formask;
     /// </summary>
     /// <param name="extMode">trueなら拡張方式で描画する</param>
     /// <param name="extPAMode">trueなら拡張方式のPA設定を有効にする</param>
-    internal static void SetExtShaderMode(bool extMode, bool extPAMode)
+    internal void SetExtShaderMode(bool extMode, bool extPAMode)
     {
         s_extMode = extMode;
         s_extPAMode = extPAMode;

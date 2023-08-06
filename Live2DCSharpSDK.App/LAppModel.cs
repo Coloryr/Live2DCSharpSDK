@@ -55,7 +55,7 @@ public class LAppModel : CubismUserModel
             return list;
         }
     }
-    public List<string> Parameters => new(Model._parameterIds);
+    public List<string> Parameters => new(Model.ParameterIds);
 
     public bool RandomMotion { get; set; } = true;
     public bool CustomValueUpdate { get; set; }
@@ -95,15 +95,15 @@ public class LAppModel : CubismUserModel
     /// </summary>
     //LAppWavFileHandler _wavFileHandler;
 
-    private readonly LAppDelegate Lapp;
+    private readonly LAppDelegate _lapp;
 
-    private readonly Random random = new();
+    private readonly Random _random = new();
 
     public event Action<LAppModel, string>? Motion;
 
     public LAppModel(LAppDelegate lapp, string dir, string fileName)
     {
-        Lapp = lapp;
+        _lapp = lapp;
 
         if (LAppDefine.MocConsistencyValidationEnable)
         {
@@ -253,7 +253,7 @@ public class LAppModel : CubismUserModel
         Updating = false;
         Initialized = true;
 
-        CreateRenderer(new CubismRenderer_OpenGLES2(Lapp.GL, Model));
+        CreateRenderer(new CubismRenderer_OpenGLES2(_lapp.GL, Model));
 
         SetupTextures();
     }
@@ -332,7 +332,7 @@ public class LAppModel : CubismUserModel
     {
         DeleteRenderer();
 
-        CreateRenderer(new CubismRenderer_OpenGLES2(Lapp.GL, Model));
+        CreateRenderer(new CubismRenderer_OpenGLES2(_lapp.GL, Model));
 
         SetupTextures();
     }
@@ -342,7 +342,7 @@ public class LAppModel : CubismUserModel
     /// </summary>
     public void Update()
     {
-        float deltaTimeSeconds = LAppPal.GetDeltaTime();
+        float deltaTimeSeconds = LAppPal.DeltaTime;
         _userTimeSeconds += deltaTimeSeconds;
 
         _dragManager.Update(deltaTimeSeconds);
@@ -439,9 +439,12 @@ public class LAppModel : CubismUserModel
         }
 
         matrix.MultiplyByMatrix(ModelMatrix);
-
-        (Renderer as CubismRenderer_OpenGLES2)?.SetMvpMatrix(matrix);
-
+        if (Renderer is CubismRenderer_OpenGLES2 ren)
+        {
+            ren.ClearColor = _lapp.BGColor;
+            ren.SetMvpMatrix(matrix);
+        }
+        
         DoDraw();
     }
 
@@ -534,7 +537,7 @@ public class LAppModel : CubismUserModel
     {
         if (_modelSetting.FileReferences?.Motions?.ContainsKey(group) == true)
         {
-            int no = random.Next() % _modelSetting.FileReferences.Motions[group].Count;
+            int no = _random.Next() % _modelSetting.FileReferences.Motions[group].Count;
             return StartMotion(group, no, priority, onFinishedMotionHandler);
         }
 
@@ -570,7 +573,7 @@ public class LAppModel : CubismUserModel
             return;
         }
 
-        int no = random.Next() % _expressions.Count;
+        int no = _random.Next() % _expressions.Count;
         int i = 0;
         foreach (var item in _expressions)
         {
@@ -666,7 +669,7 @@ public class LAppModel : CubismUserModel
                     continue;
                 texturePath = Path.GetFullPath(_modelHomeDir + texturePath);
 
-                var texture = Lapp.TextureManager.CreateTextureFromPngFile(texturePath);
+                var texture = _lapp.TextureManager.CreateTextureFromPngFile(texturePath);
                 int glTextueNumber = texture.id;
 
                 //OpenGL

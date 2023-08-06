@@ -7,6 +7,15 @@ namespace Live2DCSharpSDK.Framework.Model;
 public class CubismModel : IDisposable
 {
     /// <summary>
+    /// モデル
+    /// </summary>
+    public IntPtr Model { get; }
+
+    public readonly List<string> ParameterIds = new();
+    public readonly List<string> PartIds = new();
+    public readonly List<string> DrawableIds = new();
+
+    /// <summary>
     /// 存在していないパーツの不透明度のリスト
     /// </summary>
     private readonly Dictionary<int, float> _notExistPartOpacities = new();
@@ -27,10 +36,6 @@ public class CubismModel : IDisposable
     /// </summary>
     private readonly List<float> _savedParameters = new();
     /// <summary>
-    /// モデル
-    /// </summary>
-    public IntPtr Model { get; }
-    /// <summary>
     /// パラメータの値のリスト
     /// </summary>
     private unsafe float* _parameterValues;
@@ -50,10 +55,6 @@ public class CubismModel : IDisposable
     /// モデルの不透明度
     /// </summary>
     private float _modelOpacity;
-
-    public readonly List<string> _parameterIds = new();
-    public readonly List<string> _partIds = new();
-    public readonly List<string> _drawableIds = new();
 
     /// <summary>
     /// Drawable 乗算色の配列
@@ -109,7 +110,7 @@ public class CubismModel : IDisposable
             for (int i = 0; i < parameterCount; ++i)
             {
                 var str = new string(parameterIds[i]);
-                _parameterIds.Add(CubismFramework.CubismIdManager.GetId(str));
+                ParameterIds.Add(CubismFramework.CubismIdManager.GetId(str));
             }
         }
 
@@ -120,7 +121,7 @@ public class CubismModel : IDisposable
         for (int i = 0; i < partCount; ++i)
         {
             var str = new string((sbyte*)partIds[i]);
-            _partIds.Add(CubismFramework.CubismIdManager.GetId(str));
+            PartIds.Add(CubismFramework.CubismIdManager.GetId(str));
             _partChildDrawables[i] = new();
         }
 
@@ -159,7 +160,7 @@ public class CubismModel : IDisposable
         for (int i = 0; i < drawableCount; ++i)
         {
             var str = new string(drawableIds[i]);
-            _drawableIds.Add(CubismFramework.CubismIdManager.GetId(str));
+            DrawableIds.Add(CubismFramework.CubismIdManager.GetId(str));
             _userMultiplyColors.Add(new()
             {
                 IsOverwritten = false,
@@ -320,7 +321,7 @@ public class CubismModel : IDisposable
     /// <returns>パーツのインデックス</returns>
     public int GetPartIndex(string partId)
     {
-        int partIndex = _partIds.IndexOf(partId);
+        int partIndex = PartIds.IndexOf(partId);
         if (partIndex != -1)
         {
             return partIndex;
@@ -451,7 +452,7 @@ public class CubismModel : IDisposable
     /// <returns>パラメータのインデックス</returns>
     public int GetParameterIndex(string parameterId)
     {
-        int parameterIndex = _parameterIds.IndexOf(parameterId);
+        int parameterIndex = ParameterIds.IndexOf(parameterId);
         if (parameterIndex != -1)
             return parameterIndex;
 
@@ -659,7 +660,7 @@ public class CubismModel : IDisposable
     /// <returns>Drawableのインデックス</returns>
     public int GetDrawableIndex(string drawableId)
     {
-        return _drawableIds.IndexOf(drawableId);
+        return DrawableIds.IndexOf(drawableId);
     }
 
     /// <summary>

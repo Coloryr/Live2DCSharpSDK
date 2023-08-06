@@ -10,13 +10,25 @@ namespace Live2DCSharpSDK.Framework.Rendering;
 public abstract class CubismRenderer : IDisposable
 {
     /// <summary>
-    /// Model-View-Projection 行列
+    /// テクスチャの異方性フィルタリングのパラメータ
     /// </summary>
-    private readonly CubismMatrix44 _mvpMatrix4x4 = new();
+    public float Anisotropy { get; set; }
+    /// <summary>
+    /// レンダリング対象のモデル
+    /// </summary>
+    public CubismModel Model { get; private set; }
+
     /// <summary>
     /// モデル自体のカラー(RGBA)
     /// </summary>
-    private readonly CubismTextureColor _modelColor = new();
+    public readonly CubismTextureColor ModelColor = new();
+
+    public CubismTextureColor ClearColor { get; set; } = new(0, 0, 0, 0);
+
+    /// <summary>
+    /// Model-View-Projection 行列
+    /// </summary>
+    private readonly CubismMatrix44 _mvpMatrix4x4 = new();
     /// <summary>
     /// カリングが有効ならtrue
     /// </summary>
@@ -25,15 +37,6 @@ public abstract class CubismRenderer : IDisposable
     /// 乗算済みαならtrue
     /// </summary>
     private bool _isPremultipliedAlpha;
-    /// <summary>
-    /// テクスチャの異方性フィルタリングのパラメータ
-    /// </summary>
-    internal float Anisotropy { get; set; }
-    /// <summary>
-    /// レンダリング対象のモデル
-    /// </summary>
-    public CubismModel Model { get; private set; }
-
     /// <summary>
     /// falseの場合、マスクを纏めて描画する trueの場合、マスクはパーツ描画ごとに書き直す
     /// </summary>
@@ -51,10 +54,7 @@ public abstract class CubismRenderer : IDisposable
     /// <summary>
     /// レンダラのインスタンスを解放する
     /// </summary>
-    public void Dispose()
-    {
-
-    }
+    public abstract void Dispose();
 
     /// <summary>
     /// モデルを描画する
@@ -117,20 +117,10 @@ public abstract class CubismRenderer : IDisposable
         if (alpha < 0.0f) alpha = 0.0f;
         else if (alpha > 1.0f) alpha = 1.0f;
 
-        _modelColor.R = red;
-        _modelColor.G = green;
-        _modelColor.B = blue;
-        _modelColor.A = alpha;
-    }
-
-    /// <summary>
-    /// モデルの色を取得する。
-    /// 各色0.0f～1.0fの間で指定する(1.0fが標準の状態）。
-    /// </summary>
-    /// <returns>RGBAのカラー情報</returns>
-    public CubismTextureColor GetModelColor()
-    {
-        return new(_modelColor);
+        ModelColor.R = red;
+        ModelColor.G = green;
+        ModelColor.B = blue;
+        ModelColor.A = alpha;
     }
 
     /// <summary>
@@ -195,10 +185,7 @@ public abstract class CubismRenderer : IDisposable
     /// <summary>
     /// モデル描画の実装
     /// </summary>
-    protected virtual void DoDrawModel()
-    {
-
-    }
+    protected abstract void DoDrawModel();
 
     /// <summary>
     /// 描画オブジェクト（アートメッシュ）を描画する。
@@ -213,26 +200,17 @@ public abstract class CubismRenderer : IDisposable
     /// <param name="opacity">不透明度</param>
     /// <param name="colorBlendMode">カラーブレンディングのタイプ</param>
     /// <param name="invertedMask">マスク使用時のマスクの反転使用</param>
-    internal virtual unsafe void DrawMesh(int textureNo, int indexCount, int vertexCount
+    internal abstract unsafe void DrawMesh(int textureNo, int indexCount, int vertexCount
                           , ushort* indexArray, float* vertexArray, float* uvArray
-                          , float opacity, CubismBlendMode colorBlendMode, bool invertedMask)
-    {
-
-    }
+                          , float opacity, CubismBlendMode colorBlendMode, bool invertedMask);
 
     /// <summary>
     /// モデル描画直前のレンダラのステートを保持する
     /// </summary>
-    protected virtual void SaveProfile()
-    {
-
-    }
+    protected abstract  void SaveProfile();
 
     /// <summary>
     /// モデル描画直前のレンダラのステートを復帰させる
     /// </summary>
-    protected virtual void RestoreProfile()
-    {
-
-    }
+    protected abstract void RestoreProfile();
 }

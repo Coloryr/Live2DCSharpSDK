@@ -6,11 +6,13 @@ namespace Live2DCSharpSDK.OpenTK;
 
 public class OpenTKApi : OpenGLApi
 {
-    private NativeWindow Window;
+    private readonly NativeWindow Window;
 
     public override bool IsES2 => false;
 
     public override bool IsPhoneES2 => false;
+
+    public override bool AlwaysClear => false;
 
     public OpenTKApi(NativeWindow window)
     {

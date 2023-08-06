@@ -15,15 +15,31 @@ public abstract class CubismUserModel : IDisposable
     /// レンダラ
     /// </summary>
     public CubismRenderer? Renderer { get; private set; }
+    /// <summary>
+    /// モデル行列
+    /// </summary>
+    public CubismModelMatrix ModelMatrix { get; protected set; }
+    /// <summary>
+    /// Modelインスタンス
+    /// </summary>
+    public CubismModel Model => _moc.Model;
+    /// <summary>
+    /// 初期化されたかどうか
+    /// </summary>
+    public bool Initialized { get; set; }
+    /// <summary>
+    /// 更新されたかどうか
+    /// </summary>
+    public bool Updating { get; set; }
+    /// <summary>
+    /// 不透明度
+    /// </summary>
+    public float Opacity { get; set; }
 
     /// <summary>
     /// Mocデータ
     /// </summary>
     protected CubismMoc _moc;
-    /// <summary>
-    /// Modelインスタンス
-    /// </summary>
-    public CubismModel Model => _moc.Model;
 
     /// <summary>
     /// モーション管理
@@ -42,10 +58,6 @@ public abstract class CubismUserModel : IDisposable
     /// </summary>
     protected CubismBreath _breath;
     /// <summary>
-    /// モデル行列
-    /// </summary>
-    public CubismModelMatrix ModelMatrix { get; protected set; }
-    /// <summary>
     /// ポーズ管理
     /// </summary>
     protected CubismPose? _pose;
@@ -61,19 +73,6 @@ public abstract class CubismUserModel : IDisposable
     /// ユーザデータ
     /// </summary>
     protected CubismModelUserData? _modelUserData;
-
-    /// <summary>
-    /// 初期化されたかどうか
-    /// </summary>
-    public bool Initialized { get; set; }
-    /// <summary>
-    /// 更新されたかどうか
-    /// </summary>
-    public bool Updating { get; set; }
-    /// <summary>
-    /// 不透明度
-    /// </summary>
-    public float Opacity { get; set; }
     /// <summary>
     /// リップシンクするかどうか
     /// </summary>
@@ -144,7 +143,6 @@ public abstract class CubismUserModel : IDisposable
         _moc.Dispose();
 
         DeleteRenderer();
-        GC.SuppressFinalize(this);
     }
 
     /// <summary>

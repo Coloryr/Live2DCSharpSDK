@@ -6,7 +6,7 @@ namespace Live2DCSharpSDK.App;
 /// アプリケーションクラス。
 /// Cubism SDK の管理を行う。
 /// </summary>
-public class LAppDefine
+public static class LAppDefine
 {
     // 画面
     public const float ViewScale = 1.0f;

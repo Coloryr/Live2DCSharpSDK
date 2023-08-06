@@ -12,6 +12,7 @@ public class AvaloniaApi : OpenGLApi
     private readonly OpenGlControlBase Con;
     private readonly GlInterface GL;
     public override bool IsES2 => true;
+    public override bool AlwaysClear => true;
     public override bool IsPhoneES2 => false;
 
     public delegate void Func1(int a, int b);
