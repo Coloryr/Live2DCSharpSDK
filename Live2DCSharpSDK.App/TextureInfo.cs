@@ -8,17 +8,17 @@ public record TextureInfo
     /// <summary>
     /// テクスチャID
     /// </summary>
-    public int id;
+    public int ID;
     /// <summary>
     /// 横幅
     /// </summary>
-    public int width;
+    public int Width;
     /// <summary>
     /// 高さ
     /// </summary>
-    public int height;
+    public int Height;
     /// <summary>
     /// ファイル名
     /// </summary>
-    public required string fileName;
+    public required string FileName;
 };

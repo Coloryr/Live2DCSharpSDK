@@ -671,7 +671,7 @@ public class LAppModel : CubismUserModel
                 texturePath = Path.GetFullPath(_modelHomeDir + texturePath);
 
                 var texture = _lapp.TextureManager.CreateTextureFromPngFile(texturePath);
-                int glTextueNumber = texture.id;
+                int glTextueNumber = texture.ID;
 
                 //OpenGL
                 (Renderer as CubismRenderer_OpenGLES2)?.BindTexture(modelTextureNumber, glTextueNumber);

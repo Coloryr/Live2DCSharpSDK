@@ -5,12 +5,12 @@
 /// </summary>
 public class LAppTextureManager
 {
-    private readonly LAppDelegate Lapp;
+    private readonly LAppDelegate _lapp;
     private readonly List<TextureInfo> _textures = new();
 
     public LAppTextureManager(LAppDelegate lapp)
     {
-        Lapp = lapp;
+        _lapp = lapp;
     }
 
     /// <summary>
@@ -21,17 +21,17 @@ public class LAppTextureManager
     public unsafe TextureInfo CreateTextureFromPngFile(string fileName)
     {
         //search loaded texture already.
-        var item = _textures.FirstOrDefault(a => a.fileName == fileName);
+        var item = _textures.FirstOrDefault(a => a.FileName == fileName);
         if (item != null)
+        {
             return item;
+        }
 
-        var data = File.ReadAllBytes(fileName);
-
-        using var image = Image.Load<Rgba32>(data);
+        using var image = Image.Load<Rgba32>(fileName);
         var pixels = new byte[4 * image.Width * image.Height];
         image.CopyPixelDataTo(pixels);
 
-        var GL = Lapp.GL;
+        var GL = _lapp.GL;
         // OpenGL用のテクスチャを生成する
         int textureId = GL.glGenTexture();
         GL.glBindTexture(GL.GL_TEXTURE_2D, textureId);
@@ -44,10 +44,10 @@ public class LAppTextureManager
 
         var info = new TextureInfo()
         {
-            fileName = fileName,
-            width = image.Width,
-            height = image.Height,
-            id = textureId
+            FileName = fileName,
+            Width = image.Width,
+            Height = image.Height,
+            ID = textureId
         };
 
         _textures.Add(info);
@@ -63,7 +63,7 @@ public class LAppTextureManager
     {
         foreach (var item in _textures)
         {
-            if (item.id == textureId)
+            if (item.ID == textureId)
             {
                 _textures.Remove(item);
                 break;
@@ -78,6 +78,6 @@ public class LAppTextureManager
     /// <returns>テクスチャが存在していればTextureInfoが返る</returns>
     public TextureInfo? GetTextureInfoById(int textureId)
     {
-        return _textures.FirstOrDefault(a => a.id == textureId);
+        return _textures.FirstOrDefault(a => a.ID == textureId);
     }
 }
