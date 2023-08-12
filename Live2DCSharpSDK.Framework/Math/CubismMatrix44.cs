@@ -5,6 +5,30 @@
 /// </summary>
 public record CubismMatrix44
 {
+    private readonly float[] Ident = new float[]
+    {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    public float[] _mpt1 = new float[]
+    {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    public float[] _mpt2 = new float[16]
+    {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
     /// <summary>
     /// 4x4行列データ
     /// </summary>
@@ -25,13 +49,7 @@ public record CubismMatrix44
     /// </summary>
     public void LoadIdentity()
     {
-        SetMatrix(new[]
-        {
-            1.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-        });
+        SetMatrix(Ident);
     }
 
     /// <summary>
@@ -131,10 +149,9 @@ public record CubismMatrix44
     /// <param name="y">Y軸の移動量</param>
     public void TranslateRelative(float x, float y)
     {
-        MultiplyByMatrix(new[]{1.0f, 0.0f, 0.0f, 0.0f,
-                               0.0f, 1.0f, 0.0f, 0.0f,
-                               0.0f, 0.0f, 1.0f, 0.0f,
-                               x,    y,    0.0f, 1.0f}, _tr);
+        _mpt1[12] = x;
+        _mpt1[13] = y;
+        MultiplyByMatrix(_mpt1);
     }
 
     /// <summary>
@@ -173,10 +190,9 @@ public record CubismMatrix44
     /// <param name="y">Y軸の拡大率</param>
     public void ScaleRelative(float x, float y)
     {
-        MultiplyByMatrix(new[]{x,    0.0f, 0.0f, 0.0f,
-                               0.0f, y,    0.0f, 0.0f,
-                               0.0f, 0.0f, 1.0f, 0.0f,
-                               0.0f, 0.0f, 0.0f, 1.0f}, _tr);
+        _mpt2[0] = x;
+        _mpt2[5] = y;
+        MultiplyByMatrix(_mpt2);
     }
 
     /// <summary>
@@ -190,12 +206,12 @@ public record CubismMatrix44
         _tr[5] = y;
     }
 
-    public void MultiplyByMatrix(float[] a, float[] b)
+    public float[] _mpt = new float[16];
+
+    public void MultiplyByMatrix(float[] a)
     {
-        float[] c = new[]{0.0f, 0.0f, 0.0f, 0.0f,
-                          0.0f, 0.0f, 0.0f, 0.0f,
-                          0.0f, 0.0f, 0.0f, 0.0f,
-                          0.0f, 0.0f, 0.0f, 0.0f};
+        Array.Fill(_mpt, 0);
+
         int n = 4;
 
         for (int i = 0; i < n; ++i)
@@ -204,12 +220,12 @@ public record CubismMatrix44
             {
                 for (int k = 0; k < n; ++k)
                 {
-                    c[j + i * 4] += a[k + i * 4] * b[j + k * 4];
+                    _mpt[j + i * 4] += a[k + i * 4] * _tr[j + k * 4];
                 }
             }
         }
 
-        Array.Copy(c, _tr, 16);
+        Array.Copy(_mpt, _tr, 16);
     }
 
     /// <summary>
@@ -218,6 +234,6 @@ public record CubismMatrix44
     /// <param name="m">行列</param>
     public void MultiplyByMatrix(CubismMatrix44 m)
     {
-        MultiplyByMatrix(m.Tr, _tr);
+        MultiplyByMatrix(m.Tr);
     }
 }

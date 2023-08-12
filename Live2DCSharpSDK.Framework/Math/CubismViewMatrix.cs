@@ -78,7 +78,7 @@ public record CubismViewMatrix : CubismMatrix44
                         0.0f,   1.0f,   0.0f, 0.0f,
                         0.0f,   0.0f,   1.0f, 0.0f,
                         x,      y,      0.0f, 1.0f };
-        MultiplyByMatrix(tr1, _tr);
+        MultiplyByMatrix(tr1);
     }
 
     /// <summary>
@@ -112,15 +112,15 @@ public record CubismViewMatrix : CubismMatrix44
         MultiplyByMatrix(new[]{1.0f, 0.0f, 0.0f, 0.0f,
                                0.0f, 1.0f, 0.0f, 0.0f,
                                0.0f, 0.0f, 1.0f, 0.0f,
-                               -cx,  -cy,  0.0f, 1.0f}, _tr);
+                               -cx,  -cy,  0.0f, 1.0f});
         MultiplyByMatrix(new[]{scale, 0.0f,  0.0f, 0.0f,
                                0.0f,  scale, 0.0f, 0.0f,
                                0.0f,  0.0f,  1.0f, 0.0f,
-                               0.0f,  0.0f,  0.0f, 1.0f}, _tr);
+                               0.0f,  0.0f,  0.0f, 1.0f});
         MultiplyByMatrix(new[]{1.0f, 0.0f, 0.0f, 0.0f,
                                0.0f, 1.0f, 0.0f, 0.0f,
                                0.0f, 0.0f, 1.0f, 0.0f,
-                               cx,   cy,   0.0f, 1.0f}, _tr);
+                               cx,   cy,   0.0f, 1.0f});
     }
 
     /// <summary>

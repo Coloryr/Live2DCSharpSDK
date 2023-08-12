@@ -100,6 +100,8 @@ public class LAppLive2DManager : IDisposable
         MotionFinished?.Invoke(model, self);
     }
 
+    private readonly CubismMatrix44 _projection = new();
+
     /// <summary>
     /// 画面を更新するときの処理
     /// モデルの更新処理および描画処理を行う
@@ -111,28 +113,28 @@ public class LAppLive2DManager : IDisposable
         int modelCount = _models.Count;
         for (int i = 0; i < modelCount; ++i)
         {
-            CubismMatrix44 projection = new();
+            _projection.LoadIdentity();
             LAppModel model = GetModel(i);
 
             if (model.Model.GetCanvasWidth() > 1.0f && width < height)
             {
                 // 横に長いモデルを縦長ウィンドウに表示する際モデルの横サイズでscaleを算出する
                 model.ModelMatrix.SetWidth(2.0f);
-                projection.Scale(1.0f, (float)width / height);
+                _projection.Scale(1.0f, (float)width / height);
             }
             else
             {
-                projection.Scale((float)height / width, 1.0f);
+                _projection.Scale((float)height / width, 1.0f);
             }
 
             // 必要があればここで乗算
             if (ViewMatrix != null)
             {
-                projection.MultiplyByMatrix(ViewMatrix);
+                _projection.MultiplyByMatrix(ViewMatrix);
             }
 
             model.Update();
-            model.Draw(projection); // 参照渡しなのでprojectionは変質する
+            model.Draw(_projection); // 参照渡しなのでprojectionは変質する
         }
     }
 

@@ -16,6 +16,8 @@ public class CubismMotionQueueManager
     /// </summary>
     private readonly List<CubismMotionQueueEntry> _motions = new();
 
+    private readonly List<CubismMotionQueueEntry> _remove = new();
+
     /// <summary>
     /// コールバック関数ポインタ
     /// </summary>
@@ -72,16 +74,8 @@ public class CubismMotionQueueManager
     {
         // ------- 処理を行う --------
         // 既にモーションがあれば終了フラグを立てる
-
-        foreach (var item in new List<CubismMotionQueueEntry>(_motions))
+        foreach (var item in _motions)
         {
-            var motion = item.Motion;
-            if (motion == null)
-            {
-                _motions.Remove(item);
-                continue;
-            }
-
             // ----- 終了済みの処理があれば削除する ------
             if (!item.Finished)
             {
@@ -126,11 +120,7 @@ public class CubismMotionQueueManager
         // ------- 処理を行う --------
         // 既にモーションがあれば終了フラグを立てる
 
-        foreach (var item in new List<CubismMotionQueueEntry>(_motions))
-        {
-            // ----- 終了済みの処理があれば削除する ------
-            _motions.Remove(item); //削除
-        }
+        _motions.Clear();
     }
 
     /// <summary>
@@ -180,7 +170,9 @@ public class CubismMotionQueueManager
         // ------- 処理を行う --------
         // 既にモーションがあれば終了フラグを立てる
 
-        foreach (var item in new List<CubismMotionQueueEntry>(_motions))
+        _remove.Clear();
+
+        foreach (var item in _motions)
         {
             var motion = item.Motion;
 
@@ -203,7 +195,7 @@ public class CubismMotionQueueManager
             // ----- 終了済みの処理があれば削除する ------
             if (item.Finished)
             {
-                _motions.Remove(item);          // 削除
+                _remove.Add(item);          // 削除
             }
             else
             {
@@ -212,6 +204,11 @@ public class CubismMotionQueueManager
                     item.StartFadeout(item.FadeOutSeconds, userTimeSeconds);
                 }
             }
+        }
+
+        foreach (var item in _remove)
+        {
+            _motions.Remove(item);
         }
 
         return updated;

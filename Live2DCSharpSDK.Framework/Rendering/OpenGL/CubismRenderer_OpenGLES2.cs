@@ -52,7 +52,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         public float uv1;
     }
 
-    internal VBO[] vbo = Array.Empty<VBO>();
+    internal VBO[] vbo = new VBO[512];
 
     /// <summary>
     /// マスク描画用のフレームバッファ
@@ -267,7 +267,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
 
         GL.glBindVertexArray(VertexArray);
 
-        if (vbo == null || vbo.Length != vertexCount)
+        if (vbo == null || vbo.Length < vertexCount)
         {
             vbo = new VBO[vertexCount];
         }

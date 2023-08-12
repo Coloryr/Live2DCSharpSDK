@@ -116,7 +116,7 @@ public enum CubismMotionSegmentType : int
 /// <summary>
 /// モーションカーブの制御点。
 /// </summary>
-public record CubismMotionPoint
+public struct CubismMotionPoint
 {
     /// <summary>
     /// 時間[秒]
