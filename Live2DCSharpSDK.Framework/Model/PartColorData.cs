@@ -8,5 +8,5 @@ namespace Live2DCSharpSDK.Framework.Model;
 public record PartColorData
 {
     public bool IsOverwritten { get; set; }
-    public CubismTextureColor Color { get; set; } = new();
+    public CubismTextureColor Color = new();
 }

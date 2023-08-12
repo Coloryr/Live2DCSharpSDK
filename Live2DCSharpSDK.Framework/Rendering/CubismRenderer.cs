@@ -21,9 +21,9 @@ public abstract class CubismRenderer : IDisposable
     /// <summary>
     /// モデル自体のカラー(RGBA)
     /// </summary>
-    public readonly CubismTextureColor ModelColor = new();
+    public CubismTextureColor ModelColor = new();
 
-    public CubismTextureColor ClearColor { get; set; } = new(0, 0, 0, 0);
+    public CubismTextureColor ClearColor = new(0, 0, 0, 0);
 
     /// <summary>
     /// Model-View-Projection 行列

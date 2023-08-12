@@ -3,7 +3,7 @@
 /// <summary>
 /// テクスチャの色をRGBAで扱うための構造体
 /// </summary>
-public record CubismTextureColor
+public struct CubismTextureColor
 {
     /// <summary>
     /// 赤チャンネル
