@@ -4,7 +4,7 @@ using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Motion;
 using Live2DCSharpSDK.Framework.Rendering.OpenGL;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Live2DCSharpSDK.App;
 
@@ -127,7 +127,8 @@ public class LAppModel : CubismUserModel
 
         CubismLog.CubismLogDebug($"[Live2D]load model setting: {fileName}");
 
-        _modelSetting = JsonConvert.DeserializeObject<ModelSettingObj>(File.ReadAllText(fileName))!;
+        _modelSetting = JsonSerializer.Deserialize<ModelSettingObj>(File.ReadAllText(fileName))
+            ?? throw new Exception("model3.json error");
 
         Updating = true;
         Initialized = false;

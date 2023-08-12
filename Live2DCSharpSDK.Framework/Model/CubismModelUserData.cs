@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Live2DCSharpSDK.Framework.Model;
 
@@ -31,7 +32,8 @@ public class CubismModelUserData
     /// <param name="data">userdata3.jsonが読み込まれいるバッファ</param>
     public CubismModelUserData(string data)
     {
-        var obj = JsonConvert.DeserializeObject<CubismModelUserDataObj>(data)!;
+        var obj = JsonSerializer.Deserialize<CubismModelUserDataObj>(data)
+            ?? throw new Exception("userdata3.json error"); ;
 
         string typeOfArtMesh = CubismFramework.CubismIdManager.GetId(ArtMesh);
 

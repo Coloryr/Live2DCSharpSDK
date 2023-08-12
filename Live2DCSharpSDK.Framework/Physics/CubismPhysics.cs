@@ -1,8 +1,8 @@
 ﻿using Live2DCSharpSDK.Framework.Core;
 using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
-using Newtonsoft.Json;
 using System.Numerics;
+using System.Text.Json;
 
 namespace Live2DCSharpSDK.Framework.Physics;
 
@@ -78,7 +78,7 @@ public class CubismPhysics
         Wind.Y = 0;
         _currentRemainTime = 0.0f;
 
-        var obj = JsonConvert.DeserializeObject<CubismPhysicsObj>(buffer)
+        var obj = JsonSerializer.Deserialize<CubismPhysicsObj>(buffer)
             ?? throw new Exception("physics3.json error");
 
         _physicsRig = new CubismPhysicsRig

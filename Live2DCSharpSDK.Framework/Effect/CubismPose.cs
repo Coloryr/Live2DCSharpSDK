@@ -1,5 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace Live2DCSharpSDK.Framework.Effect;
 
@@ -28,7 +28,7 @@ public class CubismPose
     /// <summary>
     /// フェード時間[秒]
     /// </summary>
-    private float _fadeTimeSeconds = DefaultFadeInSeconds;
+    private readonly float _fadeTimeSeconds = DefaultFadeInSeconds;
     /// <summary>
     /// 前回操作したモデル
     /// </summary>
@@ -40,7 +40,7 @@ public class CubismPose
     /// <param name="pose3json">pose3.jsonのデータ</param>
     public CubismPose(string pose3json)
     {
-        var json = JObject.Parse(pose3json);
+        var json = JsonNode.Parse(pose3json)!.AsObject();
 
         // フェード時間の指定
         if (json.ContainsKey(FadeIn))
@@ -55,12 +55,12 @@ public class CubismPose
         }
 
         // パーツグループ
-        if (json[Groups] is not JArray poseListInfo)
+        if (json[Groups] is not JsonArray poseListInfo)
             return;
 
         foreach (var item in poseListInfo)
         {
-            int idCount = item.Count();
+            int idCount = item!.AsArray().Count;
             int groupCount = 0;
 
             for (int groupIndex = 0; groupIndex < idCount; ++groupIndex)
@@ -75,7 +75,7 @@ public class CubismPose
                 if (partInfo[Link] != null)
                 {
                     var linkListInfo = partInfo[Link]!;
-                    int linkCount = linkListInfo.Count();
+                    int linkCount = linkListInfo.AsArray().Count;
 
                     for (int linkIndex = 0; linkIndex < linkCount; ++linkIndex)
                     {

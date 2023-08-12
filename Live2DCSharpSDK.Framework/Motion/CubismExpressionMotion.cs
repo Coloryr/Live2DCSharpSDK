@@ -1,5 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace Live2DCSharpSDK.Framework.Motion;
 
@@ -30,7 +30,9 @@ public class CubismExpressionMotion : ACubismMotion
     /// <param name="buffer">expファイルが読み込まれているバッファ</param>
     public CubismExpressionMotion(string buf)
     {
-        var json = JObject.Parse(buf);
+        var obj = JsonNode.Parse(buf)
+            ?? throw new Exception("the motion json is error"); 
+        var json = obj.AsObject();
 
         FadeInSeconds = json.ContainsKey(ExpressionKeyFadeIn)
             ? (float)json[ExpressionKeyFadeIn]! : DefaultFadeTime;   // フェードイン
@@ -39,7 +41,7 @@ public class CubismExpressionMotion : ACubismMotion
 
         // 各パラメータについて
         var list = json[ExpressionKeyParameters]!;
-        int parameterCount = list.Count();
+        int parameterCount = list.AsArray().Count;
 
         for (int i = 0; i < parameterCount; ++i)
         {

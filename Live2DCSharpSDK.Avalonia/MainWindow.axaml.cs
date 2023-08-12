@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
+using Avalonia.Rendering;
 using Avalonia.Threading;
 using Live2DCSharpSDK.App;
 using System;
@@ -13,11 +14,22 @@ namespace Live2DCSharpSDK.Avalonia;
 
 public partial class MainWindow : Window
 {
+    private FpsTimer _renderTimer;
+
     public MainWindow()
     {
         InitializeComponent();
 
         Button1.Click += Button1_Click;
+
+        Closing += MainWindow_Closing;
+
+        _renderTimer = new(GL);
+    }
+
+    private void MainWindow_Closing(object? sender, WindowClosingEventArgs e)
+    {
+        _renderTimer.Close();
     }
 
     private void Button1_Click(object? sender, RoutedEventArgs e)
@@ -32,7 +44,6 @@ public class OpenGlPageControl : OpenGlControlBase
 
     private string _info = string.Empty;
     private DateTime time;
-    private bool render;
 
     public static readonly DirectProperty<OpenGlPageControl, string> InfoProperty =
         AvaloniaProperty.RegisterDirect<OpenGlPageControl, string>("Info", o => o.Info, (o, v) => o.Info = v);
@@ -70,13 +81,12 @@ public class OpenGlPageControl : OpenGlControlBase
 
     protected override void OnOpenGlDeinit(GlInterface GL)
     {
-        render = false;
+        
     }
 
     protected override void OnOpenGlRender(GlInterface gl, int fb)
     {
         gl.Viewport(0, 0, (int)Bounds.Width, (int)Bounds.Height);
-        render = true;
         var now = DateTime.Now;
         float span = 0;
         if (time.Ticks == 0)
@@ -90,14 +100,5 @@ public class OpenGlPageControl : OpenGlControlBase
         }
         lapp.Run(span);
         CheckError(gl);
-
-        Task.Run(() =>
-        {
-            Thread.Sleep(15);
-            if (render)
-            {
-                Dispatcher.UIThread.Invoke(RequestNextFrameRendering);
-            }
-        });
     }
 }

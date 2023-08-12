@@ -1,13 +1,13 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
 /// モーションのクラス。
 /// </summary>
-public unsafe class CubismMotion : ACubismMotion
+public class CubismMotion : ACubismMotion
 {
     public const string EffectNameEyeBlink = "EyeBlink";
     public const string EffectNameLipSync = "LipSync";
@@ -280,7 +280,8 @@ public unsafe class CubismMotion : ACubismMotion
         IsLoopFadeIn = true;       // ループ時にフェードインが有効かどうかのフラグ
         _modelOpacity = 1.0f;
 
-        var obj = JsonConvert.DeserializeObject<CubismMotionObj>(buffer)!;
+        var obj = JsonSerializer.Deserialize<CubismMotionObj>(buffer)
+            ?? throw new Exception("motion3.json error");
 
         _motionData = new()
         {
