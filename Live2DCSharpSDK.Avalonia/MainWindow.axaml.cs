@@ -3,12 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
-using Avalonia.Rendering;
-using Avalonia.Threading;
 using Live2DCSharpSDK.App;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Avalonia;
 
@@ -81,7 +77,7 @@ public class OpenGlPageControl : OpenGlControlBase
 
     protected override void OnOpenGlDeinit(GlInterface GL)
     {
-        
+
     }
 
     protected override void OnOpenGlRender(GlInterface gl, int fb)

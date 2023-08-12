@@ -31,7 +31,7 @@ public class CubismExpressionMotion : ACubismMotion
     public CubismExpressionMotion(string buf)
     {
         var obj = JsonNode.Parse(buf)
-            ?? throw new Exception("the motion json is error"); 
+            ?? throw new Exception("the motion json is error");
         var json = obj.AsObject();
 
         FadeInSeconds = json.ContainsKey(ExpressionKeyFadeIn)

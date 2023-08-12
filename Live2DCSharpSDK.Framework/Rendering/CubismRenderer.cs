@@ -207,7 +207,7 @@ public abstract class CubismRenderer : IDisposable
     /// <summary>
     /// モデル描画直前のレンダラのステートを保持する
     /// </summary>
-    protected abstract  void SaveProfile();
+    protected abstract void SaveProfile();
 
     /// <summary>
     /// モデル描画直前のレンダラのステートを復帰させる

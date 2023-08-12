@@ -49,7 +49,7 @@ public class LAppModel : CubismUserModel
             var count = Model.GetPartCount();
             for (int a = 0; a < count; a++)
             {
-                list.Add((Model.GetPartId(a), 
+                list.Add((Model.GetPartId(a),
                     a, Model.GetPartOpacity(a)));
             }
             return list;
@@ -445,7 +445,7 @@ public class LAppModel : CubismUserModel
             ren.ClearColor = _lapp.BGColor;
             ren.SetMvpMatrix(matrix);
         }
-        
+
         DoDraw();
     }
 
