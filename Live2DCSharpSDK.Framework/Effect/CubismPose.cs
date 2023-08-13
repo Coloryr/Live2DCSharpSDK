@@ -40,7 +40,8 @@ public class CubismPose
     /// <param name="pose3json">pose3.jsonのデータ</param>
     public CubismPose(string pose3json)
     {
-        var json = JsonNode.Parse(pose3json)!.AsObject();
+        using var stream = File.Open(pose3json, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        var json = JsonNode.Parse(stream)!.AsObject();
 
         // フェード時間の指定
         if (json.ContainsKey(FadeIn))

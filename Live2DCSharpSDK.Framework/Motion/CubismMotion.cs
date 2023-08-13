@@ -280,7 +280,8 @@ public class CubismMotion : ACubismMotion
         IsLoopFadeIn = true;       // ループ時にフェードインが有効かどうかのフラグ
         _modelOpacity = 1.0f;
 
-        var obj = JsonSerializer.Deserialize<CubismMotionObj>(buffer)
+        using var stream = File.Open(buffer, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        var obj = JsonSerializer.Deserialize<CubismMotionObj>(stream)
             ?? throw new Exception("motion3.json error");
 
         _motionData = new()

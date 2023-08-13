@@ -30,8 +30,8 @@ public class CubismExpressionMotion : ACubismMotion
     /// <param name="buffer">expファイルが読み込まれているバッファ</param>
     public CubismExpressionMotion(string buf)
     {
-        var obj = JsonNode.Parse(buf)
-            ?? throw new Exception("the motion json is error");
+        using var stream = File.Open(buf, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        var obj = JsonNode.Parse(stream) ?? throw new Exception("the motion json is error");
         var json = obj.AsObject();
 
         FadeInSeconds = json.ContainsKey(ExpressionKeyFadeIn)

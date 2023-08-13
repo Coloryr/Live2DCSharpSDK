@@ -162,7 +162,7 @@ public class LAppModel : CubismUserModel
                     continue;
                 }
 
-                ACubismMotion motion = new CubismExpressionMotion(File.ReadAllText(path));
+                var motion = new CubismExpressionMotion(path);
 
                 if (_expressions.ContainsKey(name))
                 {
@@ -182,7 +182,7 @@ public class LAppModel : CubismUserModel
             path = Path.GetFullPath(_modelHomeDir + path);
             if (File.Exists(path))
             {
-                LoadPhysics(File.ReadAllText(path));
+                LoadPhysics(path);
             }
         }
 
@@ -193,7 +193,7 @@ public class LAppModel : CubismUserModel
             path = Path.GetFullPath(_modelHomeDir + path);
             if (File.Exists(path))
             {
-                LoadPose(File.ReadAllText(path));
+                LoadPose(path);
             }
         }
 
@@ -212,7 +212,7 @@ public class LAppModel : CubismUserModel
             path = Path.GetFullPath(_modelHomeDir + path);
             if (File.Exists(path))
             {
-                LoadUserData(File.ReadAllText(path));
+                LoadUserData(path);
             }
         }
 
@@ -494,7 +494,7 @@ public class LAppModel : CubismUserModel
                 return null;
             }
 
-            motion = new CubismMotion(File.ReadAllText(path), onFinishedMotionHandler);
+            motion = new CubismMotion(path, onFinishedMotionHandler);
             float fadeTime = item.FadeInTime;
             if (fadeTime >= 0.0f)
             {
@@ -698,7 +698,7 @@ public class LAppModel : CubismUserModel
             var path = Path.GetFullPath(_modelHomeDir + item.File);
 
             // モーションデータの読み込み
-            var tmpMotion = new CubismMotion(File.ReadAllText(path));
+            var tmpMotion = new CubismMotion(path);
 
             // フェードインの時間を取得
             float fadeTime = item.FadeInTime;
