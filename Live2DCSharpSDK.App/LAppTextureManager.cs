@@ -1,4 +1,6 @@
-﻿namespace Live2DCSharpSDK.App;
+﻿using System.Buffers;
+
+namespace Live2DCSharpSDK.App;
 
 /// <summary>
 /// 画像読み込み、管理を行うクラス。
@@ -28,29 +30,37 @@ public class LAppTextureManager
         }
 
         using var image = Image.Load<Rgba32>(fileName);
-        var pixels = new byte[4 * image.Width * image.Height];
-        image.CopyPixelDataTo(pixels);
-
-        var GL = _lapp.GL;
-        // OpenGL用のテクスチャを生成する
-        int textureId = GL.glGenTexture();
-        GL.glBindTexture(GL.GL_TEXTURE_2D, textureId);
-        fixed (byte* ptr = pixels)
-            GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, image.Width, image.Height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, new IntPtr(ptr));
-        GL.glGenerateMipmap(GL.GL_TEXTURE_2D);
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR_MIPMAP_LINEAR);
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
-
-        var info = new TextureInfo()
+        TextureInfo info;
+        var pixels = ArrayPool<byte>.Shared.Rent(4 * image.Width * image.Height);
+        try
         {
-            FileName = fileName,
-            Width = image.Width,
-            Height = image.Height,
-            ID = textureId
-        };
+            image.CopyPixelDataTo(pixels);
 
-        _textures.Add(info);
+            var GL = _lapp.GL;
+            // OpenGL用のテクスチャを生成する
+            int textureId = GL.glGenTexture();
+            GL.glBindTexture(GL.GL_TEXTURE_2D, textureId);
+            fixed (byte* ptr = pixels)
+                GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, image.Width, image.Height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, new IntPtr(ptr));
+            GL.glGenerateMipmap(GL.GL_TEXTURE_2D);
+            GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR_MIPMAP_LINEAR);
+            GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+            GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
+
+            info = new TextureInfo()
+            {
+                FileName = fileName,
+                Width = image.Width,
+                Height = image.Height,
+                ID = textureId
+            };
+
+            _textures.Add(info);
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(pixels);
+        }
 
         return info;
     }
