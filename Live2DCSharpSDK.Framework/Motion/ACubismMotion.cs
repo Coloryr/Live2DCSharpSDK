@@ -23,7 +23,7 @@ public abstract class ACubismMotion
     /// <summary>
     /// モーション再生の開始時刻[秒]
     /// </summary>
-    public float Offset { get; set; }
+    public float OffsetSeconds { get; set; }
 
     protected readonly List<string> _firedEventValues = new();
 
@@ -56,7 +56,7 @@ public abstract class ACubismMotion
         if (!motionQueueEntry.Started)
         {
             motionQueueEntry.Started = true;
-            motionQueueEntry.StartTime = userTimeSeconds - Offset;//モーションの開始時刻を記録
+            motionQueueEntry.StartTime = userTimeSeconds - OffsetSeconds;//モーションの開始時刻を記録
             motionQueueEntry.FadeInStartTime = userTimeSeconds; //フェードインの開始時刻
 
             float duration = GetDuration();
@@ -69,6 +69,28 @@ public abstract class ACubismMotion
             }
         }
 
+        var fadeWeight = UpdateFadeWeight(motionQueueEntry, userTimeSeconds);
+
+        //---- 全てのパラメータIDをループする ----
+        DoUpdateParameters(model, userTimeSeconds, fadeWeight, motionQueueEntry);
+
+        //後処理
+        //終了時刻を過ぎたら終了フラグを立てる（CubismMotionQueueManager）
+        if ((motionQueueEntry.EndTime > 0) && (motionQueueEntry.EndTime < userTimeSeconds))
+        {
+            motionQueueEntry.Finished = true;      //終了
+        }
+    }
+
+    /// <summary>
+    /// モーションのウェイトを更新する。
+    /// </summary>
+    /// <param name="motionQueueEntry">CubismMotionQueueManagerで管理されているモーション</param>
+    /// <param name="userTimeSeconds">デルタ時間の積算値[秒]</param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public float UpdateFadeWeight(CubismMotionQueueEntry motionQueueEntry, float userTimeSeconds)
+    {
         float fadeWeight = Weight; //現在の値と掛け合わせる割合
 
         //---- フェードイン・アウトの処理 ----
@@ -88,15 +110,7 @@ public abstract class ACubismMotion
             throw new Exception("fadeWeight out of range");
         }
 
-        //---- 全てのパラメータIDをループする ----
-        DoUpdateParameters(model, userTimeSeconds, fadeWeight, motionQueueEntry);
-
-        //後処理
-        //終了時刻を過ぎたら終了フラグを立てる（CubismMotionQueueManager）
-        if ((motionQueueEntry.EndTime > 0) && (motionQueueEntry.EndTime < userTimeSeconds))
-        {
-            motionQueueEntry.Finished = true;      //終了
-        }
+        return fadeWeight;
     }
 
     /// <summary>

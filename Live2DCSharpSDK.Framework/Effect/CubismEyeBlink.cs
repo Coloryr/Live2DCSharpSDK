@@ -143,7 +143,7 @@ public class CubismEyeBlink
                 {
                     t = 1.0f;
                     _blinkingState = EyeState.Interval;
-                    _nextBlinkingTime = DeterminNextBlinkingTiming();
+                    _nextBlinkingTime = DetermineNextBlinkingTiming();
                 }
 
                 parameterValue = t;
@@ -162,7 +162,7 @@ public class CubismEyeBlink
             case EyeState.First:
             default:
                 _blinkingState = EyeState.Interval;
-                _nextBlinkingTime = DeterminNextBlinkingTiming();
+                _nextBlinkingTime = DetermineNextBlinkingTiming();
 
                 parameterValue = 1.0f;
 
@@ -182,7 +182,7 @@ public class CubismEyeBlink
     /// 次のまばたきのタイミングを決定する。
     /// </summary>
     /// <returns>次のまばたきを行う時刻[秒]</returns>
-    private float DeterminNextBlinkingTiming()
+    private float DetermineNextBlinkingTiming()
     {
         float r = _random.Next() / int.MaxValue;
 

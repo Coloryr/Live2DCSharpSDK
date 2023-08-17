@@ -77,18 +77,18 @@ public class LAppLive2DManager : IDisposable
     /// <param name="y">画面のY座標</param>
     public void OnTap(float x, float y)
     {
-        CubismLog.CubismLogDebug($"[Live2D]tap point: x:{x:#.##} y:{y:#.##}");
+        CubismLog.Debug($"[Live2D]tap point: x:{x:#.##} y:{y:#.##}");
 
         for (int i = 0; i < _models.Count; i++)
         {
             if (_models[i].HitTest(LAppDefine.HitAreaNameHead, x, y))
             {
-                CubismLog.CubismLogDebug($"[Live2D]hit area: [{LAppDefine.HitAreaNameHead}]");
+                CubismLog.Debug($"[Live2D]hit area: [{LAppDefine.HitAreaNameHead}]");
                 _models[i].SetRandomExpression();
             }
             else if (_models[i].HitTest(LAppDefine.HitAreaNameBody, x, y))
             {
-                CubismLog.CubismLogDebug($"[Live2D]hit area: [{LAppDefine.HitAreaNameBody}]");
+                CubismLog.Debug($"[Live2D]hit area: [{LAppDefine.HitAreaNameBody}]");
                 _models[i].StartRandomMotion(LAppDefine.MotionGroupTapBody, MotionPriority.PriorityNormal, OnFinishedMotion);
             }
         }
@@ -96,7 +96,7 @@ public class LAppLive2DManager : IDisposable
 
     private void OnFinishedMotion(CubismModel model, ACubismMotion self)
     {
-        CubismLog.CubismLogInfo($"[Live2D]Motion Finished: {self}");
+        CubismLog.Info($"[Live2D]Motion Finished: {self}");
         MotionFinished?.Invoke(model, self);
     }
 
@@ -140,7 +140,7 @@ public class LAppLive2DManager : IDisposable
 
     public LAppModel LoadModel(string dir, string name)
     {
-        CubismLog.CubismLogDebug($"[Live2D]model load: {name}");
+        CubismLog.Debug($"[Live2D]model load: {name}");
 
         // ModelDir[]に保持したディレクトリ名から
         // model3.jsonのパスを決定する.

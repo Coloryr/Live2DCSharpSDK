@@ -11,27 +11,27 @@ public static class CubismLog
         CubismFramework.CoreLogFunction(data);
     }
 
-    public static void CubismLogVerbose(string fmt, params object?[] args)
+    public static void Verbose(string fmt, params object?[] args)
     {
         CubismLogPrintln(LogLevel.Verbose, "[V]", fmt, args);
     }
 
-    public static void CubismLogDebug(string fmt, params object?[] args)
+    public static void Debug(string fmt, params object?[] args)
     {
         CubismLogPrintln(LogLevel.Debug, "[D]", fmt, args);
     }
 
-    public static void CubismLogInfo(string fmt, params object?[] args)
+    public static void Info(string fmt, params object?[] args)
     {
         CubismLogPrintln(LogLevel.Info, "[I]", fmt, args);
     }
 
-    public static void CubismLogWarning(string fmt, params object?[] args)
+    public static void Warning(string fmt, params object?[] args)
     {
         CubismLogPrintln(LogLevel.Warning, "[W]", fmt, args);
     }
 
-    public static void CubismLogError(string fmt, params object?[] args)
+    public static void Error(string fmt, params object?[] args)
     {
         CubismLogPrintln(LogLevel.Error, "[E]", fmt, args);
     }

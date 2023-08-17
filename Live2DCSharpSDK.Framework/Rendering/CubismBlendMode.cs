@@ -17,4 +17,8 @@ public enum CubismBlendMode
     /// 乗算
     /// </summary>
     Multiplicative = 2,
+    /// <summary>
+    /// マスク
+    /// </summary>
+    Mask = 3,
 };

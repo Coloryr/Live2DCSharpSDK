@@ -125,7 +125,7 @@ public class LAppModel : CubismUserModel
 
         _modelHomeDir = dir;
 
-        CubismLog.CubismLogDebug($"[Live2D]load model setting: {fileName}");
+        CubismLog.Debug($"[Live2D]load model setting: {fileName}");
 
         _modelSetting = JsonSerializer.Deserialize<ModelSettingObj>(File.ReadAllText(fileName))
             ?? throw new Exception("model3.json error");
@@ -143,7 +143,7 @@ public class LAppModel : CubismUserModel
                 throw new Exception("model is null");
             }
 
-            CubismLog.CubismLogDebug($"[Live2D]create model: {path}");
+            CubismLog.Debug($"[Live2D]create model: {path}");
 
             LoadModel(File.ReadAllBytes(path), _mocConsistency);
         }
@@ -475,7 +475,7 @@ public class LAppModel : CubismUserModel
         }
         else if (!_motionManager.ReserveMotion(priority))
         {
-            CubismLog.CubismLogDebug("[Live2D]can't start motion.");
+            CubismLog.Debug("[Live2D]can't start motion.");
             return null;
         }
 
@@ -523,7 +523,7 @@ public class LAppModel : CubismUserModel
             //_wavFileHandler.Start(path);
         }
 
-        CubismLog.CubismLogDebug($"[Live2D]start motion: [{group}_{no}]");
+        CubismLog.Debug($"[Live2D]start motion: [{group}_{no}]");
         return _motionManager.StartMotionPriority(motion, priority);
     }
 
@@ -552,7 +552,7 @@ public class LAppModel : CubismUserModel
     public void SetExpression(string expressionID)
     {
         ACubismMotion motion = _expressions[expressionID];
-        CubismLog.CubismLogDebug($"[Live2D]expression: [{expressionID}]");
+        CubismLog.Debug($"[Live2D]expression: [{expressionID}]");
 
         if (motion != null)
         {
@@ -560,7 +560,7 @@ public class LAppModel : CubismUserModel
         }
         else
         {
-            CubismLog.CubismLogDebug($"[Live2D]expression[{expressionID}] is null ");
+            CubismLog.Debug($"[Live2D]expression[{expressionID}] is null ");
         }
     }
 
@@ -593,7 +593,7 @@ public class LAppModel : CubismUserModel
     /// <param name="eventValue"></param>
     protected override void MotionEventFired(string eventValue)
     {
-        CubismLog.CubismLogDebug($"[Live2D]{eventValue} is fired on LAppModel!!");
+        CubismLog.Debug($"[Live2D]{eventValue} is fired on LAppModel!!");
         Motion?.Invoke(this, eventValue);
     }
 

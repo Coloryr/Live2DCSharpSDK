@@ -1319,4 +1319,16 @@ public class CubismModel : IDisposable
         _userPartScreenColors[partIndex].IsOverwritten = value;
         SetOverwriteColorForPartColors(partIndex, value, _userPartScreenColors, _userScreenColors);
     }
+
+    /// <summary>
+    /// パラメータのIDを取得する。
+    /// </summary>
+    /// <param name="parameterIndex">パラメータのIndex</param>
+    /// <returns>パラメータのID</returns>
+    public unsafe string GetParameterId(int parameterIndex)
+    {
+        var parameterId = new string(
+            CubismCore.GetParameterIds(Model)[parameterIndex]);
+        return CubismFramework.CubismIdManager.GetId(parameterId);
+    }
 }

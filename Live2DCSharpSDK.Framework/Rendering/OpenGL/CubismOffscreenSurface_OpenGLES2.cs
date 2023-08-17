@@ -3,7 +3,7 @@
 /// <summary>
 /// オフスクリーン描画用構造体
 /// </summary>
-public class CubismOffscreenFrame_OpenGLES2
+public class CubismOffscreenSurface_OpenGLES2
 {
     private readonly OpenGLApi GL;
     /// <summary>
@@ -33,7 +33,7 @@ public class CubismOffscreenFrame_OpenGLES2
     /// </summary>
     private bool _isColorBufferInherited;
 
-    public CubismOffscreenFrame_OpenGLES2(OpenGLApi gl)
+    public CubismOffscreenSurface_OpenGLES2(OpenGLApi gl)
     {
         GL = gl;
     }
@@ -101,7 +101,7 @@ public class CubismOffscreenFrame_OpenGLES2
     public unsafe bool CreateOffscreenFrame(int displayBufferWidth, int displayBufferHeight, int colorBuffer = 0)
     {
         // 一旦削除
-        DestroyOffscreenFrame();
+        DestroyOffscreenSurface();
 
         // 新しく生成する
         if (colorBuffer == 0)
@@ -145,7 +145,7 @@ public class CubismOffscreenFrame_OpenGLES2
     /// <summary>
     /// CubismOffscreenFrameの削除
     /// </summary>
-    public void DestroyOffscreenFrame()
+    public void DestroyOffscreenSurface()
     {
         if (!_isColorBufferInherited && (ColorBuffer != 0))
         {

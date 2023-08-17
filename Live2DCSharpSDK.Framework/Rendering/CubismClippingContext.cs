@@ -1,9 +1,14 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Type;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
+namespace Live2DCSharpSDK.Framework.Rendering;
 
-internal class CubismClippingContext
+public class CubismClippingContext
 {
     /// <summary>
     /// 現在の描画状態でマスクの準備が必要ならtrue
@@ -32,11 +37,11 @@ internal class CubismClippingContext
     /// <summary>
     /// マスクの位置計算結果を保持する行列
     /// </summary>
-    public readonly CubismMatrix44 _matrixForMask = new();
+    public CubismMatrix44 _matrixForMask = new();
     /// <summary>
     /// 描画オブジェクトの位置計算結果を保持する行列
     /// </summary>
-    public readonly CubismMatrix44 _matrixForDraw = new();
+    public CubismMatrix44 _matrixForDraw = new();
     /// <summary>
     /// このマスクにクリップされる描画オブジェクトのリスト
     /// </summary>
@@ -46,18 +51,11 @@ internal class CubismClippingContext
     /// </summary>
     public int _bufferIndex;
 
-    /// <summary>
-    /// このマスクを管理しているマネージャのインスタンス
-    /// </summary>
-    internal CubismClippingManager_OpenGLES2 _owner;
+    public CubismClippingManager Manager { get; }
 
-    /// <summary>
-    /// 引数付きコンストラクタ
-    /// </summary>
-    internal unsafe CubismClippingContext(CubismClippingManager_OpenGLES2 manager, int* clippingDrawableIndices, int clipCount)
+    public unsafe CubismClippingContext(CubismClippingManager manager, int* clippingDrawableIndices, int clipCount)
     {
-        _owner = manager;
-
+        Manager = manager;
         // クリップしている（＝マスク用の）Drawableのインデックスリスト
         _clippingIdList = clippingDrawableIndices;
 
@@ -69,24 +67,15 @@ internal class CubismClippingContext
         _allClippedDrawRect = new RectF();
         _layoutBounds = new RectF();
 
-        _clippedDrawableIndexList = new List<int>();
+        _clippedDrawableIndexList = new();
     }
 
     /// <summary>
     /// このマスクにクリップされる描画オブジェクトを追加する
     /// </summary>
     /// <param name="drawableIndex">クリッピング対象に追加する描画オブジェクトのインデックス</param>
-    internal void AddClippedDrawable(int drawableIndex)
+    public void AddClippedDrawable(int drawableIndex)
     {
         _clippedDrawableIndexList.Add(drawableIndex);
-    }
-
-    /// <summary>
-    /// このマスクを管理するマネージャのインスタンスを取得する。
-    /// </summary>
-    /// <returns>クリッピングマネージャのインスタンス</returns>
-    internal CubismClippingManager_OpenGLES2 GetClippingManager()
-    {
-        return _owner;
     }
 }

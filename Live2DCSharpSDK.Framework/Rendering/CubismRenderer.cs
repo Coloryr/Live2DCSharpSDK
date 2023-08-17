@@ -1,5 +1,6 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
+using Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
 namespace Live2DCSharpSDK.Framework.Rendering;
 
@@ -93,6 +94,24 @@ public abstract class CubismRenderer : IDisposable
     public CubismMatrix44 GetMvpMatrix()
     {
         return _mvpMatrix4x4;
+    }
+
+    /// <summary>
+    /// 透明度を考慮したモデルの色を計算する。
+    /// </summary>
+    /// <param name="opacity">透明度</param>
+    /// <returns>RGBAのカラー情報</returns>
+    public CubismTextureColor GetModelColorWithOpacity(float opacity)
+    {
+        CubismTextureColor modelColorRGBA = new(ModelColor);
+        modelColorRGBA.A *= opacity;
+        if (IsPremultipliedAlpha())
+        {
+            modelColorRGBA.R *= modelColorRGBA.A;
+            modelColorRGBA.G *= modelColorRGBA.A;
+            modelColorRGBA.B *= modelColorRGBA.A;
+        }
+        return modelColorRGBA;
     }
 
     /// <summary>

@@ -14,7 +14,7 @@ public class CubismMotionQueueManager
     /// <summary>
     /// モーション
     /// </summary>
-    private readonly List<CubismMotionQueueEntry> _motions = new();
+    protected readonly List<CubismMotionQueueEntry> _motions = new();
 
     private readonly List<CubismMotionQueueEntry> _remove = new();
 

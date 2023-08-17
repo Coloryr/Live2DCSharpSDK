@@ -509,11 +509,11 @@ public class CubismMotion : ACubismMotion
         //瞬き、リップシンクのターゲット数が上限を超えている場合
         if (_eyeBlinkParameterIds.Count > MaxTargetSize)
         {
-            CubismLog.CubismLogWarning($"[Live2D SDK]too many eye blink targets : {_eyeBlinkParameterIds.Count}");
+            CubismLog.Warning($"[Live2D SDK]too many eye blink targets : {_eyeBlinkParameterIds.Count}");
         }
         if (_lipSyncParameterIds.Count > MaxTargetSize)
         {
-            CubismLog.CubismLogWarning($"[Live2D SDK]too many lip sync targets : {_lipSyncParameterIds.Count}");
+            CubismLog.Warning($"[Live2D SDK]too many lip sync targets : {_lipSyncParameterIds.Count}");
         }
 
         float tmpFadeIn = (FadeInSeconds <= 0.0f) ? 1.0f :

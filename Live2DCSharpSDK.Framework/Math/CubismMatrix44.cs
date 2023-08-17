@@ -13,7 +13,7 @@ public record CubismMatrix44
         0.0f, 0.0f, 0.0f, 1.0f
     };
 
-    public float[] _mpt1 = new float[]
+    private float[] _mpt1 = new float[]
     {
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
@@ -21,7 +21,7 @@ public record CubismMatrix44
         0.0f, 0.0f, 0.0f, 1.0f
     };
 
-    public float[] _mpt2 = new float[16]
+    private float[] _mpt2 = new float[16]
     {
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
@@ -32,7 +32,7 @@ public record CubismMatrix44
     /// <summary>
     /// 4x4行列データ
     /// </summary>
-    public float[] _tr = new float[16];
+    protected float[] _tr = new float[16];
 
     public float[] Tr => _tr;
 

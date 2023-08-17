@@ -48,7 +48,7 @@ public abstract class CubismUserModel : IDisposable
     /// <summary>
     /// 表情管理
     /// </summary>
-    protected CubismMotionManager _expressionManager;
+    protected CubismExpressionMotionManager _expressionManager;
     /// <summary>
     /// 自動まばたき
     /// </summary>
@@ -112,9 +112,9 @@ public abstract class CubismUserModel : IDisposable
     /// </summary>
     /// <param name="eventValue">発火したイベントの文字列データ</param>
     /// <param name="customData">CubismUserModelを継承したインスタンスを想定</param>
-    public static void CubismDefaultMotionEventCallback(CubismUserModel customData, string eventValue)
+    public static void CubismDefaultMotionEventCallback(CubismUserModel? customData, string eventValue)
     {
-        customData.MotionEventFired(eventValue);
+        customData?.MotionEventFired(eventValue);
     }
 
     /// <summary>
@@ -132,7 +132,7 @@ public abstract class CubismUserModel : IDisposable
         _motionManager.SetEventCallback(CubismDefaultMotionEventCallback, this);
 
         // 表情モーションマネージャを作成
-        _expressionManager = new CubismMotionManager();
+        _expressionManager = new CubismExpressionMotionManager();
 
         // ドラッグによるアニメーション
         _dragManager = new CubismTargetPoint();
