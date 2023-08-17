@@ -1,10 +1,5 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Framework.Motion;
 
@@ -28,7 +23,7 @@ public record ExpressionParameterValue
     /// <summary>
     /// 上書き値
     /// </summary>
-    public float OverwriteValue;         
+    public float OverwriteValue;
 };
 
 public class CubismExpressionMotionManager : CubismMotionQueueManager
@@ -46,8 +41,8 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
     public MotionPriority ReservePriority { get; set; }
 
     public CubismExpressionMotionManager()
-    { 
-        
+    {
+
     }
 
     /// <summary>
@@ -56,7 +51,7 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
     /// <param name="motion">モーション</param>
     /// <param name="priority">優先度</param>
     /// <returns>開始したモーションの識別番号を返す。個別のモーションが終了したか否かを判定するIsFinished()の引数で使用する。開始できない時は「-1」</returns>
-    public CubismMotionQueueEntry StartMotionPriority(ACubismMotion motion,  MotionPriority priority)
+    public CubismMotionQueueEntry StartMotionPriority(ACubismMotion motion, MotionPriority priority)
     {
         if (priority == ReservePriority)
         {
@@ -138,7 +133,7 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
             }
 
             // ------ 値を計算する ------
-            expressionMotion.CalculateExpressionParameters(model, _userTimeSeconds, 
+            expressionMotion.CalculateExpressionParameters(model, _userTimeSeconds,
                 item, _expressionParameterValues, expressionIndex);
 
             expressionWeight += expressionMotion.FadeInSeconds == 0.0f

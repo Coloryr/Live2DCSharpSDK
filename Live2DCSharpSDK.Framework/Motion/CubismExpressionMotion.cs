@@ -15,7 +15,7 @@ public class CubismExpressionMotion : ACubismMotion
     /// <summary>
     /// 乗算適用の初期値
     /// </summary>
-    public const float DefaultMultiplyValue = 1.0f;  
+    public const float DefaultMultiplyValue = 1.0f;
 
     public const string ExpressionKeyFadeIn = "FadeInTime";
     public const string ExpressionKeyFadeOut = "FadeOutTime";

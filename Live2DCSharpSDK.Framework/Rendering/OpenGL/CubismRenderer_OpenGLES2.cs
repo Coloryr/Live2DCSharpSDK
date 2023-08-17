@@ -1,5 +1,4 @@
 ﻿using Live2DCSharpSDK.Framework.Model;
-using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
@@ -91,7 +90,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         if (model.IsUsingMasking())
         {
             _clippingManager = new CubismClippingManager_OpenGLES2(GL);  //クリッピングマスク・バッファ前処理方式を初期化
-            _clippingManager.Initialize(  model, maskBufferCount );
+            _clippingManager.Initialize(model, maskBufferCount);
 
             _offscreenFrameBuffers.Clear();
             for (int i = 0; i < maskBufferCount; ++i)
@@ -315,7 +314,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
             PreDraw();
 
             // サイズが違う場合はここで作成しなおし
-            for (int i = 0; i < _clippingManager.RenderTextureCount ; ++i)
+            for (int i = 0; i < _clippingManager.RenderTextureCount; ++i)
             {
                 if (_offscreenFrameBuffers[i].BufferWidth != (uint)_clippingManager.ClippingMaskBufferSize.X ||
                     _offscreenFrameBuffers[i].BufferHeight != (uint)_clippingManager.ClippingMaskBufferSize.Y)
