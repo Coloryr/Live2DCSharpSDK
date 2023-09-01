@@ -127,7 +127,9 @@ public class LAppModel : CubismUserModel
 
         CubismLog.Debug($"[Live2D]load model setting: {fileName}");
 
-        _modelSetting = JsonSerializer.Deserialize<ModelSettingObj>(File.ReadAllText(fileName))
+        using var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+        _modelSetting = JsonSerializer.Deserialize(stream, ModelSettingObjContext.Default.ModelSettingObj)
             ?? throw new Exception("model3.json error");
 
         Updating = true;

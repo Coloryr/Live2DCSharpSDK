@@ -281,7 +281,7 @@ public class CubismMotion : ACubismMotion
         _modelOpacity = 1.0f;
 
         using var stream = File.Open(buffer, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        var obj = JsonSerializer.Deserialize<CubismMotionObj>(stream)
+        var obj = JsonSerializer.Deserialize(stream, CubismMotionObjContext.Default.CubismMotionObj)
             ?? throw new Exception("motion3.json error");
 
         _motionData = new()

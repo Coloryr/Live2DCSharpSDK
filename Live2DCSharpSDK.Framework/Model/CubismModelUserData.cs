@@ -32,8 +32,8 @@ public class CubismModelUserData
     public CubismModelUserData(string data)
     {
         using var stream = File.Open(data, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        var obj = JsonSerializer.Deserialize<CubismModelUserDataObj>(stream)
-            ?? throw new Exception("userdata3.json error"); ;
+        var obj = JsonSerializer.Deserialize(stream, CubismModelUserDataObjContext.Default.CubismModelUserDataObj)
+            ?? throw new Exception("userdata3.json error");
 
         string typeOfArtMesh = CubismFramework.CubismIdManager.GetId(ArtMesh);
 
