@@ -351,9 +351,11 @@ public class CubismModel : IDisposable
     /// <returns>パーツのID</returns>
     public unsafe string GetPartId(int partIndex)
     {
-        var partIds = CubismCore.GetPartIds(Model);
-        var str = new string(partIds[partIndex]);
-        return CubismFramework.CubismIdManager.GetId(str);
+        if (0 <= partIndex && partIndex < PartIds.Count)
+        {
+            throw new IndexOutOfRangeException("Out of PartIds size");
+        }
+        return PartIds[partIndex]; 
     }
 
     /// <summary>
@@ -679,9 +681,11 @@ public class CubismModel : IDisposable
     /// <returns>DrawableのID</returns>
     public unsafe string GetDrawableId(int drawableIndex)
     {
-        var parameterIds = CubismCore.GetDrawableIds(Model);
-        var str = new string(parameterIds[drawableIndex]);
-        return CubismFramework.CubismIdManager.GetId(str);
+        if (0 <= drawableIndex && drawableIndex < DrawableIds.Count)
+        {
+            throw new IndexOutOfRangeException("Out of DrawableIds size");
+        }
+        return DrawableIds[drawableIndex];
     }
 
     /// <summary>
@@ -1327,8 +1331,10 @@ public class CubismModel : IDisposable
     /// <returns>パラメータのID</returns>
     public unsafe string GetParameterId(int parameterIndex)
     {
-        var parameterId = new string(
-            CubismCore.GetParameterIds(Model)[parameterIndex]);
-        return CubismFramework.CubismIdManager.GetId(parameterId);
+        if (0 <= parameterIndex && parameterIndex < ParameterIds.Count)
+        {
+            throw new IndexOutOfRangeException("Out of ParameterIds size");
+        }
+        return ParameterIds[parameterIndex];
     }
 }
