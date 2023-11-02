@@ -251,4 +251,46 @@ public static class CubismMath
         root1 = u1 - v1 - ba / 3.0f;
         return RangeF(root1, 0.0f, 1.0f);
     }
+
+    /// <summary>
+    /// 値を範囲内に納めて返す
+    /// </summary>
+    /// <param name="val">範囲内か確認する値</param>
+    /// <param name="min">最小値</param>
+    /// <param name="max">最大値</param>
+    /// <returns>範囲内に収まった値</returns>
+    public static int Clamp(int val, int min, int max)
+    {
+        if (val < min)
+        {
+            return min;
+        }
+        else if (max < val)
+        {
+            return max;
+        }
+
+        return val;
+    }
+
+    /// <summary>
+    /// 値を範囲内に納めて返す
+    /// </summary>
+    /// <param name="val">範囲内か確認する値</param>
+    /// <param name="min">最小値</param>
+    /// <param name="max">最大値</param>
+    /// <returns>範囲内に収まった値</returns>
+    public static float ClampF(float val, float min, float max)
+    {
+        if (val < min)
+        {
+            return min;
+        }
+        else if (max < val)
+        {
+            return max;
+        }
+
+        return val;
+    }
 }

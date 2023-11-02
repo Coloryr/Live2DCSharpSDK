@@ -69,8 +69,8 @@ public class OpenGlPageControl : OpenGlControlBase
 
         lapp = new(new AvaloniaApi(this, gl), Console.WriteLine);
         lapp.BGColor = new(0, 1, 0, 1);
-        //var model = lapp.Live2dManager.LoadModel("F:\\live2d\\koharu_haruto\\‚±‚Í‚é\\runtime\\", "koharu");
-        var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Haru\\", "Haru");
+        var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources", "Mao");
+        //var model = lapp.Live2dManager.LoadModel("F:\\live2d\\girl07\\l2d00.u\\", "l2d00.u");
         CheckError(gl);
         init = true;
     }
