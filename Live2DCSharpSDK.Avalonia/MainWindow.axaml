@@ -22,6 +22,9 @@
             HorizontalContentAlignment="Center"
             VerticalContentAlignment="Center"
             Content="刷新" />
-        <pages:OpenGlPageControl x:Name="GL" />
+        <Panel>
+            <pages:OpenGlPageControl Name="GL" />
+            <Panel Name="GLTop" />
+        </Panel>
     </DockPanel>
 </Window>

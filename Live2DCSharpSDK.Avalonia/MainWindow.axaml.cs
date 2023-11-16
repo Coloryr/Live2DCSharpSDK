@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
@@ -21,6 +22,13 @@ public partial class MainWindow : Window
         Closing += MainWindow_Closing;
 
         _renderTimer = new(GL);
+
+        GLTop.PointerPressed += GLTop_PointerPressed;
+    }
+
+    private void GLTop_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        
     }
 
     private void MainWindow_Closing(object? sender, WindowClosingEventArgs e)
@@ -44,6 +52,11 @@ public class OpenGlPageControl : OpenGlControlBase
     public static readonly DirectProperty<OpenGlPageControl, string> InfoProperty =
         AvaloniaProperty.RegisterDirect<OpenGlPageControl, string>("Info", o => o.Info, (o, v) => o.Info = v);
 
+    public OpenGlPageControl()
+    {
+        
+    }
+
     public string Info
     {
         get => _info;
@@ -57,22 +70,18 @@ public class OpenGlPageControl : OpenGlControlBase
             Console.WriteLine(err);
     }
 
-    private bool init = false;
-
     protected override unsafe void OnOpenGlInit(GlInterface gl)
     {
-        if (init)
-            return;
         CheckError(gl);
 
         Info = $"Renderer: {gl.GetString(GlConsts.GL_RENDERER)} Version: {gl.GetString(GlConsts.GL_VERSION)}";
 
-        lapp = new(new AvaloniaApi(this, gl), Console.WriteLine);
-        lapp.BGColor = new(0, 1, 0, 1);
+        lapp = new(new AvaloniaApi(this, gl), Console.WriteLine)
+        {
+            BGColor = new(0, 0, 0, 0)
+        };
         var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources", "Mao");
-        //var model = lapp.Live2dManager.LoadModel("F:\\live2d\\girl07\\l2d00.u\\", "l2d00.u");
         CheckError(gl);
-        init = true;
     }
 
     protected override void OnOpenGlDeinit(GlInterface GL)
@@ -82,7 +91,16 @@ public class OpenGlPageControl : OpenGlControlBase
 
     protected override void OnOpenGlRender(GlInterface gl, int fb)
     {
-        gl.Viewport(0, 0, (int)Bounds.Width, (int)Bounds.Height);
+        int x = (int)Bounds.Width;
+        int y = (int)Bounds.Height;
+
+        if (VisualRoot is TopLevel window)
+        {
+            var screen = window.RenderScaling;
+            x = (int)(Bounds.Width * screen);
+            y = (int)(Bounds.Height * screen);
+        }
+        gl.Viewport(0, 0, x, y);
         var now = DateTime.Now;
         float span = 0;
         if (time.Ticks == 0)
