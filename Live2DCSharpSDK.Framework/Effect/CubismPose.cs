@@ -20,11 +20,11 @@ public class CubismPose
     /// <summary>
     /// パーツグループ
     /// </summary>
-    private readonly List<PartData> _partGroups = new();
+    private readonly List<PartData> _partGroups = [];
     /// <summary>
     /// それぞれのパーツグループの個数
     /// </summary>
-    private readonly List<int> _partGroupCounts = new();
+    private readonly List<int> _partGroupCounts = [];
     /// <summary>
     /// フェード時間[秒]
     /// </summary>

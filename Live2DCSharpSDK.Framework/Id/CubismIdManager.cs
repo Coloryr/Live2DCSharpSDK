@@ -8,7 +8,7 @@ public class CubismIdManager
     /// <summary>
     /// 登録されているIDのリスト
     /// </summary>
-    private readonly List<string> _ids = new();
+    private readonly List<string> _ids = [];
 
     /// <summary>
     /// ID名をリストから登録する。

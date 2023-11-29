@@ -65,12 +65,12 @@ public class LAppDelegate : IDisposable
         _cubismAllocator = new LAppAllocator();
 
         //テクスチャサンプリング設定
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+        GL.TexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        GL.TexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 
         //透過設定
-        GL.glEnable(GL.GL_BLEND);
-        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        GL.Enable(GL.GL_BLEND);
+        GL.BlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
         // ウィンドウサイズ記憶
         GL.GetWindowSize(out _windowWidth, out _windowHeight);
@@ -133,9 +133,9 @@ public class LAppDelegate : IDisposable
         LAppPal.DeltaTime = tick;
 
         // 画面の初期化
-        GL.glClearColor(BGColor.R, BGColor.G, BGColor.B, BGColor.A);
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-        GL.glClearDepthf(1.0f);
+        GL.ClearColor(BGColor.R, BGColor.G, BGColor.B, BGColor.A);
+        GL.Clear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+        GL.ClearDepthf(1.0f);
 
         //描画更新
         View.Render();

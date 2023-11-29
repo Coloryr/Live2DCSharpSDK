@@ -1,20 +1,13 @@
 ﻿using SkiaSharp;
-using System.Buffers;
 
 namespace Live2DCSharpSDK.App;
 
 /// <summary>
 /// 画像読み込み、管理を行うクラス。
 /// </summary>
-public class LAppTextureManager
+public class LAppTextureManager(LAppDelegate lapp)
 {
-    private readonly LAppDelegate _lapp;
-    private readonly List<TextureInfo> _textures = new();
-
-    public LAppTextureManager(LAppDelegate lapp)
-    {
-        _lapp = lapp;
-    }
+    private readonly List<TextureInfo> _textures = [];
 
     /// <summary>
     /// 画像読み込み
@@ -32,15 +25,15 @@ public class LAppTextureManager
         var info1 = SKBitmap.DecodeBounds(fileName);
         info1.ColorType = SKColorType.Rgba8888;
         using var image = SKBitmap.Decode(fileName, info1);
-        var GL = _lapp.GL;
+        var GL = lapp.GL;
         // OpenGL用のテクスチャを生成する
-        int textureId = GL.glGenTexture();
-        GL.glBindTexture(GL.GL_TEXTURE_2D, textureId);
-        GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, image.Width, image.Height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, image.GetPixels());
-        GL.glGenerateMipmap(GL.GL_TEXTURE_2D);
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR_MIPMAP_LINEAR);
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
+        int textureId = GL.GenTexture();
+        GL.BindTexture(GL.GL_TEXTURE_2D, textureId);
+        GL.TexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, image.Width, image.Height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, image.GetPixels());
+        GL.GenerateMipmap(GL.GL_TEXTURE_2D);
+        GL.TexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR_MIPMAP_LINEAR);
+        GL.TexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        GL.BindTexture(GL.GL_TEXTURE_2D, 0);
 
         var info = new TextureInfo()
         {

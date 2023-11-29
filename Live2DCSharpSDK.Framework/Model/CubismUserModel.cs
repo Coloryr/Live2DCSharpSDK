@@ -128,14 +128,14 @@ public abstract class CubismUserModel : IDisposable
 
         // モーションマネージャーを作成
         // MotionQueueManagerクラスからの継承なので使い方は同じ
-        _motionManager = new CubismMotionManager();
+        _motionManager = new();
         _motionManager.SetEventCallback(CubismDefaultMotionEventCallback, this);
 
         // 表情モーションマネージャを作成
-        _expressionManager = new CubismExpressionMotionManager();
+        _expressionManager = new();
 
         // ドラッグによるアニメーション
-        _dragManager = new CubismTargetPoint();
+        _dragManager = new();
     }
 
     public void Dispose()

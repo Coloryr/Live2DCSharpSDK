@@ -11,46 +11,46 @@ public class CubismModel : IDisposable
     /// </summary>
     public IntPtr Model { get; }
 
-    public readonly List<string> ParameterIds = new();
-    public readonly List<string> PartIds = new();
-    public readonly List<string> DrawableIds = new();
+    public readonly List<string> ParameterIds = [];
+    public readonly List<string> PartIds = [];
+    public readonly List<string> DrawableIds = [];
 
     /// <summary>
     /// 存在していないパーツの不透明度のリスト
     /// </summary>
-    private readonly Dictionary<int, float> _notExistPartOpacities = new();
+    private readonly Dictionary<int, float> _notExistPartOpacities = [];
     /// <summary>
     /// 存在していないパーツIDのリスト
     /// </summary>
-    private readonly Dictionary<string, int> _notExistPartId = new();
+    private readonly Dictionary<string, int> _notExistPartId = [];
     /// <summary>
     /// 存在していないパラメータの値のリスト
     /// </summary>
-    private readonly Dictionary<int, float> _notExistParameterValues = new();
+    private readonly Dictionary<int, float> _notExistParameterValues = [];
     /// <summary>
     /// 存在していないパラメータIDのリスト
     /// </summary>
-    private readonly Dictionary<string, int> _notExistParameterId = new();
+    private readonly Dictionary<string, int> _notExistParameterId = [];
     /// <summary>
     /// 保存されたパラメータ
     /// </summary>
-    private readonly List<float> _savedParameters = new();
+    private readonly List<float> _savedParameters = [];
     /// <summary>
     /// パラメータの値のリスト
     /// </summary>
-    private unsafe float* _parameterValues;
+    private readonly unsafe float* _parameterValues;
     /// <summary>
     /// パラメータの最大値のリスト
     /// </summary>
-    private unsafe float* _parameterMaximumValues;
+    private readonly unsafe float* _parameterMaximumValues;
     /// <summary>
     /// パラメータの最小値のリスト
     /// </summary>
-    private unsafe float* _parameterMinimumValues;
+    private readonly unsafe float* _parameterMinimumValues;
     /// <summary>
     /// パーツの不透明度のリスト
     /// </summary>
-    private unsafe float* _partOpacities;
+    private readonly unsafe float* _partOpacities;
     /// <summary>
     /// モデルの不透明度
     /// </summary>
@@ -59,27 +59,27 @@ public class CubismModel : IDisposable
     /// <summary>
     /// Drawable 乗算色の配列
     /// </summary>
-    private readonly List<DrawableColorData> _userScreenColors = new();
+    private readonly List<DrawableColorData> _userScreenColors = [];
     /// <summary>
     /// Drawable スクリーン色の配列
     /// </summary>
-    private readonly List<DrawableColorData> _userMultiplyColors = new();
+    private readonly List<DrawableColorData> _userMultiplyColors = [];
     /// <summary>
     /// カリング設定の配列
     /// </summary>
-    private readonly List<DrawableCullingData> _userCullings = new();
+    private readonly List<DrawableCullingData> _userCullings = [];
     /// <summary>
     /// Part 乗算色の配列
     /// </summary>
-    private readonly List<PartColorData> _userPartScreenColors = new();
+    private readonly List<PartColorData> _userPartScreenColors = [];
     /// <summary>
     /// Part スクリーン色の配列
     /// </summary>
-    private readonly List<PartColorData> _userPartMultiplyColors = new();
+    private readonly List<PartColorData> _userPartMultiplyColors = [];
     /// <summary>
     /// Partの子DrawableIndexの配列
     /// </summary>
-    private List<int>[] _partChildDrawables;
+    private readonly List<int>[] _partChildDrawables;
     /// <summary>
     /// 乗算色を全て上書きするか？
     /// </summary>
@@ -120,9 +120,9 @@ public class CubismModel : IDisposable
         _partChildDrawables = new List<int>[partCount];
         for (int i = 0; i < partCount; ++i)
         {
-            var str = new string((sbyte*)partIds[i]);
+            var str = new string(partIds[i]);
             PartIds.Add(CubismFramework.CubismIdManager.GetId(str));
-            _partChildDrawables[i] = new();
+            _partChildDrawables[i] = [];
         }
 
         var drawableIds = CubismCore.GetDrawableIds(Model);
@@ -432,10 +432,10 @@ public class CubismModel : IDisposable
     /// <returns>パーツの不透明度</returns>
     public unsafe float GetPartOpacity(int partIndex)
     {
-        if (_notExistPartOpacities.ContainsKey(partIndex))
+        if (_notExistPartOpacities.TryGetValue(partIndex, out float value))
         {
             // モデルに存在しないパーツIDの場合、非存在パーツリストから不透明度を返す
-            return _notExistPartOpacities[partIndex];
+            return value;
         }
 
         //インデックスの範囲内検知
@@ -456,7 +456,9 @@ public class CubismModel : IDisposable
     {
         int parameterIndex = ParameterIds.IndexOf(parameterId);
         if (parameterIndex != -1)
+        {
             return parameterIndex;
+        }
 
         // モデルに存在していない場合、非存在パラメータIDリスト内を検索し、そのインデックスを返す
         if (_notExistParameterId.TryGetValue(parameterId, out var data))
@@ -576,12 +578,10 @@ public class CubismModel : IDisposable
     /// <param name="weight">重み</param>
     public unsafe void SetParameterValue(int parameterIndex, float value, float weight = 1.0f)
     {
-        if (_notExistParameterValues.ContainsKey(parameterIndex))
+        if (_notExistParameterValues.TryGetValue(parameterIndex, out float value1))
         {
-            _notExistParameterValues[parameterIndex] = (weight == 1)
-                                                             ? value
-                                                             : (_notExistParameterValues[parameterIndex] * (1 - weight)) +
-                                                             (value * weight);
+            _notExistParameterValues[parameterIndex] = weight == 1
+                ? value : (value1 * (1 - weight)) + (value * weight);
             return;
         }
 

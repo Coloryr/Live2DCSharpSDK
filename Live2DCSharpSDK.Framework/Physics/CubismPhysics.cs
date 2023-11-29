@@ -45,11 +45,11 @@ public class CubismPhysics
     /// <summary>
     /// 最新の振り子計算の結果
     /// </summary>
-    private readonly List<float[]> _currentRigOutputs = new();
+    private readonly List<float[]> _currentRigOutputs = [];
     /// <summary>
     /// 一つ前の振り子計算の結果
     /// </summary>
-    private readonly List<float[]> _previousRigOutputs = new();
+    private readonly List<float[]> _previousRigOutputs = [];
 
     /// <summary>
     /// 物理演算が処理していない時間
@@ -59,11 +59,11 @@ public class CubismPhysics
     /// <summary>
     /// Evaluateで利用するパラメータのキャッシュs
     /// </summary>
-    private float[] _parameterCaches = Array.Empty<float>();
+    private float[] _parameterCaches = [];
     /// <summary>
     /// UpdateParticlesが動くときの入力をキャッシュ
     /// </summary>
-    private float[] _parameterInputCaches = Array.Empty<float>();
+    private float[] _parameterInputCaches = [];
 
     /// <summary>
     /// インスタンスを作成する。

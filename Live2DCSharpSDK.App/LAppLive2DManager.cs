@@ -9,28 +9,22 @@ namespace Live2DCSharpSDK.App;
 /// サンプルアプリケーションにおいてCubismModelを管理するクラス
 /// モデル生成と破棄、タップイベントの処理、モデル切り替えを行う。
 /// </summary>
-public class LAppLive2DManager : IDisposable
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
 {
+    public event Action<CubismModel, ACubismMotion>? MotionFinished;
+
     /// <summary>
     /// モデル描画に用いるView行列
     /// </summary>
     public CubismMatrix44 ViewMatrix { get; } = new();
+
     /// <summary>
     /// モデルインスタンスのコンテナ
     /// </summary>
-    private readonly List<LAppModel> _models = new();
-
-    private readonly LAppDelegate _lapp;
-
-    public event Action<CubismModel, ACubismMotion>? MotionFinished;
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public LAppLive2DManager(LAppDelegate lapp)
-    {
-        _lapp = lapp;
-    }
+    private readonly List<LAppModel> _models = [];
 
     /// <summary>
     /// 現在のシーンで保持しているモデルを返す
@@ -108,7 +102,7 @@ public class LAppLive2DManager : IDisposable
     /// </summary>
     public void OnUpdate()
     {
-        _lapp.GL.GetWindowSize(out int width, out int height);
+        lapp.GL.GetWindowSize(out int width, out int height);
 
         int modelCount = _models.Count;
         for (int i = 0; i < modelCount; ++i)
@@ -145,7 +139,7 @@ public class LAppLive2DManager : IDisposable
         // ModelDir[]に保持したディレクトリ名から
         // model3.jsonのパスを決定する.
         // ディレクトリ名とmodel3.jsonの名前を一致させておくこと.
-        if(!dir.EndsWith('\\') && !dir.EndsWith("/"))
+        if(!dir.EndsWith('\\') && !dir.EndsWith('/'))
         {
             dir = Path.GetFullPath(dir + '/');
         }
@@ -160,7 +154,7 @@ public class LAppLive2DManager : IDisposable
             throw new Exception($"[Live2D]File not found: {modelJsonName}");
         }
         
-        var model = new LAppModel(_lapp, dir, modelJsonName);
+        var model = new LAppModel(lapp, dir, modelJsonName);
         _models.Add(model);
 
         return model;

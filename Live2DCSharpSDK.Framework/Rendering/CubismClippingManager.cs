@@ -24,21 +24,21 @@ public class CubismClippingManager
     /// <summary>
     /// オフスクリーンサーフェイスのアドレス
     /// </summary>
-    protected CubismOffscreenSurface_OpenGLES2 _currentMaskBuffer;
+    protected CubismOffscreenSurface_OpenGLES2 CurrentMaskBuffer;
     /// <summary>
     /// マスクのクリアフラグの配列
     /// </summary>
-    protected List<bool> _clearedMaskBufferFlags = new();
+    protected List<bool> ClearedMaskBufferFlags = [];
 
-    protected List<CubismTextureColor> _channelColors = new();
+    protected List<CubismTextureColor> ChannelColors = [];
     /// <summary>
     /// マスク用クリッピングコンテキストのリスト
     /// </summary>
-    protected List<CubismClippingContext> _clippingContextListForMask = new();
+    protected List<CubismClippingContext> ClippingContextListForMask = [];
     /// <summary>
     /// 描画用クリッピングコンテキストのリスト
     /// </summary>
-    public List<CubismClippingContext> ClippingContextListForDraw { get; init; } = new();
+    public List<CubismClippingContext?> ClippingContextListForDraw { get; init; } = [];
     /// <summary>
     /// クリッピングマスクのバッファサイズ（初期値:256）
     /// </summary>
@@ -51,39 +51,39 @@ public class CubismClippingManager
     /// <summary>
     /// マスク計算用の行列
     /// </summary>
-    protected CubismMatrix44 _tmpMatrix = new();
+    protected CubismMatrix44 TmpMatrix = new();
     /// <summary>
     /// マスク計算用の行列
     /// </summary>
-    protected CubismMatrix44 _tmpMatrixForMask = new();
+    protected CubismMatrix44 TmpMatrixForMask = new();
     /// <summary>
     /// マスク計算用の行列
     /// </summary>
-    protected CubismMatrix44 _tmpMatrixForDraw = new();
+    protected CubismMatrix44 TmpMatrixForDraw = new();
     /// <summary>
     /// マスク配置計算用の矩形
     /// </summary>
-    protected RectF _tmpBoundsOnModel = new();
+    protected RectF TmpBoundsOnModel = new();
 
-    private RenderType _renderType;
+    private readonly RenderType _renderType;
 
     public CubismClippingManager(RenderType render)
     {
         _renderType = render;
         ClippingMaskBufferSize = new(256, 256);
 
-        _channelColors.Add(new(1.0f, 0f, 0f, 0f));
-        _channelColors.Add(new(0f, 1.0f, 0f, 0f));
-        _channelColors.Add(new(0f, 0f, 1.0f, 0f));
-        _channelColors.Add(new(0f, 0f, 0f, 1.0f));
+        ChannelColors.Add(new(1.0f, 0f, 0f, 0f));
+        ChannelColors.Add(new(0f, 1.0f, 0f, 0f));
+        ChannelColors.Add(new(0f, 0f, 1.0f, 0f));
+        ChannelColors.Add(new(0f, 0f, 0f, 1.0f));
     }
 
     public void Close()
     {
         ClippingContextListForDraw.Clear();
-        _clippingContextListForMask.Clear();
-        _channelColors.Clear();
-        _clearedMaskBufferFlags.Clear();
+        ClippingContextListForMask.Clear();
+        ChannelColors.Clear();
+        ClearedMaskBufferFlags.Clear();
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public class CubismClippingManager
         // レンダーテクスチャのクリアフラグの設定
         for (int i = 0; i < RenderTextureCount; ++i)
         {
-            _clearedMaskBufferFlags.Add(false);
+            ClearedMaskBufferFlags.Add(false);
         }
 
         //クリッピングマスクを使う描画オブジェクトを全て登録する
@@ -122,7 +122,11 @@ public class CubismClippingManager
                 {
                     cc = new CubismClippingContext_OpenGLES2(this, model, model.GetDrawableMasks()[i], model.GetDrawableMaskCounts()[i]);
                 }
-                _clippingContextListForMask.Add(cc);
+                else
+                {
+                    throw new Exception("Only OpenGL");
+                }
+                ClippingContextListForMask.Add(cc);
             }
 
             cc.AddClippedDrawable(i);
@@ -142,17 +146,17 @@ public class CubismClippingManager
     private unsafe CubismClippingContext? FindSameClip(int* drawableMasks, int drawableMaskCounts)
     {
         // 作成済みClippingContextと一致するか確認
-        for (int i = 0; i < _clippingContextListForMask.Count; i++)
+        for (int i = 0; i < ClippingContextListForMask.Count; i++)
         {
-            CubismClippingContext cc = _clippingContextListForMask[i];
-            int count = cc._clippingIdCount;
+            var cc = ClippingContextListForMask[i];
+            int count = cc.ClippingIdCount;
             if (count != drawableMaskCounts) continue; //個数が違う場合は別物
             int samecount = 0;
 
             // 同じIDを持つか確認。配列の数が同じなので、一致した個数が同じなら同じ物を持つとする。
             for (int j = 0; j < count; j++)
             {
-                int clipId = cc._clippingIdList[j];
+                int clipId = cc.ClippingIdList[j];
                 for (int k = 0; k < count; k++)
                 {
                     if (drawableMasks[k] == clipId)
@@ -180,15 +184,15 @@ public class CubismClippingManager
         // 全てのクリッピングを用意する
         // 同じクリップ（複数の場合はまとめて１つのクリップ）を使う場合は１度だけ設定する
         int usingClipCount = 0;
-        for (int clipIndex = 0; clipIndex < _clippingContextListForMask.Count; clipIndex++)
+        for (int clipIndex = 0; clipIndex < ClippingContextListForMask.Count; clipIndex++)
         {
             // １つのクリッピングマスクに関して
-            CubismClippingContext cc = _clippingContextListForMask[clipIndex];
+            CubismClippingContext cc = ClippingContextListForMask[clipIndex];
 
             // このクリップを利用する描画オブジェクト群全体を囲む矩形を計算
             CalcClippedDrawTotalBounds(model, cc);
 
-            if (cc._isUsing)
+            if (cc.IsUsing)
             {
                 usingClipCount++; //使用中としてカウント
             }
@@ -202,13 +206,13 @@ public class CubismClippingManager
         SetupLayoutBounds(0);
 
         // サイズがレンダーテクスチャの枚数と合わない場合は合わせる
-        if (_clearedMaskBufferFlags.Count != RenderTextureCount)
+        if (ClearedMaskBufferFlags.Count != RenderTextureCount)
         {
-            _clearedMaskBufferFlags.Clear();
+            ClearedMaskBufferFlags.Clear();
 
             for (int i = 0; i < RenderTextureCount; ++i)
             {
-                _clearedMaskBufferFlags.Add(false);
+                ClearedMaskBufferFlags.Add(false);
             }
         }
         else
@@ -216,42 +220,42 @@ public class CubismClippingManager
             // マスクのクリアフラグを毎フレーム開始時に初期化
             for (int i = 0; i < RenderTextureCount; ++i)
             {
-                _clearedMaskBufferFlags[i] = false;
+                ClearedMaskBufferFlags[i] = false;
             }
         }
 
         // 実際にマスクを生成する
         // 全てのマスクをどの様にレイアウトして描くかを決定し、ClipContext , ClippedDrawContext に記憶する
-        for (int clipIndex = 0; clipIndex < _clippingContextListForMask.Count; clipIndex++)
+        for (int clipIndex = 0; clipIndex < ClippingContextListForMask.Count; clipIndex++)
         {
             // --- 実際に１つのマスクを描く ---
-            CubismClippingContext clipContext = _clippingContextListForMask[clipIndex];
-            RectF allClippedDrawRect = clipContext._allClippedDrawRect; //このマスクを使う、全ての描画オブジェクトの論理座標上の囲み矩形
-            RectF layoutBoundsOnTex01 = clipContext._layoutBounds; //この中にマスクを収める
+            CubismClippingContext clipContext = ClippingContextListForMask[clipIndex];
+            RectF allClippedDrawRect = clipContext.AllClippedDrawRect; //このマスクを使う、全ての描画オブジェクトの論理座標上の囲み矩形
+            RectF layoutBoundsOnTex01 = clipContext.LayoutBounds; //この中にマスクを収める
             float MARGIN = 0.05f;
-            float scaleX = 0.0f;
-            float scaleY = 0.0f;
+            float scaleX;
+            float scaleY;
             float ppu = model.GetPixelsPerUnit();
             float maskPixelWidth = clipContext.Manager.ClippingMaskBufferSize.X;
             float maskPixelHeight = clipContext.Manager.ClippingMaskBufferSize.Y;
             float physicalMaskWidth = layoutBoundsOnTex01.Width * maskPixelWidth;
             float physicalMaskHeight = layoutBoundsOnTex01.Height * maskPixelHeight;
 
-            _tmpBoundsOnModel.SetRect(allClippedDrawRect);
-            if (_tmpBoundsOnModel.Width * ppu > physicalMaskWidth)
+            TmpBoundsOnModel.SetRect(allClippedDrawRect);
+            if (TmpBoundsOnModel.Width * ppu > physicalMaskWidth)
             {
-                _tmpBoundsOnModel.Expand(allClippedDrawRect.Width * MARGIN, 0.0f);
-                scaleX = layoutBoundsOnTex01.Width / _tmpBoundsOnModel.Width;
+                TmpBoundsOnModel.Expand(allClippedDrawRect.Width * MARGIN, 0.0f);
+                scaleX = layoutBoundsOnTex01.Width / TmpBoundsOnModel.Width;
             }
             else
             {
                 scaleX = ppu / physicalMaskWidth;
             }
 
-            if (_tmpBoundsOnModel.Height * ppu > physicalMaskHeight)
+            if (TmpBoundsOnModel.Height * ppu > physicalMaskHeight)
             {
-                _tmpBoundsOnModel.Expand(0.0f, allClippedDrawRect.Height * MARGIN);
-                scaleY = layoutBoundsOnTex01.Height / _tmpBoundsOnModel.Height;
+                TmpBoundsOnModel.Expand(0.0f, allClippedDrawRect.Height * MARGIN);
+                scaleY = layoutBoundsOnTex01.Height / TmpBoundsOnModel.Height;
             }
             else
             {
@@ -260,10 +264,10 @@ public class CubismClippingManager
 
 
             // マスク生成時に使う行列を求める
-            createMatrixForMask(isRightHanded, layoutBoundsOnTex01, scaleX, scaleY);
+            CreateMatrixForMask(isRightHanded, layoutBoundsOnTex01, scaleX, scaleY);
 
-            clipContext._matrixForMask.SetMatrix(_tmpMatrixForMask.Tr);
-            clipContext._matrixForDraw.SetMatrix(_tmpMatrixForDraw.Tr);
+            clipContext.MatrixForMask.SetMatrix(TmpMatrixForMask.Tr);
+            clipContext.MatrixForDraw.SetMatrix(TmpMatrixForDraw.Tr);
         }
     }
 
@@ -274,31 +278,31 @@ public class CubismClippingManager
     /// <param name="layoutBoundsOnTex01">マスクを収める領域</param>
     /// <param name="scaleX">描画オブジェクトの伸縮率</param>
     /// <param name="scaleY">描画オブジェクトの伸縮率</param>
-    protected void createMatrixForMask(bool isRightHanded, RectF layoutBoundsOnTex01, float scaleX, float scaleY)
+    protected void CreateMatrixForMask(bool isRightHanded, RectF layoutBoundsOnTex01, float scaleX, float scaleY)
     {
-        _tmpMatrix.LoadIdentity();
+        TmpMatrix.LoadIdentity();
         {
             // Layout0..1 を -1..1に変換
-            _tmpMatrix.TranslateRelative(-1.0f, -1.0f);
-            _tmpMatrix.ScaleRelative(2.0f, 2.0f);
+            TmpMatrix.TranslateRelative(-1.0f, -1.0f);
+            TmpMatrix.ScaleRelative(2.0f, 2.0f);
         }
         {
             // view to Layout0..1
-            _tmpMatrix.TranslateRelative(layoutBoundsOnTex01.X, layoutBoundsOnTex01.Y); //new = [translate]
-            _tmpMatrix.ScaleRelative(scaleX, scaleY); //new = [translate][scale]
-            _tmpMatrix.TranslateRelative(-_tmpBoundsOnModel.X, -_tmpBoundsOnModel.Y); //new = [translate][scale][translate]
+            TmpMatrix.TranslateRelative(layoutBoundsOnTex01.X, layoutBoundsOnTex01.Y); //new = [translate]
+            TmpMatrix.ScaleRelative(scaleX, scaleY); //new = [translate][scale]
+            TmpMatrix.TranslateRelative(-TmpBoundsOnModel.X, -TmpBoundsOnModel.Y); //new = [translate][scale][translate]
         }
         // tmpMatrixForMask が計算結果
-        _tmpMatrixForMask.SetMatrix(_tmpMatrix.Tr);
+        TmpMatrixForMask.SetMatrix(TmpMatrix.Tr);
 
-        _tmpMatrix.LoadIdentity();
+        TmpMatrix.LoadIdentity();
         {
-            _tmpMatrix.TranslateRelative(layoutBoundsOnTex01.X, layoutBoundsOnTex01.Y * ((isRightHanded) ? -1.0f : 1.0f)); //new = [translate]
-            _tmpMatrix.ScaleRelative(scaleX, scaleY * ((isRightHanded) ? -1.0f : 1.0f)); //new = [translate][scale]
-            _tmpMatrix.TranslateRelative(-_tmpBoundsOnModel.X, -_tmpBoundsOnModel.Y); //new = [translate][scale][translate]
+            TmpMatrix.TranslateRelative(layoutBoundsOnTex01.X, layoutBoundsOnTex01.Y * (isRightHanded ? -1.0f : 1.0f)); //new = [translate]
+            TmpMatrix.ScaleRelative(scaleX, scaleY * (isRightHanded ? -1.0f : 1.0f)); //new = [translate][scale]
+            TmpMatrix.TranslateRelative(-TmpBoundsOnModel.X, -TmpBoundsOnModel.Y); //new = [translate][scale][translate]
         }
 
-        _tmpMatrixForDraw.SetMatrix(_tmpMatrix.Tr);
+        TmpMatrixForDraw.SetMatrix(TmpMatrix.Tr);
     }
 
     /// <summary>
@@ -324,15 +328,15 @@ public class CubismClippingManager
             }
 
             // この場合は一つのマスクターゲットを毎回クリアして使用する
-            for (int index = 0; index < _clippingContextListForMask.Count; index++)
+            for (int index = 0; index < ClippingContextListForMask.Count; index++)
             {
-                CubismClippingContext cc = _clippingContextListForMask[index];
-                cc._layoutChannelNo = 0; // どうせ毎回消すので固定で良い
-                cc._layoutBounds.X = 0.0f;
-                cc._layoutBounds.Y = 0.0f;
-                cc._layoutBounds.Width = 1.0f;
-                cc._layoutBounds.Height = 1.0f;
-                cc._bufferIndex = 0;
+                CubismClippingContext cc = ClippingContextListForMask[index];
+                cc.LayoutChannelNo = 0; // どうせ毎回消すので固定で良い
+                cc.LayoutBounds.X = 0.0f;
+                cc.LayoutBounds.Y = 0.0f;
+                cc.LayoutBounds.Width = 1.0f;
+                cc.LayoutBounds.Height = 1.0f;
+                cc.BufferIndex = 0;
             }
             return;
         }
@@ -374,13 +378,13 @@ public class CubismClippingManager
                 else if (layoutCount == 1)
                 {
                     //全てをそのまま使う
-                    CubismClippingContext cc = _clippingContextListForMask[curClipIndex++];
-                    cc._layoutChannelNo = channelNo;
-                    cc._layoutBounds.X = 0.0f;
-                    cc._layoutBounds.Y = 0.0f;
-                    cc._layoutBounds.Width = 1.0f;
-                    cc._layoutBounds.Height = 1.0f;
-                    cc._bufferIndex = renderTextureNo;
+                    CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
+                    cc.LayoutChannelNo = channelNo;
+                    cc.LayoutBounds.X = 0.0f;
+                    cc.LayoutBounds.Y = 0.0f;
+                    cc.LayoutBounds.Width = 1.0f;
+                    cc.LayoutBounds.Height = 1.0f;
+                    cc.BufferIndex = renderTextureNo;
                 }
                 else if (layoutCount == 2)
                 {
@@ -388,14 +392,14 @@ public class CubismClippingManager
                     {
                         int xpos = i % 2;
 
-                        CubismClippingContext cc = _clippingContextListForMask[curClipIndex++];
-                        cc._layoutChannelNo = channelNo;
+                        CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
+                        cc.LayoutChannelNo = channelNo;
 
-                        cc._layoutBounds.X = xpos * 0.5f;
-                        cc._layoutBounds.Y = 0.0f;
-                        cc._layoutBounds.Width = 0.5f;
-                        cc._layoutBounds.Height = 1.0f;
-                        cc._bufferIndex = renderTextureNo;
+                        cc.LayoutBounds.X = xpos * 0.5f;
+                        cc.LayoutBounds.Y = 0.0f;
+                        cc.LayoutBounds.Width = 0.5f;
+                        cc.LayoutBounds.Height = 1.0f;
+                        cc.BufferIndex = renderTextureNo;
                         //UVを2つに分解して使う
                     }
                 }
@@ -407,14 +411,14 @@ public class CubismClippingManager
                         int xpos = i % 2;
                         int ypos = i / 2;
 
-                        CubismClippingContext cc = _clippingContextListForMask[curClipIndex++];
-                        cc._layoutChannelNo = channelNo;
+                        CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
+                        cc.LayoutChannelNo = channelNo;
 
-                        cc._layoutBounds.X = xpos * 0.5f;
-                        cc._layoutBounds.Y = ypos * 0.5f;
-                        cc._layoutBounds.Width = 0.5f;
-                        cc._layoutBounds.Height = 0.5f;
-                        cc._bufferIndex = renderTextureNo;
+                        cc.LayoutBounds.X = xpos * 0.5f;
+                        cc.LayoutBounds.Y = ypos * 0.5f;
+                        cc.LayoutBounds.Width = 0.5f;
+                        cc.LayoutBounds.Height = 0.5f;
+                        cc.BufferIndex = renderTextureNo;
                     }
                 }
                 else if (layoutCount <= layoutCountMaxValue)
@@ -425,14 +429,14 @@ public class CubismClippingManager
                         int xpos = i % 3;
                         int ypos = i / 3;
 
-                        CubismClippingContext cc = _clippingContextListForMask[curClipIndex++];
-                        cc._layoutChannelNo = channelNo;
+                        CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
+                        cc.LayoutChannelNo = channelNo;
 
-                        cc._layoutBounds.X = xpos / 3.0f;
-                        cc._layoutBounds.Y = ypos / 3.0f;
-                        cc._layoutBounds.Width = 1.0f / 3.0f;
-                        cc._layoutBounds.Height = 1.0f / 3.0f;
-                        cc._bufferIndex = renderTextureNo;
+                        cc.LayoutBounds.X = xpos / 3.0f;
+                        cc.LayoutBounds.Y = ypos / 3.0f;
+                        cc.LayoutBounds.Width = 1.0f / 3.0f;
+                        cc.LayoutBounds.Height = 1.0f / 3.0f;
+                        cc.BufferIndex = renderTextureNo;
                     }
                 }
                 // マスクの制限枚数を超えた場合の処理
@@ -449,13 +453,13 @@ public class CubismClippingManager
                     // もちろん描画結果はろくなことにならない
                     for (int i = 0; i < layoutCount; i++)
                     {
-                        CubismClippingContext cc = _clippingContextListForMask[curClipIndex++];
-                        cc._layoutChannelNo = 0;
-                        cc._layoutBounds.X = 0.0f;
-                        cc._layoutBounds.Y = 0.0f;
-                        cc._layoutBounds.Width = 1.0f;
-                        cc._layoutBounds.Height = 1.0f;
-                        cc._bufferIndex = 0;
+                        CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
+                        cc.LayoutChannelNo = 0;
+                        cc.LayoutBounds.X = 0.0f;
+                        cc.LayoutBounds.Y = 0.0f;
+                        cc.LayoutBounds.Width = 1.0f;
+                        cc.LayoutBounds.Height = 1.0f;
+                        cc.BufferIndex = 0;
                     }
                 }
             }
@@ -476,11 +480,11 @@ public class CubismClippingManager
         // このマスクが実際に必要か判定する
         // このクリッピングを利用する「描画オブジェクト」がひとつでも使用可能であればマスクを生成する必要がある
 
-        int clippedDrawCount = clippingContext._clippedDrawableIndexList.Count;
+        int clippedDrawCount = clippingContext.ClippedDrawableIndexList.Count;
         for (int clippedDrawableIndex = 0; clippedDrawableIndex < clippedDrawCount; clippedDrawableIndex++)
         {
             // マスクを使用する描画オブジェクトの描画される矩形を求める
-            int drawableIndex = clippingContext._clippedDrawableIndexList[clippedDrawableIndex];
+            int drawableIndex = clippingContext.ClippedDrawableIndexList[clippedDrawableIndex];
 
             int drawableVertexCount = model.GetDrawableVertexCount(drawableIndex);
             float* drawableVertexes = (float*)(model.GetDrawableVertices(drawableIndex));
@@ -510,21 +514,21 @@ public class CubismClippingManager
         }
         if (clippedDrawTotalMinX == float.MaxValue)
         {
-            clippingContext._allClippedDrawRect.X = 0.0f;
-            clippingContext._allClippedDrawRect.Y = 0.0f;
-            clippingContext._allClippedDrawRect.Width = 0.0f;
-            clippingContext._allClippedDrawRect.Height = 0.0f;
-            clippingContext._isUsing = false;
+            clippingContext.AllClippedDrawRect.X = 0.0f;
+            clippingContext.AllClippedDrawRect.Y = 0.0f;
+            clippingContext.AllClippedDrawRect.Width = 0.0f;
+            clippingContext.AllClippedDrawRect.Height = 0.0f;
+            clippingContext.IsUsing = false;
         }
         else
         {
-            clippingContext._isUsing = true;
+            clippingContext.IsUsing = true;
             float w = clippedDrawTotalMaxX - clippedDrawTotalMinX;
             float h = clippedDrawTotalMaxY - clippedDrawTotalMinY;
-            clippingContext._allClippedDrawRect.X = clippedDrawTotalMinX;
-            clippingContext._allClippedDrawRect.Y = clippedDrawTotalMinY;
-            clippingContext._allClippedDrawRect.Width = w;
-            clippingContext._allClippedDrawRect.Height = h;
+            clippingContext.AllClippedDrawRect.X = clippedDrawTotalMinX;
+            clippingContext.AllClippedDrawRect.Y = clippedDrawTotalMinY;
+            clippingContext.AllClippedDrawRect.Width = w;
+            clippingContext.AllClippedDrawRect.Height = h;
         }
     }
 
@@ -535,7 +539,7 @@ public class CubismClippingManager
     /// <returns></returns>
     public CubismTextureColor GetChannelFlagAsColor(int channelNo)
     {
-        return _channelColors[channelNo];
+        return ChannelColors[channelNo];
     }
 
     /// <summary>

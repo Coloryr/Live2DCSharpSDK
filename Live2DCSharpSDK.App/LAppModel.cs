@@ -25,19 +25,19 @@ public class LAppModel : CubismUserModel
     /// <summary>
     /// モデルに設定されたまばたき機能用パラメータID
     /// </summary>
-    private readonly List<string> _eyeBlinkIds = new();
+    private readonly List<string> _eyeBlinkIds = [];
     /// <summary>
     /// モデルに設定されたリップシンク機能用パラメータID
     /// </summary>
-    private readonly List<string> _lipSyncIds = new();
+    private readonly List<string> _lipSyncIds = [];
     /// <summary>
     /// 読み込まれているモーションのリスト
     /// </summary>
-    private readonly Dictionary<string, ACubismMotion> _motions = new();
+    private readonly Dictionary<string, ACubismMotion> _motions = [];
     /// <summary>
     /// 読み込まれている表情のリスト
     /// </summary>
-    private readonly Dictionary<string, ACubismMotion> _expressions = new();
+    private readonly Dictionary<string, ACubismMotion> _expressions = [];
 
     public List<string> Motions => new(_motions.Keys);
     public List<string> Expressions => new(_expressions.Keys);
@@ -237,7 +237,7 @@ public class LAppModel : CubismUserModel
         }
 
         //Layout
-        Dictionary<string, float> layout = new();
+        Dictionary<string, float> layout = [];
         _modelSetting.GetLayoutMap(layout);
         ModelMatrix.SetupFromLayout(layout);
 
@@ -280,51 +280,51 @@ public class LAppModel : CubismUserModel
     public void LoadBreath()
     {
         //Breath
-        _breath = new CubismBreath()
+        _breath = new()
         {
-            Parameters = new()
+            Parameters =
+            [
+                new()
                 {
-                    new BreathParameterData()
-                    {
-                        ParameterId = IdParamAngleX,
-                        Offset = 0.0f,
-                        Peak = 15.0f,
-                        Cycle = 6.5345f,
-                        Weight = 0.5f
-                    },
-                    new BreathParameterData()
-                    {
-                        ParameterId = IdParamAngleY,
-                        Offset = 0.0f,
-                        Peak = 8.0f,
-                        Cycle = 3.5345f,
-                        Weight = 0.5f
-                    },
-                    new BreathParameterData()
-                    {
-                        ParameterId = IdParamAngleZ,
-                        Offset = 0.0f,
-                        Peak = 10.0f,
-                        Cycle = 5.5345f,
-                        Weight = 0.5f
-                    },
-                    new BreathParameterData()
-                    {
-                        ParameterId = IdParamBodyAngleX,
-                        Offset = 0.0f,
-                        Peak = 4.0f,
-                        Cycle = 15.5345f,
-                        Weight = 0.5f
-                    },
-                    new BreathParameterData()
-                    {
-                        ParameterId = IdParamBreath,
-                        Offset = 0.5f,
-                        Peak = 0.5f,
-                        Cycle = 3.2345f,
-                        Weight = 0.5f
-                    }
+                    ParameterId = IdParamAngleX,
+                    Offset = 0.0f,
+                    Peak = 15.0f,
+                    Cycle = 6.5345f,
+                    Weight = 0.5f
+                },
+                new()
+                {
+                    ParameterId = IdParamAngleY,
+                    Offset = 0.0f,
+                    Peak = 8.0f,
+                    Cycle = 3.5345f,
+                    Weight = 0.5f
+                },
+                new()
+                {
+                    ParameterId = IdParamAngleZ,
+                    Offset = 0.0f,
+                    Peak = 10.0f,
+                    Cycle = 5.5345f,
+                    Weight = 0.5f
+                },
+                new()
+                {
+                    ParameterId = IdParamBodyAngleX,
+                    Offset = 0.0f,
+                    Peak = 4.0f,
+                    Cycle = 15.5345f,
+                    Weight = 0.5f
+                },
+                new()
+                {
+                    ParameterId = IdParamBreath,
+                    Offset = 0.5f,
+                    Peak = 0.5f,
+                    Cycle = 3.2345f,
+                    Weight = 0.5f
                 }
+            ]
         };
     }
 
@@ -487,7 +487,7 @@ public class LAppModel : CubismUserModel
         string name = $"{group}_{no}";
 
         CubismMotion motion;
-        if (!_motions.ContainsKey(name))
+        if (!_motions.TryGetValue(name, out var value))
         {
             string path = item.File;
             path = Path.GetFullPath(_modelHomeDir + path);
@@ -512,7 +512,7 @@ public class LAppModel : CubismUserModel
         }
         else
         {
-            motion = (_motions[name] as CubismMotion)!;
+            motion = (value as CubismMotion)!;
             motion.OnFinishedMotion = onFinishedMotionHandler;
         }
 

@@ -215,7 +215,9 @@ public static partial class CubismCore
     /// <param name="outOriginInPixels">Origin of model on canvas.</param>
     /// <param name="outPixelsPerUnit">Aspect used for scaling pixels to units.</param>
     [DllImport("Live2DCubismCore", EntryPoint = "csmReadCanvasInfo")]
+#pragma warning disable SYSLIB1054 // 使用 “LibraryImportAttribute” 而不是 “DllImportAttribute” 在编译时生成 P/Invoke 封送代码
     internal extern static void ReadCanvasInfo(IntPtr model, out Vector2 outSizeInPixels,
+#pragma warning restore SYSLIB1054 // 使用 “LibraryImportAttribute” 而不是 “DllImportAttribute” 在编译时生成 P/Invoke 封送代码
         out Vector2 outOriginInPixels, out float outPixelsPerUnit);
 
     //PARAMETERS

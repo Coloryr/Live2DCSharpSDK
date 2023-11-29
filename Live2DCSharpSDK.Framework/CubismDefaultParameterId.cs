@@ -52,5 +52,5 @@ public static class CubismDefaultParameterId
     public const string ParamBustY = "ParamBustY";
     public const string ParamBaseX = "ParamBaseX";
     public const string ParamBaseY = "ParamBaseY";
-    public const string ParamNONE = "NONE:";
+    public const string ParamNONE = "NONE";
 }

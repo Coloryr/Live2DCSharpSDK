@@ -14,9 +14,9 @@ public class CubismMotionQueueManager
     /// <summary>
     /// モーション
     /// </summary>
-    protected readonly List<CubismMotionQueueEntry> _motions = new();
+    protected readonly List<CubismMotionQueueEntry> Motions = [];
 
-    private readonly List<CubismMotionQueueEntry> _remove = new();
+    private readonly List<CubismMotionQueueEntry> _remove = [];
 
     /// <summary>
     /// コールバック関数ポインタ
@@ -30,7 +30,7 @@ public class CubismMotionQueueManager
     /// <summary>
     /// デルタ時間の積算値[秒]
     /// </summary>
-    protected float _userTimeSeconds;
+    protected float UserTimeSeconds;
 
     /// <summary>
     /// 指定したモーションを開始する。同じタイプのモーションが既にある場合は、既存のモーションに終了フラグを立て、フェードアウトを開始させる。
@@ -44,9 +44,9 @@ public class CubismMotionQueueManager
         CubismMotionQueueEntry motionQueueEntry;
 
         // 既にモーションがあれば終了フラグを立てる
-        for (int i = 0; i < _motions.Count; ++i)
+        for (int i = 0; i < Motions.Count; ++i)
         {
-            motionQueueEntry = _motions[i];
+            motionQueueEntry = Motions[i];
             if (motionQueueEntry == null)
             {
                 continue;
@@ -60,7 +60,7 @@ public class CubismMotionQueueManager
             Motion = motion
         }; // 終了時に破棄する
 
-        _motions.Add(motionQueueEntry);
+        Motions.Add(motionQueueEntry);
 
         return motionQueueEntry;
     }
@@ -74,7 +74,7 @@ public class CubismMotionQueueManager
     {
         // ------- 処理を行う --------
         // 既にモーションがあれば終了フラグを立てる
-        foreach (var item in _motions)
+        foreach (var item in Motions)
         {
             // ----- 終了済みの処理があれば削除する ------
             if (!item.Finished)
@@ -96,7 +96,7 @@ public class CubismMotionQueueManager
     {
         // 既にモーションがあれば終了フラグを立てる
 
-        foreach (var item in _motions)
+        foreach (var item in Motions)
         {
             if (item == null)
             {
@@ -120,7 +120,7 @@ public class CubismMotionQueueManager
         // ------- 処理を行う --------
         // 既にモーションがあれば終了フラグを立てる
 
-        _motions.Clear();
+        Motions.Clear();
     }
 
     /// <summary>
@@ -134,7 +134,7 @@ public class CubismMotionQueueManager
         //------- 処理を行う --------
         //既にモーションがあれば終了フラグを立てる
 
-        foreach (var item in _motions)
+        foreach (var item in Motions)
         {
             if (item == motionQueueEntryNumber)
             {
@@ -172,7 +172,7 @@ public class CubismMotionQueueManager
 
         _remove.Clear();
 
-        foreach (var item in _motions)
+        foreach (var item in Motions)
         {
             var motion = item.Motion;
 
@@ -208,7 +208,7 @@ public class CubismMotionQueueManager
 
         foreach (var item in _remove)
         {
-            _motions.Remove(item);
+            Motions.Remove(item);
         }
 
         return updated;

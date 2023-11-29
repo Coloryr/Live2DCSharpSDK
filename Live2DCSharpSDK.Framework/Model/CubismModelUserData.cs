@@ -19,11 +19,11 @@ public class CubismModelUserData
     /// <summary>
     /// ユーザデータ構造体配列
     /// </summary>
-    private readonly List<CubismModelUserDataNode> _userDataNodes = new();
+    private readonly List<CubismModelUserDataNode> _userDataNodes = [];
     /// <summary>
     /// 閲覧リスト保持
     /// </summary>
-    public readonly List<CubismModelUserDataNode> ArtMeshUserDataNodes = new();
+    public readonly List<CubismModelUserDataNode> ArtMeshUserDataNodes = [];
 
     /// <summary>
     /// userdata3.jsonをパースする。

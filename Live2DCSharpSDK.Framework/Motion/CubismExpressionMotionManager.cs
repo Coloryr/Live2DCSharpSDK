@@ -29,7 +29,7 @@ public record ExpressionParameterValue
 public class CubismExpressionMotionManager : CubismMotionQueueManager
 {
     // モデルに適用する各パラメータの値
-    private List<ExpressionParameterValue> _expressionParameterValues = new();
+    private readonly List<ExpressionParameterValue> _expressionParameterValues = [];
 
     /// <summary>
     /// 現在再生中のモーションの優先度
@@ -39,11 +39,6 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
     /// 再生予定のモーションの優先度。再生中は0になる。モーションファイルを別スレッドで読み込むときの機能。
     /// </summary>
     public MotionPriority ReservePriority { get; set; }
-
-    public CubismExpressionMotionManager()
-    {
-
-    }
 
     /// <summary>
     /// 優先度を設定して表情モーションを開始する。
@@ -59,7 +54,7 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
         }
         CurrentPriority = priority;        // 再生中モーションの優先度を設定
 
-        return StartMotion(motion, _userTimeSeconds);
+        return StartMotion(motion, UserTimeSeconds);
     }
 
     /// <summary>
@@ -71,9 +66,9 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
     /// false   更新されていない</returns>
     public bool UpdateMotion(CubismModel model, float deltaTimeSeconds)
     {
-        _userTimeSeconds += deltaTimeSeconds;
+        UserTimeSeconds += deltaTimeSeconds;
         bool updated = false;
-        List<CubismMotionQueueEntry> motions = _motions;
+        List<CubismMotionQueueEntry> motions = Motions;
 
         float expressionWeight = 0.0f;
         int expressionIndex = 0;
@@ -83,9 +78,7 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
         var list = new List<CubismMotionQueueEntry>();
         foreach (var item in motions)
         {
-            var expressionMotion = item.Motion as CubismExpressionMotion;
-
-            if (expressionMotion == null)
+            if (item.Motion is not CubismExpressionMotion expressionMotion)
             {
                 list.Add(item);
                 continue;
@@ -133,19 +126,19 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
             }
 
             // ------ 値を計算する ------
-            expressionMotion.CalculateExpressionParameters(model, _userTimeSeconds,
+            expressionMotion.CalculateExpressionParameters(model, UserTimeSeconds,
                 item, _expressionParameterValues, expressionIndex);
 
             expressionWeight += expressionMotion.FadeInSeconds == 0.0f
                 ? 1.0f
-                : CubismMath.GetEasingSine((_userTimeSeconds - item.FadeInStartTime) / expressionMotion.FadeInSeconds);
+                : CubismMath.GetEasingSine((UserTimeSeconds - item.FadeInStartTime) / expressionMotion.FadeInSeconds);
 
             updated = true;
 
             if (item.IsTriggeredFadeOut)
             {
                 // フェードアウト開始
-                item.StartFadeout(item.FadeOutSeconds, _userTimeSeconds);
+                item.StartFadeout(item.FadeOutSeconds, UserTimeSeconds);
             }
 
             ++expressionIndex;
@@ -155,7 +148,7 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
         if (motions.Count > 1)
         {
             CubismExpressionMotion expressionMotion =
-                (CubismExpressionMotion)(motions[motions.Count - 1]).Motion;
+                (CubismExpressionMotion)(motions[^1]).Motion;
             if (expressionMotion.FadeWeight >= 1.0f)
             {
                 // 配列の最後の要素は削除しない

@@ -74,10 +74,10 @@ public record CubismViewMatrix : CubismMatrix44
             y = ScreenBottom - _tr[5] * MaxBottom - _tr[13];
         }
 
-        float[] tr1 = new[] { 1.0f,   0.0f,   0.0f, 0.0f,
+        float[] tr1 = [ 1.0f,   0.0f,   0.0f, 0.0f,
                         0.0f,   1.0f,   0.0f, 0.0f,
                         0.0f,   0.0f,   1.0f, 0.0f,
-                        x,      y,      0.0f, 1.0f };
+                        x,      y,      0.0f, 1.0f ];
         MultiplyByMatrix(tr1);
     }
 
@@ -109,18 +109,18 @@ public record CubismViewMatrix : CubismMatrix44
             }
         }
 
-        MultiplyByMatrix(new[]{1.0f, 0.0f, 0.0f, 0.0f,
-                               0.0f, 1.0f, 0.0f, 0.0f,
-                               0.0f, 0.0f, 1.0f, 0.0f,
-                               -cx,  -cy,  0.0f, 1.0f});
-        MultiplyByMatrix(new[]{scale, 0.0f,  0.0f, 0.0f,
-                               0.0f,  scale, 0.0f, 0.0f,
-                               0.0f,  0.0f,  1.0f, 0.0f,
-                               0.0f,  0.0f,  0.0f, 1.0f});
-        MultiplyByMatrix(new[]{1.0f, 0.0f, 0.0f, 0.0f,
-                               0.0f, 1.0f, 0.0f, 0.0f,
-                               0.0f, 0.0f, 1.0f, 0.0f,
-                               cx,   cy,   0.0f, 1.0f});
+        MultiplyByMatrix([1.0f, 0.0f, 0.0f, 0.0f,
+                            0.0f, 1.0f, 0.0f, 0.0f,
+                            0.0f, 0.0f, 1.0f, 0.0f,
+                            -cx,  -cy,  0.0f, 1.0f]);
+        MultiplyByMatrix([scale, 0.0f,  0.0f, 0.0f,
+                            0.0f,  scale, 0.0f, 0.0f,
+                            0.0f,  0.0f,  1.0f, 0.0f,
+                            0.0f,  0.0f,  0.0f, 1.0f]);
+        MultiplyByMatrix([1.0f, 0.0f, 0.0f, 0.0f,
+                            0.0f, 1.0f, 0.0f, 0.0f,
+                            0.0f, 0.0f, 1.0f, 0.0f,
+                            cx,   cy,   0.0f, 1.0f]);
     }
 
     /// <summary>

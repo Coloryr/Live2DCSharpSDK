@@ -32,7 +32,7 @@ public class CubismMotionManager : CubismMotionQueueManager
 
         CurrentPriority = priority;        // 再生中モーションの優先度を設定
 
-        return StartMotion(motion, _userTimeSeconds);
+        return StartMotion(motion, UserTimeSeconds);
     }
 
     /// <summary>
@@ -44,9 +44,9 @@ public class CubismMotionManager : CubismMotionQueueManager
     /// false   更新されていない</returns>
     public bool UpdateMotion(CubismModel model, float deltaTimeSeconds)
     {
-        _userTimeSeconds += deltaTimeSeconds;
+        UserTimeSeconds += deltaTimeSeconds;
 
-        bool updated = DoUpdateMotion(model, _userTimeSeconds);
+        bool updated = DoUpdateMotion(model, UserTimeSeconds);
 
         if (IsFinished())
         {

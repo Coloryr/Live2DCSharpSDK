@@ -23,7 +23,7 @@ public record PartData
     /// <summary>
     ///  連動するパラメータ
     /// </summary>
-    public readonly List<PartData> Link = new();
+    public readonly List<PartData> Link = [];
 
     /// <summary>
     /// 初期化する。

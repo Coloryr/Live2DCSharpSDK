@@ -4,7 +4,7 @@ using Live2DCSharpSDK.Framework.Type;
 
 namespace Live2DCSharpSDK.Framework.Rendering.OpenGL;
 
-internal class CubismShader_OpenGLES2
+internal class CubismShader_OpenGLES2(OpenGLApi gl)
 {
     public const string CSM_FRAGMENT_SHADER_FP_PRECISION_HIGH = "highp";
     public const string CSM_FRAGMENT_SHADER_FP_PRECISION_MID = "mediump";
@@ -241,7 +241,6 @@ gl_FragColor = col_formask;
 
     public const int ShaderCount = 19; // シェーダの数 = マスク生成用 + (通常 + 加算 + 乗算) * (マスク無 + マスク有 + マスク有反転 + マスク無の乗算済アルファ対応版 + マスク有の乗算済アルファ対応版 + マスク有反転の乗算済アルファ対応版)
 
-    private readonly OpenGLApi GL;
     /// <summary>
     /// Tegra対応.拡張方式で描画
     /// </summary>
@@ -255,12 +254,7 @@ gl_FragColor = col_formask;
     /// <summary>
     /// ロードしたシェーダプログラムを保持する変数
     /// </summary>
-    private List<CubismShaderSet> _shaderSets = new();
-
-    public CubismShader_OpenGLES2(OpenGLApi gl)
-    {
-        GL = gl;
-    }
+    private readonly List<CubismShaderSet> _shaderSets = [];
 
     /// <summary>
     /// シェーダプログラムの一連のセットアップを実行する
@@ -303,83 +297,83 @@ gl_FragColor = col_formask;
             case CubismBlendMode.Normal:
             default:
                 shaderSet = _shaderSets[(int)ShaderNames.Normal + offset];
-                SRC_COLOR = GL.GL_ONE;
-                DST_COLOR = GL.GL_ONE_MINUS_SRC_ALPHA;
-                SRC_ALPHA = GL.GL_ONE;
-                DST_ALPHA = GL.GL_ONE_MINUS_SRC_ALPHA;
+                SRC_COLOR = gl.GL_ONE;
+                DST_COLOR = gl.GL_ONE_MINUS_SRC_ALPHA;
+                SRC_ALPHA = gl.GL_ONE;
+                DST_ALPHA = gl.GL_ONE_MINUS_SRC_ALPHA;
                 break;
 
             case CubismBlendMode.Additive:
                 shaderSet = _shaderSets[(int)ShaderNames.Add + offset];
-                SRC_COLOR = GL.GL_ONE;
-                DST_COLOR = GL.GL_ONE;
-                SRC_ALPHA = GL.GL_ZERO;
-                DST_ALPHA = GL.GL_ONE;
+                SRC_COLOR = gl.GL_ONE;
+                DST_COLOR = gl.GL_ONE;
+                SRC_ALPHA = gl.GL_ZERO;
+                DST_ALPHA = gl.GL_ONE;
                 break;
 
             case CubismBlendMode.Multiplicative:
                 shaderSet = _shaderSets[(int)ShaderNames.Mult + offset];
-                SRC_COLOR = GL.GL_DST_COLOR;
-                DST_COLOR = GL.GL_ONE_MINUS_SRC_ALPHA;
-                SRC_ALPHA = GL.GL_ZERO;
-                DST_ALPHA = GL.GL_ONE;
+                SRC_COLOR = gl.GL_DST_COLOR;
+                DST_COLOR = gl.GL_ONE_MINUS_SRC_ALPHA;
+                SRC_ALPHA = gl.GL_ZERO;
+                DST_ALPHA = gl.GL_ONE;
                 break;
         }
 
-        GL.glUseProgram(shaderSet.ShaderProgram);
+        gl.UseProgram(shaderSet.ShaderProgram);
 
         // 頂点配列の設定
-        GL.glEnableVertexAttribArray(shaderSet.AttributePositionLocation);
-        GL.glVertexAttribPointer(shaderSet.AttributePositionLocation, 2, GL.GL_FLOAT, false, 4 * sizeof(float), 0);
+        gl.EnableVertexAttribArray(shaderSet.AttributePositionLocation);
+        gl.VertexAttribPointer(shaderSet.AttributePositionLocation, 2, gl.GL_FLOAT, false, 4 * sizeof(float), 0);
 
         // テクスチャ頂点の設定
-        GL.glEnableVertexAttribArray(shaderSet.AttributeTexCoordLocation);
-        GL.glVertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, GL.GL_FLOAT, false, 4 * sizeof(float), 2 * sizeof(float));
+        gl.EnableVertexAttribArray(shaderSet.AttributeTexCoordLocation);
+        gl.VertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, gl.GL_FLOAT, false, 4 * sizeof(float), 2 * sizeof(float));
 
         if (masked)
         {
-            GL.glActiveTexture(GL.GL_TEXTURE1);
+            gl.ActiveTexture(gl.GL_TEXTURE1);
 
             var draw = renderer.ClippingContextBufferForDraw!;
 
             // frameBufferに書かれたテクスチャ
-            var tex = renderer.GetMaskBuffer(draw._bufferIndex).ColorBuffer;
+            var tex = renderer.GetMaskBuffer(draw.BufferIndex).ColorBuffer;
 
-            GL.glBindTexture(GL.GL_TEXTURE_2D, tex);
-            GL.glUniform1i(shaderSet.SamplerTexture1Location, 1);
+            gl.BindTexture(gl.GL_TEXTURE_2D, tex);
+            gl.Uniform1i(shaderSet.SamplerTexture1Location, 1);
 
             // View座標をClippingContextの座標に変換するための行列を設定
-            GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, draw._matrixForDraw.Tr);
+            gl.UniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, draw.MatrixForDraw.Tr);
 
             // 使用するカラーチャンネルを設定
-            var channelNo = draw._layoutChannelNo;
+            var channelNo = draw.LayoutChannelNo;
             var colorChannel = draw.Manager.GetChannelFlagAsColor(channelNo);
-            GL.glUniform4f(shaderSet.UnifromChannelFlagLocation, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
+            gl.Uniform4f(shaderSet.UnifromChannelFlagLocation, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
         }
 
         int textureNo = model.GetDrawableTextureIndex(index);
         int textureId = renderer.GetBindedTextures()[textureNo];
 
         //テクスチャ設定
-        GL.glActiveTexture(GL.GL_TEXTURE0);
-        GL.glBindTexture(GL.GL_TEXTURE_2D, textureId);
-        GL.glUniform1i(shaderSet.SamplerTexture0Location, 0);
+        gl.ActiveTexture(gl.GL_TEXTURE0);
+        gl.BindTexture(gl.GL_TEXTURE_2D, textureId);
+        gl.Uniform1i(shaderSet.SamplerTexture0Location, 0);
 
         CubismMatrix44 matrix4x4 = renderer.GetMvpMatrix();
 
         //座標変換
-        GL.glUniformMatrix4fv(shaderSet.UniformMatrixLocation, 1, false, matrix4x4.Tr);
+        gl.UniformMatrix4fv(shaderSet.UniformMatrixLocation, 1, false, matrix4x4.Tr);
 
         //ベース色の取得
         var baseColor = renderer.GetModelColorWithOpacity(model.GetDrawableOpacity(index));
         var multiplyColor = model.GetMultiplyColor(index);
         var screenColor = model.GetScreenColor(index);
 
-        GL.glUniform4f(shaderSet.UniformBaseColorLocation, baseColor.R, baseColor.G, baseColor.B, baseColor.A);
-        GL.glUniform4f(shaderSet.UniformMultiplyColorLocation, multiplyColor.R, multiplyColor.G, multiplyColor.B, multiplyColor.A);
-        GL.glUniform4f(shaderSet.UniformScreenColorLocation, screenColor.R, screenColor.G, screenColor.B, screenColor.A);
+        gl.Uniform4f(shaderSet.UniformBaseColorLocation, baseColor.R, baseColor.G, baseColor.B, baseColor.A);
+        gl.Uniform4f(shaderSet.UniformMultiplyColorLocation, multiplyColor.R, multiplyColor.G, multiplyColor.B, multiplyColor.A);
+        gl.Uniform4f(shaderSet.UniformScreenColorLocation, screenColor.R, screenColor.G, screenColor.B, screenColor.A);
 
-        GL.glBlendFuncSeparate(SRC_COLOR, DST_COLOR, SRC_ALPHA, DST_ALPHA);
+        gl.BlendFuncSeparate(SRC_COLOR, DST_COLOR, SRC_ALPHA, DST_ALPHA);
     }
 
     internal unsafe void SetupShaderProgramForMask(CubismRenderer_OpenGLES2 renderer, CubismModel model, int index)
@@ -396,35 +390,35 @@ gl_FragColor = col_formask;
         int DST_ALPHA;
 
         CubismShaderSet shaderSet = _shaderSets[(int)ShaderNames.SetupMask];
-        GL.glUseProgram(shaderSet.ShaderProgram);
+        gl.UseProgram(shaderSet.ShaderProgram);
 
         //テクスチャ設定
         int textureNo = model.GetDrawableTextureIndex(index);
         int textureId = renderer.GetBindedTextures()[textureNo];
-        GL.glActiveTexture(GL.GL_TEXTURE0);
-        GL.glBindTexture(GL.GL_TEXTURE_2D, textureId);
-        GL.glUniform1i(shaderSet.SamplerTexture0Location, 0);
+        gl.ActiveTexture(gl.GL_TEXTURE0);
+        gl.BindTexture(gl.GL_TEXTURE_2D, textureId);
+        gl.Uniform1i(shaderSet.SamplerTexture0Location, 0);
 
         // 頂点配列の設定
-        GL.glEnableVertexAttribArray(shaderSet.AttributePositionLocation);
-        GL.glVertexAttribPointer(shaderSet.AttributePositionLocation, 2, GL.GL_FLOAT, false, 4 * sizeof(float), 0);
+        gl.EnableVertexAttribArray(shaderSet.AttributePositionLocation);
+        gl.VertexAttribPointer(shaderSet.AttributePositionLocation, 2, gl.GL_FLOAT, false, 4 * sizeof(float), 0);
 
         // テクスチャ頂点の設定
-        GL.glEnableVertexAttribArray(shaderSet.AttributeTexCoordLocation);
-        GL.glVertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, GL.GL_FLOAT, false, 4 * sizeof(float), 2 * sizeof(float));
+        gl.EnableVertexAttribArray(shaderSet.AttributeTexCoordLocation);
+        gl.VertexAttribPointer(shaderSet.AttributeTexCoordLocation, 2, gl.GL_FLOAT, false, 4 * sizeof(float), 2 * sizeof(float));
 
         var draw = renderer.ClippingContextBufferForMask!;
 
         // チャンネル
-        int channelNo = draw._layoutChannelNo;
+        int channelNo = draw.LayoutChannelNo;
         var colorChannel = draw.Manager.GetChannelFlagAsColor(channelNo);
-        GL.glUniform4f(shaderSet.UnifromChannelFlagLocation, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
+        gl.Uniform4f(shaderSet.UnifromChannelFlagLocation, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
 
-        GL.glUniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, draw._matrixForMask.Tr);
+        gl.UniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, draw.MatrixForMask.Tr);
 
-        RectF rect = draw._layoutBounds;
+        RectF rect = draw.LayoutBounds;
 
-        GL.glUniform4f(shaderSet.UniformBaseColorLocation,
+        gl.Uniform4f(shaderSet.UniformBaseColorLocation,
                     rect.X * 2.0f - 1.0f,
                     rect.Y * 2.0f - 1.0f,
                     rect.GetRight() * 2.0f - 1.0f,
@@ -432,15 +426,15 @@ gl_FragColor = col_formask;
 
         var multiplyColor = model.GetMultiplyColor(index);
         var screenColor = model.GetScreenColor(index);
-        GL.glUniform4f(shaderSet.UniformMultiplyColorLocation, multiplyColor.R, multiplyColor.G, multiplyColor.B, multiplyColor.A);
-        GL.glUniform4f(shaderSet.UniformScreenColorLocation, screenColor.R, screenColor.G, screenColor.B, screenColor.A);
+        gl.Uniform4f(shaderSet.UniformMultiplyColorLocation, multiplyColor.R, multiplyColor.G, multiplyColor.B, multiplyColor.A);
+        gl.Uniform4f(shaderSet.UniformScreenColorLocation, screenColor.R, screenColor.G, screenColor.B, screenColor.A);
 
-        SRC_COLOR = GL.GL_ZERO;
-        DST_COLOR = GL.GL_ONE_MINUS_SRC_COLOR;
-        SRC_ALPHA = GL.GL_ZERO;
-        DST_ALPHA = GL.GL_ONE_MINUS_SRC_ALPHA;
+        SRC_COLOR = gl.GL_ZERO;
+        DST_COLOR = gl.GL_ONE_MINUS_SRC_COLOR;
+        SRC_ALPHA = gl.GL_ZERO;
+        DST_ALPHA = gl.GL_ONE_MINUS_SRC_ALPHA;
 
-        GL.glBlendFuncSeparate(SRC_COLOR, DST_COLOR, SRC_ALPHA, DST_ALPHA);
+        gl.BlendFuncSeparate(SRC_COLOR, DST_COLOR, SRC_ALPHA, DST_ALPHA);
     }
 
     /// <summary>
@@ -452,7 +446,7 @@ gl_FragColor = col_formask;
         {
             if (_shaderSets[i].ShaderProgram != 0)
             {
-                GL.glDeleteProgram(_shaderSets[i].ShaderProgram);
+                gl.DeleteProgram(_shaderSets[i].ShaderProgram);
                 _shaderSets[i].ShaderProgram = 0;
             }
         }
@@ -468,7 +462,7 @@ gl_FragColor = col_formask;
             _shaderSets.Add(new CubismShaderSet());
         }
 
-        if (GL.IsES2)
+        if (gl.IsES2)
         {
             if (s_extMode)
             {
@@ -538,212 +532,212 @@ gl_FragColor = col_formask;
         }
 
         // SetupMask
-        _shaderSets[0].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[0].ShaderProgram, "a_position");
-        _shaderSets[0].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[0].ShaderProgram, "a_texCoord");
-        _shaderSets[0].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[0].ShaderProgram, "s_texture0");
-        _shaderSets[0].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[0].ShaderProgram, "u_clipMatrix");
-        _shaderSets[0].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[0].ShaderProgram, "u_channelFlag");
-        _shaderSets[0].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[0].ShaderProgram, "u_baseColor");
-        _shaderSets[0].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[0].ShaderProgram, "u_multiplyColor");
-        _shaderSets[0].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[0].ShaderProgram, "u_screenColor");
+        _shaderSets[0].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[0].ShaderProgram, "a_position");
+        _shaderSets[0].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[0].ShaderProgram, "a_texCoord");
+        _shaderSets[0].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[0].ShaderProgram, "s_texture0");
+        _shaderSets[0].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[0].ShaderProgram, "u_clipMatrix");
+        _shaderSets[0].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[0].ShaderProgram, "u_channelFlag");
+        _shaderSets[0].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[0].ShaderProgram, "u_baseColor");
+        _shaderSets[0].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[0].ShaderProgram, "u_multiplyColor");
+        _shaderSets[0].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[0].ShaderProgram, "u_screenColor");
 
         // 通常
-        _shaderSets[1].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[1].ShaderProgram, "a_position");
-        _shaderSets[1].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[1].ShaderProgram, "a_texCoord");
-        _shaderSets[1].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[1].ShaderProgram, "s_texture0");
-        _shaderSets[1].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[1].ShaderProgram, "u_matrix");
-        _shaderSets[1].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[1].ShaderProgram, "u_baseColor");
-        _shaderSets[1].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[1].ShaderProgram, "u_multiplyColor");
-        _shaderSets[1].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[1].ShaderProgram, "u_screenColor");
+        _shaderSets[1].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[1].ShaderProgram, "a_position");
+        _shaderSets[1].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[1].ShaderProgram, "a_texCoord");
+        _shaderSets[1].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[1].ShaderProgram, "s_texture0");
+        _shaderSets[1].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[1].ShaderProgram, "u_matrix");
+        _shaderSets[1].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[1].ShaderProgram, "u_baseColor");
+        _shaderSets[1].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[1].ShaderProgram, "u_multiplyColor");
+        _shaderSets[1].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[1].ShaderProgram, "u_screenColor");
 
         // 通常（クリッピング）
-        _shaderSets[2].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[2].ShaderProgram, "a_position");
-        _shaderSets[2].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[2].ShaderProgram, "a_texCoord");
-        _shaderSets[2].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[2].ShaderProgram, "s_texture0");
-        _shaderSets[2].SamplerTexture1Location = GL.glGetUniformLocation(_shaderSets[2].ShaderProgram, "s_texture1");
-        _shaderSets[2].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[2].ShaderProgram, "u_matrix");
-        _shaderSets[2].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[2].ShaderProgram, "u_clipMatrix");
-        _shaderSets[2].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[2].ShaderProgram, "u_channelFlag");
-        _shaderSets[2].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[2].ShaderProgram, "u_baseColor");
-        _shaderSets[2].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[2].ShaderProgram, "u_multiplyColor");
-        _shaderSets[2].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[2].ShaderProgram, "u_screenColor");
+        _shaderSets[2].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[2].ShaderProgram, "a_position");
+        _shaderSets[2].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[2].ShaderProgram, "a_texCoord");
+        _shaderSets[2].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[2].ShaderProgram, "s_texture0");
+        _shaderSets[2].SamplerTexture1Location = gl.GetUniformLocation(_shaderSets[2].ShaderProgram, "s_texture1");
+        _shaderSets[2].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[2].ShaderProgram, "u_matrix");
+        _shaderSets[2].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[2].ShaderProgram, "u_clipMatrix");
+        _shaderSets[2].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[2].ShaderProgram, "u_channelFlag");
+        _shaderSets[2].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[2].ShaderProgram, "u_baseColor");
+        _shaderSets[2].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[2].ShaderProgram, "u_multiplyColor");
+        _shaderSets[2].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[2].ShaderProgram, "u_screenColor");
 
         // 通常（クリッピング・反転）
-        _shaderSets[3].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[3].ShaderProgram, "a_position");
-        _shaderSets[3].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[3].ShaderProgram, "a_texCoord");
-        _shaderSets[3].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[3].ShaderProgram, "s_texture0");
-        _shaderSets[3].SamplerTexture1Location = GL.glGetUniformLocation(_shaderSets[3].ShaderProgram, "s_texture1");
-        _shaderSets[3].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[3].ShaderProgram, "u_matrix");
-        _shaderSets[3].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[3].ShaderProgram, "u_clipMatrix");
-        _shaderSets[3].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[3].ShaderProgram, "u_channelFlag");
-        _shaderSets[3].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[3].ShaderProgram, "u_baseColor");
-        _shaderSets[3].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[3].ShaderProgram, "u_multiplyColor");
-        _shaderSets[3].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[3].ShaderProgram, "u_screenColor");
+        _shaderSets[3].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[3].ShaderProgram, "a_position");
+        _shaderSets[3].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[3].ShaderProgram, "a_texCoord");
+        _shaderSets[3].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[3].ShaderProgram, "s_texture0");
+        _shaderSets[3].SamplerTexture1Location = gl.GetUniformLocation(_shaderSets[3].ShaderProgram, "s_texture1");
+        _shaderSets[3].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[3].ShaderProgram, "u_matrix");
+        _shaderSets[3].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[3].ShaderProgram, "u_clipMatrix");
+        _shaderSets[3].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[3].ShaderProgram, "u_channelFlag");
+        _shaderSets[3].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[3].ShaderProgram, "u_baseColor");
+        _shaderSets[3].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[3].ShaderProgram, "u_multiplyColor");
+        _shaderSets[3].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[3].ShaderProgram, "u_screenColor");
 
         // 通常（PremultipliedAlpha）
-        _shaderSets[4].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[4].ShaderProgram, "a_position");
-        _shaderSets[4].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[4].ShaderProgram, "a_texCoord");
-        _shaderSets[4].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[4].ShaderProgram, "s_texture0");
-        _shaderSets[4].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[4].ShaderProgram, "u_matrix");
-        _shaderSets[4].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[4].ShaderProgram, "u_baseColor");
-        _shaderSets[4].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[4].ShaderProgram, "u_multiplyColor");
-        _shaderSets[4].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[4].ShaderProgram, "u_screenColor");
+        _shaderSets[4].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[4].ShaderProgram, "a_position");
+        _shaderSets[4].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[4].ShaderProgram, "a_texCoord");
+        _shaderSets[4].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[4].ShaderProgram, "s_texture0");
+        _shaderSets[4].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[4].ShaderProgram, "u_matrix");
+        _shaderSets[4].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[4].ShaderProgram, "u_baseColor");
+        _shaderSets[4].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[4].ShaderProgram, "u_multiplyColor");
+        _shaderSets[4].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[4].ShaderProgram, "u_screenColor");
 
         // 通常（クリッピング、PremultipliedAlpha）
-        _shaderSets[5].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[5].ShaderProgram, "a_position");
-        _shaderSets[5].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[5].ShaderProgram, "a_texCoord");
-        _shaderSets[5].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[5].ShaderProgram, "s_texture0");
-        _shaderSets[5].SamplerTexture1Location = GL.glGetUniformLocation(_shaderSets[5].ShaderProgram, "s_texture1");
-        _shaderSets[5].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[5].ShaderProgram, "u_matrix");
-        _shaderSets[5].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[5].ShaderProgram, "u_clipMatrix");
-        _shaderSets[5].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[5].ShaderProgram, "u_channelFlag");
-        _shaderSets[5].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[5].ShaderProgram, "u_baseColor");
-        _shaderSets[5].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[5].ShaderProgram, "u_multiplyColor");
-        _shaderSets[5].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[5].ShaderProgram, "u_screenColor");
+        _shaderSets[5].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[5].ShaderProgram, "a_position");
+        _shaderSets[5].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[5].ShaderProgram, "a_texCoord");
+        _shaderSets[5].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[5].ShaderProgram, "s_texture0");
+        _shaderSets[5].SamplerTexture1Location = gl.GetUniformLocation(_shaderSets[5].ShaderProgram, "s_texture1");
+        _shaderSets[5].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[5].ShaderProgram, "u_matrix");
+        _shaderSets[5].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[5].ShaderProgram, "u_clipMatrix");
+        _shaderSets[5].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[5].ShaderProgram, "u_channelFlag");
+        _shaderSets[5].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[5].ShaderProgram, "u_baseColor");
+        _shaderSets[5].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[5].ShaderProgram, "u_multiplyColor");
+        _shaderSets[5].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[5].ShaderProgram, "u_screenColor");
 
         // 通常（クリッピング・反転、PremultipliedAlpha）
-        _shaderSets[6].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[6].ShaderProgram, "a_position");
-        _shaderSets[6].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[6].ShaderProgram, "a_texCoord");
-        _shaderSets[6].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[6].ShaderProgram, "s_texture0");
-        _shaderSets[6].SamplerTexture1Location = GL.glGetUniformLocation(_shaderSets[6].ShaderProgram, "s_texture1");
-        _shaderSets[6].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[6].ShaderProgram, "u_matrix");
-        _shaderSets[6].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[6].ShaderProgram, "u_clipMatrix");
-        _shaderSets[6].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[6].ShaderProgram, "u_channelFlag");
-        _shaderSets[6].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[6].ShaderProgram, "u_baseColor");
-        _shaderSets[6].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[6].ShaderProgram, "u_multiplyColor");
-        _shaderSets[6].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[6].ShaderProgram, "u_screenColor");
+        _shaderSets[6].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[6].ShaderProgram, "a_position");
+        _shaderSets[6].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[6].ShaderProgram, "a_texCoord");
+        _shaderSets[6].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[6].ShaderProgram, "s_texture0");
+        _shaderSets[6].SamplerTexture1Location = gl.GetUniformLocation(_shaderSets[6].ShaderProgram, "s_texture1");
+        _shaderSets[6].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[6].ShaderProgram, "u_matrix");
+        _shaderSets[6].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[6].ShaderProgram, "u_clipMatrix");
+        _shaderSets[6].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[6].ShaderProgram, "u_channelFlag");
+        _shaderSets[6].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[6].ShaderProgram, "u_baseColor");
+        _shaderSets[6].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[6].ShaderProgram, "u_multiplyColor");
+        _shaderSets[6].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[6].ShaderProgram, "u_screenColor");
 
         // 加算
-        _shaderSets[7].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[7].ShaderProgram, "a_position");
-        _shaderSets[7].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[7].ShaderProgram, "a_texCoord");
-        _shaderSets[7].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[7].ShaderProgram, "s_texture0");
-        _shaderSets[7].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[7].ShaderProgram, "u_matrix");
-        _shaderSets[7].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[7].ShaderProgram, "u_baseColor");
-        _shaderSets[7].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[7].ShaderProgram, "u_multiplyColor");
-        _shaderSets[7].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[7].ShaderProgram, "u_screenColor");
+        _shaderSets[7].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[7].ShaderProgram, "a_position");
+        _shaderSets[7].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[7].ShaderProgram, "a_texCoord");
+        _shaderSets[7].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[7].ShaderProgram, "s_texture0");
+        _shaderSets[7].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[7].ShaderProgram, "u_matrix");
+        _shaderSets[7].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[7].ShaderProgram, "u_baseColor");
+        _shaderSets[7].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[7].ShaderProgram, "u_multiplyColor");
+        _shaderSets[7].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[7].ShaderProgram, "u_screenColor");
 
         // 加算（クリッピング）
-        _shaderSets[8].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[8].ShaderProgram, "a_position");
-        _shaderSets[8].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[8].ShaderProgram, "a_texCoord");
-        _shaderSets[8].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[8].ShaderProgram, "s_texture0");
-        _shaderSets[8].SamplerTexture1Location = GL.glGetUniformLocation(_shaderSets[8].ShaderProgram, "s_texture1");
-        _shaderSets[8].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[8].ShaderProgram, "u_matrix");
-        _shaderSets[8].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[8].ShaderProgram, "u_clipMatrix");
-        _shaderSets[8].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[8].ShaderProgram, "u_channelFlag");
-        _shaderSets[8].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[8].ShaderProgram, "u_baseColor");
-        _shaderSets[8].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[8].ShaderProgram, "u_multiplyColor");
-        _shaderSets[8].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[8].ShaderProgram, "u_screenColor");
+        _shaderSets[8].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[8].ShaderProgram, "a_position");
+        _shaderSets[8].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[8].ShaderProgram, "a_texCoord");
+        _shaderSets[8].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[8].ShaderProgram, "s_texture0");
+        _shaderSets[8].SamplerTexture1Location = gl.GetUniformLocation(_shaderSets[8].ShaderProgram, "s_texture1");
+        _shaderSets[8].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[8].ShaderProgram, "u_matrix");
+        _shaderSets[8].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[8].ShaderProgram, "u_clipMatrix");
+        _shaderSets[8].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[8].ShaderProgram, "u_channelFlag");
+        _shaderSets[8].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[8].ShaderProgram, "u_baseColor");
+        _shaderSets[8].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[8].ShaderProgram, "u_multiplyColor");
+        _shaderSets[8].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[8].ShaderProgram, "u_screenColor");
 
         // 加算（クリッピング・反転）
-        _shaderSets[9].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[9].ShaderProgram, "a_position");
-        _shaderSets[9].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[9].ShaderProgram, "a_texCoord");
-        _shaderSets[9].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[9].ShaderProgram, "s_texture0");
-        _shaderSets[9].SamplerTexture1Location = GL.glGetUniformLocation(_shaderSets[9].ShaderProgram, "s_texture1");
-        _shaderSets[9].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[9].ShaderProgram, "u_matrix");
-        _shaderSets[9].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[9].ShaderProgram, "u_clipMatrix");
-        _shaderSets[9].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[9].ShaderProgram, "u_channelFlag");
-        _shaderSets[9].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[9].ShaderProgram, "u_baseColor");
-        _shaderSets[9].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[9].ShaderProgram, "u_multiplyColor");
-        _shaderSets[9].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[9].ShaderProgram, "u_screenColor");
+        _shaderSets[9].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[9].ShaderProgram, "a_position");
+        _shaderSets[9].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[9].ShaderProgram, "a_texCoord");
+        _shaderSets[9].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[9].ShaderProgram, "s_texture0");
+        _shaderSets[9].SamplerTexture1Location = gl.GetUniformLocation(_shaderSets[9].ShaderProgram, "s_texture1");
+        _shaderSets[9].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[9].ShaderProgram, "u_matrix");
+        _shaderSets[9].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[9].ShaderProgram, "u_clipMatrix");
+        _shaderSets[9].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[9].ShaderProgram, "u_channelFlag");
+        _shaderSets[9].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[9].ShaderProgram, "u_baseColor");
+        _shaderSets[9].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[9].ShaderProgram, "u_multiplyColor");
+        _shaderSets[9].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[9].ShaderProgram, "u_screenColor");
 
         // 加算（PremultipliedAlpha）
-        _shaderSets[10].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[10].ShaderProgram, "a_position");
-        _shaderSets[10].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[10].ShaderProgram, "a_texCoord");
-        _shaderSets[10].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[10].ShaderProgram, "s_texture0");
-        _shaderSets[10].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[10].ShaderProgram, "u_matrix");
-        _shaderSets[10].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[10].ShaderProgram, "u_baseColor");
-        _shaderSets[10].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[10].ShaderProgram, "u_multiplyColor");
-        _shaderSets[10].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[10].ShaderProgram, "u_screenColor");
+        _shaderSets[10].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[10].ShaderProgram, "a_position");
+        _shaderSets[10].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[10].ShaderProgram, "a_texCoord");
+        _shaderSets[10].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[10].ShaderProgram, "s_texture0");
+        _shaderSets[10].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[10].ShaderProgram, "u_matrix");
+        _shaderSets[10].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[10].ShaderProgram, "u_baseColor");
+        _shaderSets[10].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[10].ShaderProgram, "u_multiplyColor");
+        _shaderSets[10].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[10].ShaderProgram, "u_screenColor");
 
         // 加算（クリッピング、PremultipliedAlpha）
-        _shaderSets[11].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[11].ShaderProgram, "a_position");
-        _shaderSets[11].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[11].ShaderProgram, "a_texCoord");
-        _shaderSets[11].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[11].ShaderProgram, "s_texture0");
-        _shaderSets[11].SamplerTexture1Location = GL.glGetUniformLocation(_shaderSets[11].ShaderProgram, "s_texture1");
-        _shaderSets[11].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[11].ShaderProgram, "u_matrix");
-        _shaderSets[11].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[11].ShaderProgram, "u_clipMatrix");
-        _shaderSets[11].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[11].ShaderProgram, "u_channelFlag");
-        _shaderSets[11].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[11].ShaderProgram, "u_baseColor");
-        _shaderSets[11].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[11].ShaderProgram, "u_multiplyColor");
-        _shaderSets[11].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[11].ShaderProgram, "u_screenColor");
+        _shaderSets[11].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[11].ShaderProgram, "a_position");
+        _shaderSets[11].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[11].ShaderProgram, "a_texCoord");
+        _shaderSets[11].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[11].ShaderProgram, "s_texture0");
+        _shaderSets[11].SamplerTexture1Location = gl.GetUniformLocation(_shaderSets[11].ShaderProgram, "s_texture1");
+        _shaderSets[11].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[11].ShaderProgram, "u_matrix");
+        _shaderSets[11].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[11].ShaderProgram, "u_clipMatrix");
+        _shaderSets[11].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[11].ShaderProgram, "u_channelFlag");
+        _shaderSets[11].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[11].ShaderProgram, "u_baseColor");
+        _shaderSets[11].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[11].ShaderProgram, "u_multiplyColor");
+        _shaderSets[11].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[11].ShaderProgram, "u_screenColor");
 
         // 加算（クリッピング・反転、PremultipliedAlpha）
-        _shaderSets[12].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[12].ShaderProgram, "a_position");
-        _shaderSets[12].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[12].ShaderProgram, "a_texCoord");
-        _shaderSets[12].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[12].ShaderProgram, "s_texture0");
-        _shaderSets[12].SamplerTexture1Location = GL.glGetUniformLocation(_shaderSets[12].ShaderProgram, "s_texture1");
-        _shaderSets[12].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[12].ShaderProgram, "u_matrix");
-        _shaderSets[12].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[12].ShaderProgram, "u_clipMatrix");
-        _shaderSets[12].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[12].ShaderProgram, "u_channelFlag");
-        _shaderSets[12].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[12].ShaderProgram, "u_baseColor");
-        _shaderSets[12].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[12].ShaderProgram, "u_multiplyColor");
-        _shaderSets[12].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[12].ShaderProgram, "u_screenColor");
+        _shaderSets[12].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[12].ShaderProgram, "a_position");
+        _shaderSets[12].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[12].ShaderProgram, "a_texCoord");
+        _shaderSets[12].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[12].ShaderProgram, "s_texture0");
+        _shaderSets[12].SamplerTexture1Location = gl.GetUniformLocation(_shaderSets[12].ShaderProgram, "s_texture1");
+        _shaderSets[12].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[12].ShaderProgram, "u_matrix");
+        _shaderSets[12].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[12].ShaderProgram, "u_clipMatrix");
+        _shaderSets[12].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[12].ShaderProgram, "u_channelFlag");
+        _shaderSets[12].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[12].ShaderProgram, "u_baseColor");
+        _shaderSets[12].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[12].ShaderProgram, "u_multiplyColor");
+        _shaderSets[12].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[12].ShaderProgram, "u_screenColor");
 
         // 乗算
-        _shaderSets[13].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[13].ShaderProgram, "a_position");
-        _shaderSets[13].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[13].ShaderProgram, "a_texCoord");
-        _shaderSets[13].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[13].ShaderProgram, "s_texture0");
-        _shaderSets[13].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[13].ShaderProgram, "u_matrix");
-        _shaderSets[13].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[13].ShaderProgram, "u_baseColor");
-        _shaderSets[13].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[13].ShaderProgram, "u_multiplyColor");
-        _shaderSets[13].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[13].ShaderProgram, "u_screenColor");
+        _shaderSets[13].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[13].ShaderProgram, "a_position");
+        _shaderSets[13].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[13].ShaderProgram, "a_texCoord");
+        _shaderSets[13].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[13].ShaderProgram, "s_texture0");
+        _shaderSets[13].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[13].ShaderProgram, "u_matrix");
+        _shaderSets[13].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[13].ShaderProgram, "u_baseColor");
+        _shaderSets[13].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[13].ShaderProgram, "u_multiplyColor");
+        _shaderSets[13].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[13].ShaderProgram, "u_screenColor");
 
         // 乗算（クリッピング）
-        _shaderSets[14].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[14].ShaderProgram, "a_position");
-        _shaderSets[14].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[14].ShaderProgram, "a_texCoord");
-        _shaderSets[14].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[14].ShaderProgram, "s_texture0");
-        _shaderSets[14].SamplerTexture1Location = GL.glGetUniformLocation(_shaderSets[14].ShaderProgram, "s_texture1");
-        _shaderSets[14].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[14].ShaderProgram, "u_matrix");
-        _shaderSets[14].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[14].ShaderProgram, "u_clipMatrix");
-        _shaderSets[14].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[14].ShaderProgram, "u_channelFlag");
-        _shaderSets[14].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[14].ShaderProgram, "u_baseColor");
-        _shaderSets[14].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[14].ShaderProgram, "u_multiplyColor");
-        _shaderSets[14].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[14].ShaderProgram, "u_screenColor");
+        _shaderSets[14].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[14].ShaderProgram, "a_position");
+        _shaderSets[14].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[14].ShaderProgram, "a_texCoord");
+        _shaderSets[14].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[14].ShaderProgram, "s_texture0");
+        _shaderSets[14].SamplerTexture1Location = gl.GetUniformLocation(_shaderSets[14].ShaderProgram, "s_texture1");
+        _shaderSets[14].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[14].ShaderProgram, "u_matrix");
+        _shaderSets[14].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[14].ShaderProgram, "u_clipMatrix");
+        _shaderSets[14].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[14].ShaderProgram, "u_channelFlag");
+        _shaderSets[14].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[14].ShaderProgram, "u_baseColor");
+        _shaderSets[14].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[14].ShaderProgram, "u_multiplyColor");
+        _shaderSets[14].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[14].ShaderProgram, "u_screenColor");
 
         // 乗算（クリッピング・反転）
-        _shaderSets[15].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[15].ShaderProgram, "a_position");
-        _shaderSets[15].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[15].ShaderProgram, "a_texCoord");
-        _shaderSets[15].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[15].ShaderProgram, "s_texture0");
-        _shaderSets[15].SamplerTexture1Location = GL.glGetUniformLocation(_shaderSets[15].ShaderProgram, "s_texture1");
-        _shaderSets[15].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[15].ShaderProgram, "u_matrix");
-        _shaderSets[15].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[15].ShaderProgram, "u_clipMatrix");
-        _shaderSets[15].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[15].ShaderProgram, "u_channelFlag");
-        _shaderSets[15].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[15].ShaderProgram, "u_baseColor");
-        _shaderSets[15].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[15].ShaderProgram, "u_multiplyColor");
-        _shaderSets[15].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[15].ShaderProgram, "u_screenColor");
+        _shaderSets[15].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[15].ShaderProgram, "a_position");
+        _shaderSets[15].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[15].ShaderProgram, "a_texCoord");
+        _shaderSets[15].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[15].ShaderProgram, "s_texture0");
+        _shaderSets[15].SamplerTexture1Location = gl.GetUniformLocation(_shaderSets[15].ShaderProgram, "s_texture1");
+        _shaderSets[15].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[15].ShaderProgram, "u_matrix");
+        _shaderSets[15].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[15].ShaderProgram, "u_clipMatrix");
+        _shaderSets[15].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[15].ShaderProgram, "u_channelFlag");
+        _shaderSets[15].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[15].ShaderProgram, "u_baseColor");
+        _shaderSets[15].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[15].ShaderProgram, "u_multiplyColor");
+        _shaderSets[15].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[15].ShaderProgram, "u_screenColor");
 
         // 乗算（PremultipliedAlpha）
-        _shaderSets[16].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[16].ShaderProgram, "a_position");
-        _shaderSets[16].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[16].ShaderProgram, "a_texCoord");
-        _shaderSets[16].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[16].ShaderProgram, "s_texture0");
-        _shaderSets[16].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[16].ShaderProgram, "u_matrix");
-        _shaderSets[16].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[16].ShaderProgram, "u_baseColor");
-        _shaderSets[16].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[16].ShaderProgram, "u_multiplyColor");
-        _shaderSets[16].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[16].ShaderProgram, "u_screenColor");
+        _shaderSets[16].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[16].ShaderProgram, "a_position");
+        _shaderSets[16].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[16].ShaderProgram, "a_texCoord");
+        _shaderSets[16].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[16].ShaderProgram, "s_texture0");
+        _shaderSets[16].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[16].ShaderProgram, "u_matrix");
+        _shaderSets[16].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[16].ShaderProgram, "u_baseColor");
+        _shaderSets[16].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[16].ShaderProgram, "u_multiplyColor");
+        _shaderSets[16].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[16].ShaderProgram, "u_screenColor");
 
         // 乗算（クリッピング、PremultipliedAlpha）
-        _shaderSets[17].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[17].ShaderProgram, "a_position");
-        _shaderSets[17].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[17].ShaderProgram, "a_texCoord");
-        _shaderSets[17].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[17].ShaderProgram, "s_texture0");
-        _shaderSets[17].SamplerTexture1Location = GL.glGetUniformLocation(_shaderSets[17].ShaderProgram, "s_texture1");
-        _shaderSets[17].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[17].ShaderProgram, "u_matrix");
-        _shaderSets[17].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[17].ShaderProgram, "u_clipMatrix");
-        _shaderSets[17].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[17].ShaderProgram, "u_channelFlag");
-        _shaderSets[17].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[17].ShaderProgram, "u_baseColor");
-        _shaderSets[17].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[17].ShaderProgram, "u_multiplyColor");
-        _shaderSets[17].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[17].ShaderProgram, "u_screenColor");
+        _shaderSets[17].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[17].ShaderProgram, "a_position");
+        _shaderSets[17].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[17].ShaderProgram, "a_texCoord");
+        _shaderSets[17].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[17].ShaderProgram, "s_texture0");
+        _shaderSets[17].SamplerTexture1Location = gl.GetUniformLocation(_shaderSets[17].ShaderProgram, "s_texture1");
+        _shaderSets[17].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[17].ShaderProgram, "u_matrix");
+        _shaderSets[17].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[17].ShaderProgram, "u_clipMatrix");
+        _shaderSets[17].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[17].ShaderProgram, "u_channelFlag");
+        _shaderSets[17].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[17].ShaderProgram, "u_baseColor");
+        _shaderSets[17].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[17].ShaderProgram, "u_multiplyColor");
+        _shaderSets[17].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[17].ShaderProgram, "u_screenColor");
 
         // 乗算（クリッピング・反転、PremultipliedAlpha）
-        _shaderSets[18].AttributePositionLocation = GL.glGetAttribLocation(_shaderSets[18].ShaderProgram, "a_position");
-        _shaderSets[18].AttributeTexCoordLocation = GL.glGetAttribLocation(_shaderSets[18].ShaderProgram, "a_texCoord");
-        _shaderSets[18].SamplerTexture0Location = GL.glGetUniformLocation(_shaderSets[18].ShaderProgram, "s_texture0");
-        _shaderSets[18].SamplerTexture1Location = GL.glGetUniformLocation(_shaderSets[18].ShaderProgram, "s_texture1");
-        _shaderSets[18].UniformMatrixLocation = GL.glGetUniformLocation(_shaderSets[18].ShaderProgram, "u_matrix");
-        _shaderSets[18].UniformClipMatrixLocation = GL.glGetUniformLocation(_shaderSets[18].ShaderProgram, "u_clipMatrix");
-        _shaderSets[18].UnifromChannelFlagLocation = GL.glGetUniformLocation(_shaderSets[18].ShaderProgram, "u_channelFlag");
-        _shaderSets[18].UniformBaseColorLocation = GL.glGetUniformLocation(_shaderSets[18].ShaderProgram, "u_baseColor");
-        _shaderSets[18].UniformMultiplyColorLocation = GL.glGetUniformLocation(_shaderSets[18].ShaderProgram, "u_multiplyColor");
-        _shaderSets[18].UniformScreenColorLocation = GL.glGetUniformLocation(_shaderSets[18].ShaderProgram, "u_screenColor");
+        _shaderSets[18].AttributePositionLocation = gl.GetAttribLocation(_shaderSets[18].ShaderProgram, "a_position");
+        _shaderSets[18].AttributeTexCoordLocation = gl.GetAttribLocation(_shaderSets[18].ShaderProgram, "a_texCoord");
+        _shaderSets[18].SamplerTexture0Location = gl.GetUniformLocation(_shaderSets[18].ShaderProgram, "s_texture0");
+        _shaderSets[18].SamplerTexture1Location = gl.GetUniformLocation(_shaderSets[18].ShaderProgram, "s_texture1");
+        _shaderSets[18].UniformMatrixLocation = gl.GetUniformLocation(_shaderSets[18].ShaderProgram, "u_matrix");
+        _shaderSets[18].UniformClipMatrixLocation = gl.GetUniformLocation(_shaderSets[18].ShaderProgram, "u_clipMatrix");
+        _shaderSets[18].UnifromChannelFlagLocation = gl.GetUniformLocation(_shaderSets[18].ShaderProgram, "u_channelFlag");
+        _shaderSets[18].UniformBaseColorLocation = gl.GetUniformLocation(_shaderSets[18].ShaderProgram, "u_baseColor");
+        _shaderSets[18].UniformMultiplyColorLocation = gl.GetUniformLocation(_shaderSets[18].ShaderProgram, "u_multiplyColor");
+        _shaderSets[18].UniformScreenColorLocation = gl.GetUniformLocation(_shaderSets[18].ShaderProgram, "u_screenColor");
     }
 
     /// <summary>
@@ -755,26 +749,26 @@ gl_FragColor = col_formask;
     internal unsafe int LoadShaderProgram(string vertShaderSrc, string fragShaderSrc)
     {
         // Create shader program.
-        int shaderProgram = GL.glCreateProgram();
+        int shaderProgram = gl.CreateProgram();
 
-        if (!CompileShaderSource(out int vertShader, GL.GL_VERTEX_SHADER, vertShaderSrc))
+        if (!CompileShaderSource(out int vertShader, gl.GL_VERTEX_SHADER, vertShaderSrc))
         {
             CubismLog.Error("[Live2D SDK]Vertex shader compile error!");
             return 0;
         }
 
         // Create and compile fragment shader.
-        if (!CompileShaderSource(out int fragShader, GL.GL_FRAGMENT_SHADER, fragShaderSrc))
+        if (!CompileShaderSource(out int fragShader, gl.GL_FRAGMENT_SHADER, fragShaderSrc))
         {
             CubismLog.Error("[Live2D SDK]Fragment shader compile error!");
             return 0;
         }
 
         // Attach vertex shader to program.
-        GL.glAttachShader(shaderProgram, vertShader);
+        gl.AttachShader(shaderProgram, vertShader);
 
         // Attach fragment shader to program.
-        GL.glAttachShader(shaderProgram, fragShader);
+        gl.AttachShader(shaderProgram, fragShader);
 
         // Link program.
         if (!LinkProgram(shaderProgram))
@@ -783,15 +777,15 @@ gl_FragColor = col_formask;
 
             if (vertShader != 0)
             {
-                GL.glDeleteShader(vertShader);
+                gl.DeleteShader(vertShader);
             }
             if (fragShader != 0)
             {
-                GL.glDeleteShader(fragShader);
+                gl.DeleteShader(fragShader);
             }
             if (shaderProgram != 0)
             {
-                GL.glDeleteProgram(shaderProgram);
+                gl.DeleteProgram(shaderProgram);
             }
 
             return 0;
@@ -800,14 +794,14 @@ gl_FragColor = col_formask;
         // Release vertex and fragment shaders.
         if (vertShader != 0)
         {
-            GL.glDetachShader(shaderProgram, vertShader);
-            GL.glDeleteShader(vertShader);
+            gl.DetachShader(shaderProgram, vertShader);
+            gl.DeleteShader(vertShader);
         }
 
         if (fragShader != 0)
         {
-            GL.glDetachShader(shaderProgram, fragShader);
-            GL.glDeleteShader(fragShader);
+            gl.DetachShader(shaderProgram, fragShader);
+            gl.DeleteShader(fragShader);
         }
 
         return shaderProgram;
@@ -825,22 +819,22 @@ gl_FragColor = col_formask;
     {
         int status;
 
-        outShader = GL.glCreateShader(shaderType);
-        GL.glShaderSource(outShader, shaderSource);
-        GL.glCompileShader(outShader);
+        outShader = gl.CreateShader(shaderType);
+        gl.ShaderSource(outShader, shaderSource);
+        gl.CompileShader(outShader);
 
         int logLength;
-        GL.glGetShaderiv(outShader, GL.GL_INFO_LOG_LENGTH, &logLength);
+        gl.GetShaderiv(outShader, gl.GL_INFO_LOG_LENGTH, &logLength);
         if (logLength > 0)
         {
-            GL.glGetShaderInfoLog(outShader, out string log);
+            gl.GetShaderInfoLog(outShader, out string log);
             CubismLog.Error($"[Live2D SDK]Shader compile log: {log}");
         }
 
-        GL.glGetShaderiv(outShader, GL.GL_COMPILE_STATUS, &status);
-        if (status == GL.GL_FALSE)
+        gl.GetShaderiv(outShader, gl.GL_COMPILE_STATUS, &status);
+        if (status == gl.GL_FALSE)
         {
-            GL.glDeleteShader(outShader);
+            gl.DeleteShader(outShader);
             return false;
         }
 
@@ -856,18 +850,18 @@ gl_FragColor = col_formask;
     internal unsafe bool LinkProgram(int shaderProgram)
     {
         int status;
-        GL.glLinkProgram(shaderProgram);
+        gl.LinkProgram(shaderProgram);
 
         int logLength;
-        GL.glGetProgramiv(shaderProgram, GL.GL_INFO_LOG_LENGTH, &logLength);
+        gl.GetProgramiv(shaderProgram, gl.GL_INFO_LOG_LENGTH, &logLength);
         if (logLength > 0)
         {
-            GL.glGetProgramInfoLog(shaderProgram, out string log);
+            gl.GetProgramInfoLog(shaderProgram, out string log);
             CubismLog.Error($"[Live2D SDK]Program link log: {log}");
         }
 
-        GL.glGetProgramiv(shaderProgram, GL.GL_LINK_STATUS, &status);
-        if (status == GL.GL_FALSE)
+        gl.GetProgramiv(shaderProgram, gl.GL_LINK_STATUS, &status);
+        if (status == gl.GL_FALSE)
         {
             return false;
         }
@@ -885,16 +879,16 @@ gl_FragColor = col_formask;
     {
         int logLength, status;
 
-        GL.glValidateProgram(shaderProgram);
-        GL.glGetProgramiv(shaderProgram, GL.GL_INFO_LOG_LENGTH, &logLength);
+        gl.ValidateProgram(shaderProgram);
+        gl.GetProgramiv(shaderProgram, gl.GL_INFO_LOG_LENGTH, &logLength);
         if (logLength > 0)
         {
-            GL.glGetProgramInfoLog(shaderProgram, out string log);
+            gl.GetProgramInfoLog(shaderProgram, out string log);
             CubismLog.Error($"[Live2D SDK]Validate program log: {log}");
         }
 
-        GL.glGetProgramiv(shaderProgram, GL.GL_VALIDATE_STATUS, &status);
-        if (status == GL.GL_FALSE)
+        gl.GetProgramiv(shaderProgram, gl.GL_VALIDATE_STATUS, &status);
+        if (status == gl.GL_FALSE)
         {
             return false;
         }

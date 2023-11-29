@@ -21,11 +21,11 @@ public class CubismMotion : ACubismMotion
     /// <summary>
     /// ロードしたファイルのFPS。記述が無ければデフォルト値15fpsとなる
     /// </summary>
-    private float _sourceFrameRate;
+    private readonly float _sourceFrameRate;
     /// <summary>
     /// mtnファイルで定義される一連のモーションの長さ
     /// </summary>
-    private float _loopDurationSeconds;
+    private readonly float _loopDurationSeconds;
     /// <summary>
     /// ループするか?
     /// </summary>
@@ -839,18 +839,18 @@ public class CubismMotion : ACubismMotion
     /// <returns></returns>
     public override List<string> GetFiredEvent(float beforeCheckTimeSeconds, float motionTimeSeconds)
     {
-        _firedEventValues.Clear();
+        FiredEventValues.Clear();
         /// イベントの発火チェック
         for (int u = 0; u < _motionData.EventCount; ++u)
         {
             if ((_motionData.Events[u].FireTime > beforeCheckTimeSeconds) &&
                 (_motionData.Events[u].FireTime <= motionTimeSeconds))
             {
-                _firedEventValues.Add(_motionData.Events[u].Value);
+                FiredEventValues.Add(_motionData.Events[u].Value);
             }
         }
 
-        return _firedEventValues;
+        return FiredEventValues;
 
     }
 

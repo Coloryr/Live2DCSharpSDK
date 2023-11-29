@@ -13,7 +13,7 @@ public class CubismEyeBlink
     /// <summary>
     /// 操作対象のパラメータのIDのリスト
     /// </summary>
-    public readonly List<string> ParameterIds = new();
+    public readonly List<string> ParameterIds = [];
     /// <summary>
     /// 現在の状態
     /// </summary>

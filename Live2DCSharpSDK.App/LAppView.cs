@@ -6,46 +6,30 @@ namespace Live2DCSharpSDK.App;
 /// <summary>
 /// 描画クラス
 /// </summary>
-public class LAppView
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+public class LAppView(LAppDelegate lapp)
 {
     /// <summary>
     /// タッチマネージャー
     /// </summary>
-    private readonly TouchManager _touchManager;
+    private readonly TouchManager _touchManager = new();
     /// <summary>
     /// デバイスからスクリーンへの行列
     /// </summary>
-    private readonly CubismMatrix44 _deviceToScreen;
+    private readonly CubismMatrix44 _deviceToScreen = new();
     /// <summary>
     /// viewMatrix
     /// </summary>
-    private readonly CubismViewMatrix _viewMatrix;
-
-    private readonly LAppDelegate _lapp;
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public LAppView(LAppDelegate lapp)
-    {
-        _lapp = lapp;
-
-        // タッチ関係のイベント管理
-        _touchManager = new TouchManager();
-
-        // デバイス座標からスクリーン座標に変換するための
-        _deviceToScreen = new CubismMatrix44();
-
-        // 画面の表示の拡大縮小や移動の変換を行う行列
-        _viewMatrix = new CubismViewMatrix();
-    }
+    private readonly CubismViewMatrix _viewMatrix = new();
 
     /// <summary>
     /// 初期化する。
     /// </summary>
     public void Initialize()
     {
-        _lapp.GL.GetWindowSize(out int width, out int height);
+        lapp.GL.GetWindowSize(out int width, out int height);
 
         if (width == 0 || height == 0)
         {
@@ -93,7 +77,7 @@ public class LAppView
     /// </summary>
     public void Render()
     {
-        var Live2DManager = _lapp.Live2dManager;
+        var Live2DManager = lapp.Live2dManager;
         Live2DManager.ViewMatrix.SetMatrix(_viewMatrix);
 
         // Cubism更新・描画
@@ -123,7 +107,7 @@ public class LAppView
 
         _touchManager.TouchesMoved(pointX, pointY);
 
-        _lapp.Live2dManager.OnDrag(viewX, viewY);
+        lapp.Live2dManager.OnDrag(viewX, viewY);
     }
 
     /// <summary>
@@ -131,10 +115,10 @@ public class LAppView
     /// </summary>
     /// <param name="pointX">スクリーンX座標</param>
     /// <param name="pointY">スクリーンY座標</param>
-    public void OnTouchesEnded(float pointX, float pointY)
+    public void OnTouchesEnded(float _, float __)
     {
         // タッチ終了
-        var live2DManager = _lapp.Live2dManager;
+        var live2DManager = lapp.Live2dManager;
         live2DManager.OnDrag(0.0f, 0.0f);
         // シングルタップ
         float x = _deviceToScreen.TransformX(_touchManager.GetX()); // 論理座標変換した座標を取得。

@@ -25,294 +25,294 @@ public class OpenTKApi : OpenGLApi
         h = Window.ClientSize.Y;
     }
 
-    public override void glActiveTexture(int bit)
+    public override void ActiveTexture(int bit)
     {
         GL.ActiveTexture((TextureUnit)bit);
     }
 
-    public override void glAttachShader(int a, int b)
+    public override void AttachShader(int a, int b)
     {
         GL.AttachShader(a, b);
     }
 
-    public override void glBindBuffer(int bit, int index)
+    public override void BindBuffer(int bit, int index)
     {
         GL.BindBuffer((BufferTarget)bit, index);
     }
 
-    public override void glBindFramebuffer(int type, int data)
+    public override void BindFramebuffer(int type, int data)
     {
         GL.BindFramebuffer((FramebufferTarget)type, data);
     }
 
-    public override void glBindTexture(int bit, int index)
+    public override void BindTexture(int bit, int index)
     {
         GL.BindTexture((TextureTarget)bit, index);
     }
 
-    public override void glBindVertexArrayOES(int data)
+    public override void BindVertexArrayOES(int data)
     {
         //TODO ES2
         GL.BindVertexArray(data);
     }
 
-    public override void glBlendFunc(int a, int b)
+    public override void BlendFunc(int a, int b)
     {
         GL.BlendFunc((BlendingFactor)a, (BlendingFactor)b);
     }
 
-    public override void glBlendFuncSeparate(int a, int b, int c, int d)
+    public override void BlendFuncSeparate(int a, int b, int c, int d)
     {
         GL.BlendFuncSeparate((BlendingFactorSrc)a, (BlendingFactorDest)b, (BlendingFactorSrc)c, (BlendingFactorDest)d);
     }
 
-    public override void glClear(int bit)
+    public override void Clear(int bit)
     {
         GL.Clear((ClearBufferMask)bit);
     }
 
-    public override void glClearColor(float r, float g, float b, float a)
+    public override void ClearColor(float r, float g, float b, float a)
     {
         GL.ClearColor(r, g, b, a);
     }
 
-    public override void glClearDepthf(float data)
+    public override void ClearDepthf(float data)
     {
         GL.ClearDepth(data);
     }
 
-    public override void glColorMask(bool a, bool b, bool c, bool d)
+    public override void ColorMask(bool a, bool b, bool c, bool d)
     {
         GL.ColorMask(a, b, c, d);
     }
 
-    public override void glCompileShader(int index)
+    public override void CompileShader(int index)
     {
         GL.CompileShader(index);
     }
 
-    public override int glCreateProgram()
+    public override int CreateProgram()
     {
         return GL.CreateProgram();
     }
 
-    public override int glCreateShader(int type)
+    public override int CreateShader(int type)
     {
         return GL.CreateShader((ShaderType)type);
     }
 
-    public override void glDeleteFramebuffer(int data)
+    public override void DeleteFramebuffer(int data)
     {
         GL.DeleteFramebuffer(data);
     }
 
-    public override void glDeleteProgram(int index)
+    public override void DeleteProgram(int index)
     {
         GL.DeleteProgram(index);
     }
 
-    public override void glDeleteShader(int index)
+    public override void DeleteShader(int index)
     {
         GL.DeleteShader(index);
     }
 
-    public override void glDeleteTexture(int data)
+    public override void DeleteTexture(int data)
     {
         GL.DeleteTexture(data);
     }
 
-    public override void glDetachShader(int index, int data)
+    public override void DetachShader(int index, int data)
     {
         GL.DetachShader(index, data);
     }
 
-    public override void glDisable(int bit)
+    public override void Disable(int bit)
     {
         GL.Disable((EnableCap)bit);
     }
 
-    public override void glDisableVertexAttribArray(int index)
+    public override void DisableVertexAttribArray(int index)
     {
         GL.DisableVertexAttribArray(index);
     }
 
-    public override unsafe void glDrawElements(int type, int count, int type1, nint arry)
+    public override unsafe void DrawElements(int type, int count, int type1, nint arry)
     {
         GL.DrawElements((PrimitiveType)type, count, (DrawElementsType)type1, (int)arry);
     }
 
-    public override void glEnable(int bit)
+    public override void Enable(int bit)
     {
         GL.Enable((EnableCap)bit);
     }
 
-    public override void glEnableVertexAttribArray(int index)
+    public override void EnableVertexAttribArray(int index)
     {
         GL.EnableVertexAttribArray(index);
     }
 
-    public override void glFramebufferTexture2D(int a, int b, int c, int buff, int offset)
+    public override void FramebufferTexture2D(int a, int b, int c, int buff, int offset)
     {
         GL.FramebufferTexture2D((FramebufferTarget)a, (FramebufferAttachment)b,
             (TextureTarget)c, buff, offset);
     }
 
-    public override void glFrontFace(int data)
+    public override void FrontFace(int data)
     {
         GL.FrontFace((FrontFaceDirection)data);
     }
 
-    public override void glGenerateMipmap(int a)
+    public override void GenerateMipmap(int a)
     {
         GL.GenerateMipmap((GenerateMipmapTarget)a);
     }
 
-    public override int glGenFramebuffer()
+    public override int GenFramebuffer()
     {
         return GL.GenFramebuffer();
     }
 
-    public override int glGenTexture()
+    public override int GenTexture()
     {
         return GL.GenTexture();
     }
 
-    public override int glGetAttribLocation(int index, string attr)
+    public override int GetAttribLocation(int index, string attr)
     {
         return GL.GetAttribLocation(index, attr);
     }
 
-    public override void glGetBooleanv(int bit, bool[] data)
+    public override void GetBooleanv(int bit, bool[] data)
     {
         GL.GetBoolean((GetPName)bit, data);
     }
 
-    public override void glGetIntegerv(int bit, out int data)
+    public override void GetIntegerv(int bit, out int data)
     {
         GL.GetInteger((GetPName)bit, out data);
     }
 
-    public override void glGetIntegerv(int bit, int[] data)
+    public override void GetIntegerv(int bit, int[] data)
     {
         GL.GetInteger((GetPName)bit, data);
     }
 
-    public override void glGetProgramInfoLog(int index, out string log)
+    public override void GetProgramInfoLog(int index, out string log)
     {
         GL.GetProgramInfoLog(index, out log);
     }
 
-    public override unsafe void glGetProgramiv(int index, int type, int* length)
+    public override unsafe void GetProgramiv(int index, int type, int* length)
     {
         GL.GetProgram(index, (GetProgramParameterName)type, length);
     }
 
-    public override void glGetShaderInfoLog(int index, out string log)
+    public override void GetShaderInfoLog(int index, out string log)
     {
         GL.GetShaderInfoLog(index, out log);
     }
 
-    public override unsafe void glGetShaderiv(int index, int type, int* length)
+    public override unsafe void GetShaderiv(int index, int type, int* length)
     {
         GL.GetShader(index, (ShaderParameter)type, length);
     }
 
-    public override int glGetUniformLocation(int index, string uni)
+    public override int GetUniformLocation(int index, string uni)
     {
         return GL.GetUniformLocation(index, uni);
     }
 
-    public override unsafe void glGetVertexAttribiv(int index, int bit, out int data)
+    public override unsafe void GetVertexAttribiv(int index, int bit, out int data)
     {
         GL.GetVertexAttrib(index, (VertexAttribParameter)bit, out data);
     }
 
-    public override bool glIsEnabled(int bit)
+    public override bool IsEnabled(int bit)
     {
         return GL.IsEnabled((EnableCap)bit);
     }
 
-    public override void glLinkProgram(int index)
+    public override void LinkProgram(int index)
     {
         GL.LinkProgram(index);
     }
 
-    public override void glShaderSource(int a, string source)
+    public override void ShaderSource(int a, string source)
     {
         GL.ShaderSource(a, source);
     }
 
-    public override void glTexImage2D(int type, int a, int type1, int w, int h, int size, int type2, int type3, nint data)
+    public override void TexImage2D(int type, int a, int type1, int w, int h, int size, int type2, int type3, nint data)
     {
         GL.TexImage2D((TextureTarget)type, a, (PixelInternalFormat)type1, w, h, size, (PixelFormat)type2, (PixelType)type3, data);
     }
 
-    public override void glTexParameterf(int type, int type1, float value)
+    public override void TexParameterf(int type, int type1, float value)
     {
         GL.TexParameter((TextureTarget)type, (TextureParameterName)type1, value);
     }
 
-    public override void glTexParameteri(int a, int b, int c)
+    public override void TexParameteri(int a, int b, int c)
     {
         GL.TexParameter((TextureTarget)a, (TextureParameterName)b, c);
     }
 
-    public override void glUniform1i(int index, int data)
+    public override void Uniform1i(int index, int data)
     {
         GL.Uniform1(index, data);
     }
 
-    public override void glUniform4f(int index, float a, float b, float c, float d)
+    public override void Uniform4f(int index, float a, float b, float c, float d)
     {
         GL.Uniform4(index, a, b, c, d);
     }
 
-    public override void glUniformMatrix4fv(int index, int length, bool b, float[] data)
+    public override void UniformMatrix4fv(int index, int length, bool b, float[] data)
     {
         GL.UniformMatrix4(index, length, b, data);
     }
 
-    public override void glUseProgram(int index)
+    public override void UseProgram(int index)
     {
         GL.UseProgram(index);
     }
 
-    public override void glValidateProgram(int index)
+    public override void ValidateProgram(int index)
     {
         GL.ValidateProgram(index);
     }
 
-    public override unsafe void glVertexAttribPointer(int index, int length, int type, bool b, int size, nint arr)
+    public override unsafe void VertexAttribPointer(int index, int length, int type, bool b, int size, nint arr)
     {
         GL.VertexAttribPointer(index, length, (VertexAttribPointerType)type, b, size, arr);
     }
 
-    public override void glViewport(int x, int y, int w, int h)
+    public override void Viewport(int x, int y, int w, int h)
     {
         GL.Viewport(x, y, w, h);
     }
 
-    public override int glGetError()
+    public override int GetError()
     {
         return (int)GL.GetError();
     }
 
-    public override int glGenBuffer()
+    public override int GenBuffer()
     {
         return GL.GenBuffer();
     }
 
-    public override void glBufferData(int type, int v1, nint v2, int type1)
+    public override void BufferData(int type, int v1, nint v2, int type1)
     {
         GL.BufferData((BufferTarget)type, v1, v2, (BufferUsageHint)type1);
     }
 
-    public override int glGenVertexArray()
+    public override int GenVertexArray()
     {
         return GL.GenVertexArray();
     }
 
-    public override void glBindVertexArray(int vertexArray)
+    public override void BindVertexArray(int vertexArray)
     {
         GL.BindVertexArray(vertexArray);
     }

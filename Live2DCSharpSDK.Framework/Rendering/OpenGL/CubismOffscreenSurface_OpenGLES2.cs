@@ -3,9 +3,8 @@
 /// <summary>
 /// オフスクリーン描画用構造体
 /// </summary>
-public class CubismOffscreenSurface_OpenGLES2
+public class CubismOffscreenSurface_OpenGLES2(OpenGLApi gl)
 {
-    private readonly OpenGLApi GL;
     /// <summary>
     /// レンダリングターゲットとしてのアドレス
     /// </summary>
@@ -33,11 +32,6 @@ public class CubismOffscreenSurface_OpenGLES2
     /// </summary>
     private bool _isColorBufferInherited;
 
-    public CubismOffscreenSurface_OpenGLES2(OpenGLApi gl)
-    {
-        GL = gl;
-    }
-
     /// <summary>
     /// 指定の描画ターゲットに向けて描画開始
     /// </summary>
@@ -52,7 +46,7 @@ public class CubismOffscreenSurface_OpenGLES2
         // バックバッファのサーフェイスを記憶しておく
         if (restoreFBO < 0)
         {
-            GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, out _oldFBO);
+            gl.GetIntegerv(gl.GL_FRAMEBUFFER_BINDING, out _oldFBO);
         }
         else
         {
@@ -60,7 +54,7 @@ public class CubismOffscreenSurface_OpenGLES2
         }
 
         //マスク用RenderTextureをactiveにセット
-        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, RenderTexture);
+        gl.BindFramebuffer(gl.GL_FRAMEBUFFER, RenderTexture);
     }
 
     /// <summary>
@@ -74,7 +68,7 @@ public class CubismOffscreenSurface_OpenGLES2
         }
 
         // 描画対象を戻す
-        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, _oldFBO);
+        gl.BindFramebuffer(gl.GL_FRAMEBUFFER, _oldFBO);
     }
 
     /// <summary>
@@ -88,8 +82,8 @@ public class CubismOffscreenSurface_OpenGLES2
     public void Clear(float r, float g, float b, float a)
     {
         // マスクをクリアする
-        GL.glClearColor(r, g, b, a);
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT);
+        gl.ClearColor(r, g, b, a);
+        gl.Clear(gl.GL_COLOR_BUFFER_BIT);
     }
 
     /// <summary>
@@ -106,15 +100,15 @@ public class CubismOffscreenSurface_OpenGLES2
         // 新しく生成する
         if (colorBuffer == 0)
         {
-            ColorBuffer = GL.glGenTexture();
+            ColorBuffer = gl.GenTexture();
 
-            GL.glBindTexture(GL.GL_TEXTURE_2D, ColorBuffer);
-            GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, displayBufferWidth, displayBufferHeight, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, 0);
-            GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE);
-            GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE);
-            GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-            GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-            GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
+            gl.BindTexture(gl.GL_TEXTURE_2D, ColorBuffer);
+            gl.TexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, displayBufferWidth, displayBufferHeight, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, 0);
+            gl.TexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_WRAP_S, gl.GL_CLAMP_TO_EDGE);
+            gl.TexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_WRAP_T, gl.GL_CLAMP_TO_EDGE);
+            gl.TexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
+            gl.TexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
+            gl.BindTexture(gl.GL_TEXTURE_2D, 0);
 
             _isColorBufferInherited = false;
         }
@@ -126,12 +120,12 @@ public class CubismOffscreenSurface_OpenGLES2
             _isColorBufferInherited = true;
         }
 
-        GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING, out int tmpFramebufferObject);
+        gl.GetIntegerv(gl.GL_FRAMEBUFFER_BINDING, out int tmpFramebufferObject);
 
-        int ret = GL.glGenFramebuffer();
-        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, ret);
-        GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, ColorBuffer, 0);
-        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, tmpFramebufferObject);
+        int ret = gl.GenFramebuffer();
+        gl.BindFramebuffer(gl.GL_FRAMEBUFFER, ret);
+        gl.FramebufferTexture2D(gl.GL_FRAMEBUFFER, gl.GL_COLOR_ATTACHMENT0, gl.GL_TEXTURE_2D, ColorBuffer, 0);
+        gl.BindFramebuffer(gl.GL_FRAMEBUFFER, tmpFramebufferObject);
 
         RenderTexture = ret;
 
@@ -149,13 +143,13 @@ public class CubismOffscreenSurface_OpenGLES2
     {
         if (!_isColorBufferInherited && (ColorBuffer != 0))
         {
-            GL.glDeleteTexture(ColorBuffer);
+            gl.DeleteTexture(ColorBuffer);
             ColorBuffer = 0;
         }
 
         if (RenderTexture != 0)
         {
-            GL.glDeleteFramebuffer(RenderTexture);
+            gl.DeleteFramebuffer(RenderTexture);
             RenderTexture = 0;
         }
     }

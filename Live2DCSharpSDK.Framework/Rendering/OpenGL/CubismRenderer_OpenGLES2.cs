@@ -18,11 +18,11 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     /// <summary>
     /// 描画オブジェクトのインデックスを描画順に並べたリスト
     /// </summary>
-    private int[] _sortedDrawableIndexList = Array.Empty<int>();
+    private readonly int[] _sortedDrawableIndexList;
     /// <summary>
     /// OpenGLのステートを保持するオブジェクト
     /// </summary>
-    private CubismRendererProfile_OpenGLES2 _rendererProfile;
+    private readonly CubismRendererProfile_OpenGLES2 _rendererProfile;
     /// <summary>
     /// クリッピングマスク管理オブジェクト
     /// </summary>
@@ -41,7 +41,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     /// <summary>
     /// マスク描画用のフレームバッファ
     /// </summary>
-    private readonly List<CubismOffscreenSurface_OpenGLES2> _offscreenFrameBuffers = new();
+    private readonly List<CubismOffscreenSurface_OpenGLES2> _offscreenFrameBuffers = [];
 
     internal int VertexArray { get; private set; }
     internal int VertexBuffer { get; private set; }
@@ -76,9 +76,9 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         _rendererProfile = new(gl);
         _textures = new Dictionary<int, int>(32);
 
-        VertexArray = GL.glGenVertexArray();
-        VertexBuffer = GL.glGenBuffer();
-        IndexBuffer = GL.glGenBuffer();
+        VertexArray = GL.GenVertexArray();
+        VertexBuffer = GL.GenBuffer();
+        IndexBuffer = GL.GenBuffer();
 
         // 1未満は1に補正する
         if (maskBufferCount < 1)
@@ -165,7 +165,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
 
     public bool IsGeneratingMask()
     {
-        return (ClippingContextBufferForMask != null);
+        return ClippingContextBufferForMask != null;
     }
 
 
@@ -192,14 +192,14 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         // 裏面描画の有効・無効
         if (IsCulling())
         {
-            GL.glEnable(GL.GL_CULL_FACE);
+            GL.Enable(GL.GL_CULL_FACE);
         }
         else
         {
-            GL.glDisable(GL.GL_CULL_FACE);
+            GL.Disable(GL.GL_CULL_FACE);
         }
 
-        GL.glFrontFace(GL.GL_CCW);    // Cubism SDK OpenGLはマスク・アートメッシュ共にCCWが表面
+        GL.FrontFace(GL.GL_CCW);    // Cubism SDK OpenGLはマスク・アートメッシュ共にCCWが表面
 
         var modelColorRGBA = new CubismTextureColor(ModelColor);
 
@@ -207,7 +207,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         var vertexArray = model.GetDrawableVertices(index);
         var uvArray = (float*)model.GetDrawableVertexUvs(index);
 
-        GL.glBindVertexArray(VertexArray);
+        GL.BindVertexArray(VertexArray);
 
         if (vbo == null || vbo.Length < vertexCount)
         {
@@ -225,17 +225,17 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         int indexCount = model.GetDrawableVertexIndexCount(index);
         ushort* indexArray = model.GetDrawableVertexIndices(index);
 
-        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, VertexBuffer);
+        GL.BindBuffer(GL.GL_ARRAY_BUFFER, VertexBuffer);
         fixed (void* p = vbo)
         {
-            GL.glBufferData(GL.GL_ARRAY_BUFFER, vertexCount * sizeof(VBO), new IntPtr(p), GL.GL_STATIC_DRAW);
+            GL.BufferData(GL.GL_ARRAY_BUFFER, vertexCount * sizeof(VBO), new IntPtr(p), GL.GL_STATIC_DRAW);
         }
 
-        GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, IndexBuffer);
+        GL.BindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, IndexBuffer);
 
-        GL.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(ushort), new IntPtr(indexArray), GL.GL_STATIC_DRAW);
+        GL.BufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(ushort), new IntPtr(indexArray), GL.GL_STATIC_DRAW);
 
-        GL.glBindVertexArray(VertexArray);
+        GL.BindVertexArray(VertexArray);
 
         if (IsGeneratingMask())  // マスク生成時
         {
@@ -247,13 +247,13 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         }
 
         // ポリゴンメッシュを描画する
-        GL.glDrawElements(GL.GL_TRIANGLES, indexCount, GL.GL_UNSIGNED_SHORT, 0);
+        GL.DrawElements(GL.GL_TRIANGLES, indexCount, GL.GL_UNSIGNED_SHORT, 0);
 
         // 後処理
-        GL.glUseProgram(0);
-        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
-        GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0);
-        GL.glBindVertexArray(0);
+        GL.UseProgram(0);
+        GL.BindBuffer(GL.GL_ARRAY_BUFFER, 0);
+        GL.BindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GL.BindVertexArray(0);
         ClippingContextBufferForDraw = null;
         ClippingContextBufferForMask = null;
     }
@@ -264,28 +264,28 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     /// </summary>
     internal void PreDraw()
     {
-        GL.glDisable(GL.GL_SCISSOR_TEST);
-        GL.glDisable(GL.GL_STENCIL_TEST);
-        GL.glDisable(GL.GL_DEPTH_TEST);
+        GL.Disable(GL.GL_SCISSOR_TEST);
+        GL.Disable(GL.GL_STENCIL_TEST);
+        GL.Disable(GL.GL_DEPTH_TEST);
 
-        GL.glEnable(GL.GL_BLEND);
-        GL.glColorMask(true, true, true, true);
+        GL.Enable(GL.GL_BLEND);
+        GL.ColorMask(true, true, true, true);
 
         if (GL.IsPhoneES2)
         {
-            GL.glBindVertexArrayOES(0);
+            GL.BindVertexArrayOES(0);
         }
 
-        GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0);
-        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, 0); //前にバッファがバインドされていたら破棄する必要がある
+        GL.BindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GL.BindBuffer(GL.GL_ARRAY_BUFFER, 0); //前にバッファがバインドされていたら破棄する必要がある
 
         //異方性フィルタリング。プラットフォームのOpenGLによっては未対応の場合があるので、未設定のときは設定しない
         if (Anisotropy > 0.0f)
         {
             for (int i = 0; i < _textures.Count; i++)
             {
-                GL.glBindTexture(GL.GL_TEXTURE_2D, _textures[i]);
-                GL.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAX_ANISOTROPY_EXT, Anisotropy);
+                GL.BindTexture(GL.GL_TEXTURE_2D, _textures[i]);
+                GL.TexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAX_ANISOTROPY_EXT, Anisotropy);
             }
         }
     }
@@ -324,7 +324,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
                 }
             }
 
-            _clippingManager.SetupClippingContext(Model, this, _rendererProfile._lastFBO, _rendererProfile._lastViewport);
+            _clippingManager.SetupClippingContext(Model, this, _rendererProfile.LastFBO, _rendererProfile.LastViewport);
         }
 
         // 上記クリッピング処理内でも一度PreDrawを呼ぶので注意!!
@@ -342,11 +342,11 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
 
         if (GL.AlwaysClear)
         {
-            GL.glClearColor(ClearColor.R,
+            GL.ClearColor(ClearColor.R,
                             ClearColor.G,
                             ClearColor.B,
                             ClearColor.A);
-            GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+            GL.Clear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         }
 
         // 描画
@@ -365,28 +365,28 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
 
             if (clipContext != null && IsUsingHighPrecisionMask()) // マスクを書く必要がある
             {
-                if (clipContext._isUsing) // 書くことになっていた
+                if (clipContext.IsUsing) // 書くことになっていた
                 {
                     // 生成したFrameBufferと同じサイズでビューポートを設定
-                    GL.glViewport(0, 0, (int)_clippingManager!.ClippingMaskBufferSize.X, (int)_clippingManager.ClippingMaskBufferSize.Y);
+                    GL.Viewport(0, 0, (int)_clippingManager!.ClippingMaskBufferSize.X, (int)_clippingManager.ClippingMaskBufferSize.Y);
 
                     PreDraw(); // バッファをクリアする
 
                     // ---------- マスク描画処理 ----------
                     // マスク用RenderTextureをactiveにセット
-                    GetMaskBuffer(clipContext._bufferIndex).BeginDraw(_rendererProfile._lastFBO);
+                    GetMaskBuffer(clipContext.BufferIndex).BeginDraw(_rendererProfile.LastFBO);
 
                     // マスクをクリアする
                     // 1が無効（描かれない）領域、0が有効（描かれる）領域。（シェーダで Cd*Csで0に近い値をかけてマスクを作る。1をかけると何も起こらない）
-                    GL.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-                    GL.glClear(GL.GL_COLOR_BUFFER_BIT);
+                    GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+                    GL.Clear(GL.GL_COLOR_BUFFER_BIT);
                 }
 
                 {
-                    var clipDrawCount = clipContext._clippingIdCount;
+                    var clipDrawCount = clipContext.ClippingIdCount;
                     for (int index = 0; index < clipDrawCount; index++)
                     {
-                        var clipDrawIndex = clipContext._clippingIdList[index];
+                        var clipDrawIndex = clipContext.ClippingIdList[index];
 
                         // 頂点情報が更新されておらず、信頼性がない場合は描画をパスする
                         if (!Model.GetDrawableDynamicFlagVertexPositionsDidChange(clipDrawIndex))
@@ -406,9 +406,9 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
 
                 {
                     // --- 後処理 ---
-                    GetMaskBuffer(clipContext._bufferIndex).EndDraw();
+                    GetMaskBuffer(clipContext.BufferIndex).EndDraw();
                     ClippingContextBufferForMask = null;
-                    GL.glViewport(_rendererProfile._lastViewport[0], _rendererProfile._lastViewport[1], _rendererProfile._lastViewport[2], _rendererProfile._lastViewport[3]);
+                    GL.Viewport(_rendererProfile.LastViewport[0], _rendererProfile.LastViewport[1], _rendererProfile.LastViewport[2], _rendererProfile.LastViewport[3]);
 
                     PreDraw(); // バッファをクリアする
                 }

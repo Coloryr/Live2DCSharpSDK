@@ -25,7 +25,7 @@ public abstract class ACubismMotion
     /// </summary>
     public float OffsetSeconds { get; set; }
 
-    protected readonly List<string> _firedEventValues = new();
+    protected readonly List<string> FiredEventValues = [];
 
     // モーション再生終了コールバック関数
     public FinishedMotionCallback? OnFinishedMotion { get; set; }
@@ -148,7 +148,7 @@ public abstract class ACubismMotion
     /// <returns></returns>
     public virtual List<string> GetFiredEvent(float beforeCheckTimeSeconds, float motionTimeSeconds)
     {
-        return _firedEventValues;
+        return FiredEventValues;
     }
 
     /// <summary>

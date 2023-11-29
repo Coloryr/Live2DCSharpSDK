@@ -21,7 +21,7 @@ public static class CubismFramework
     /// <summary>
     /// IDマネージャのインスタンスを取得する。
     /// </summary>
-    public static CubismIdManager CubismIdManager { get; private set; } = new CubismIdManager();
+    public static CubismIdManager CubismIdManager { get; private set; } = new();
 
     public static bool IsInitialized { get; private set; }
     public static bool IsStarted { get; private set; }

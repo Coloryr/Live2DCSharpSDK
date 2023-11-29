@@ -31,7 +31,7 @@ public class CubismExpressionMotion : ACubismMotion
     /// <summary>
     /// 表情のパラメータ情報リスト
     /// </summary>
-    public List<ExpressionParameter> Parameters { get; init; } = new();
+    public List<ExpressionParameter> Parameters { get; init; } = [];
 
     public float FadeWeight { get; private set; }
 

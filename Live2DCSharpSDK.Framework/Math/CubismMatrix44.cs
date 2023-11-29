@@ -5,29 +5,29 @@
 /// </summary>
 public record CubismMatrix44
 {
-    private readonly float[] Ident = new float[]
-    {
+    private readonly float[] Ident =
+    [
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f
-    };
+    ];
 
-    private float[] _mpt1 = new float[]
-    {
+    private readonly float[] _mpt1 =
+    [
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f
-    };
+    ];
 
-    private float[] _mpt2 = new float[16]
-    {
+    private readonly float[] _mpt2 =
+    [
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f
-    };
+    ];
 
     /// <summary>
     /// 4x4行列データ
