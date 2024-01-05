@@ -27,12 +27,11 @@ public class AvaloniaApi(OpenGlControlBase con, GlInterface gl) : OpenGLApi
 
     public Func1 GLBlendFunc = Marshal.GetDelegateForFunctionPointer<Func1>(gl.GetProcAddress("glBlendFunc"));
     public Func2 GLBlendFuncSeparate = Marshal.GetDelegateForFunctionPointer<Func2>(gl.GetProcAddress("glBlendFuncSeparate"));
-    public Func3 GLClearDepthf = Marshal.GetDelegateForFunctionPointer<Func3>(gl.GetProcAddress("glClearDepthf"));
+    public Func3 GLClearDepth = Marshal.GetDelegateForFunctionPointer<Func3>(gl.GetProcAddress("glClearDepth"));
     public Func4 GLColorMask = Marshal.GetDelegateForFunctionPointer<Func4>(gl.GetProcAddress("glColorMask"));
     public Func1 GLDetachShader = Marshal.GetDelegateForFunctionPointer<Func1>(gl.GetProcAddress("glDetachShader"));
     public Func5 GLDisable = Marshal.GetDelegateForFunctionPointer<Func5>(gl.GetProcAddress("glDisable"));
     public Func5 GLDisableVertexAttribArray = Marshal.GetDelegateForFunctionPointer<Func5>(gl.GetProcAddress("glDisableVertexAttribArray"));
-    public Func6 GLFramebufferTexture2D = Marshal.GetDelegateForFunctionPointer<Func6>(gl.GetProcAddress("glFramebufferTexture2D"));
     public Func5 GLFrontFace = Marshal.GetDelegateForFunctionPointer<Func5>(gl.GetProcAddress("glFrontFace"));
     public Func5 GLGenerateMipmap = Marshal.GetDelegateForFunctionPointer<Func5>(gl.GetProcAddress("glGenerateMipmap"));
     public Func7 GLGetBooleanv = Marshal.GetDelegateForFunctionPointer<Func7>(gl.GetProcAddress("glGetBooleanv"));
@@ -102,7 +101,7 @@ public class AvaloniaApi(OpenGlControlBase con, GlInterface gl) : OpenGLApi
 
     public override void ClearDepthf(float data)
     {
-        GLClearDepthf(data);
+        GLClearDepth(data);
     }
 
     public override void ColorMask(bool a, bool b, bool c, bool d)
@@ -177,7 +176,7 @@ public class AvaloniaApi(OpenGlControlBase con, GlInterface gl) : OpenGLApi
 
     public override void FramebufferTexture2D(int a, int b, int c, int buff, int data)
     {
-        GLFramebufferTexture2D(a, b, c, buff, data);
+        gl.FramebufferTexture2D(a, b, c, buff, data);
     }
 
     public override void FrontFace(int data)
