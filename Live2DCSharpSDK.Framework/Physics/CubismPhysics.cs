@@ -80,7 +80,7 @@ public class CubismPhysics
 
         using var stream = File.Open(buffer, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         var obj = JsonSerializer.Deserialize(stream, CubismPhysicsObjContext.Default.CubismPhysicsObj)
-            ?? throw new Exception("physics3.json error");
+            ?? throw new Exception("Load Physics error");
 
         _physicsRig = new CubismPhysicsRig
         {

@@ -20,7 +20,7 @@ public unsafe class CubismClippingContext(CubismClippingManager manager, int* cl
     /// <summary>
     /// RGBAのいずれのチャンネルにこのクリップを配置するか(0:R , 1:G , 2:B , 3:A)
     /// </summary>
-    public int LayoutChannelNo = 0;
+    public int LayoutChannelIndex = 0;
     /// <summary>
     /// マスク用チャンネルのどの領域にマスクを入れるか(View座標-1..1, UVは0..1に直す)
     /// </summary>

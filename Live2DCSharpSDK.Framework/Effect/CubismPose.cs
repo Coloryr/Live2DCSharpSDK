@@ -41,7 +41,8 @@ public class CubismPose
     public CubismPose(string pose3json)
     {
         using var stream = File.Open(pose3json, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        var json = JsonNode.Parse(stream)!.AsObject();
+        var json = JsonNode.Parse(stream)?.AsObject()
+            ?? throw new Exception("Pose json is error");
 
         // フェード時間の指定
         if (json.ContainsKey(FadeIn))

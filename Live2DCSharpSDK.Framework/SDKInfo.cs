@@ -2,5 +2,5 @@
 
 public static class SDKInfo
 {
-    public const string Version = "Cubism 5 SDK for Native R1 beta3";
+    public const string Version = "Cubism 5 SDK for Native R1 beta4";
 }

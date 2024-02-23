@@ -42,13 +42,23 @@ public class CubismExpressionMotion : ACubismMotion
     public CubismExpressionMotion(string buf)
     {
         using var stream = File.Open(buf, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        var obj = JsonNode.Parse(stream) ?? throw new Exception("the motion json is error");
+        var obj = JsonNode.Parse(stream) ?? throw new Exception("Load ExpressionMotion error");
         var json = obj.AsObject();
 
         FadeInSeconds = json.ContainsKey(ExpressionKeyFadeIn)
             ? (float)json[ExpressionKeyFadeIn]! : DefaultFadeTime;   // フェードイン
         FadeOutSeconds = json.ContainsKey(ExpressionKeyFadeOut)
             ? (float)json[ExpressionKeyFadeOut]! : DefaultFadeTime; // フェードアウト
+
+        if (FadeInSeconds < 0.0f)
+        {
+            FadeInSeconds = DefaultFadeTime;
+        }
+
+        if (FadeOutSeconds < 0.0f)
+        {
+            FadeOutSeconds = DefaultFadeTime;
+        }
 
         // 各パラメータについて
         var list = json[ExpressionKeyParameters]!;

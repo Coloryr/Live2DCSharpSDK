@@ -346,8 +346,8 @@ gl_FragColor = col_formask;
             gl.UniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, draw.MatrixForDraw.Tr);
 
             // 使用するカラーチャンネルを設定
-            var channelNo = draw.LayoutChannelNo;
-            var colorChannel = draw.Manager.GetChannelFlagAsColor(channelNo);
+            var channelIndex = draw.LayoutChannelIndex;
+            var colorChannel = draw.Manager.GetChannelFlagAsColor(channelIndex);
             gl.Uniform4f(shaderSet.UnifromChannelFlagLocation, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
         }
 
@@ -393,8 +393,8 @@ gl_FragColor = col_formask;
         gl.UseProgram(shaderSet.ShaderProgram);
 
         //テクスチャ設定
-        int textureNo = model.GetDrawableTextureIndex(index);
-        int textureId = renderer.GetBindedTextures()[textureNo];
+        int textureIndex = model.GetDrawableTextureIndex(index);
+        int textureId = renderer.GetBindedTextures()[textureIndex];
         gl.ActiveTexture(gl.GL_TEXTURE0);
         gl.BindTexture(gl.GL_TEXTURE_2D, textureId);
         gl.Uniform1i(shaderSet.SamplerTexture0Location, 0);
@@ -410,8 +410,8 @@ gl_FragColor = col_formask;
         var draw = renderer.ClippingContextBufferForMask!;
 
         // チャンネル
-        int channelNo = draw.LayoutChannelNo;
-        var colorChannel = draw.Manager.GetChannelFlagAsColor(channelNo);
+        int channelIndex = draw.LayoutChannelIndex;
+        var colorChannel = draw.Manager.GetChannelFlagAsColor(channelIndex);
         gl.Uniform4f(shaderSet.UnifromChannelFlagLocation, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
 
         gl.UniformMatrix4fv(shaderSet.UniformClipMatrixLocation, 1, false, draw.MatrixForMask.Tr);

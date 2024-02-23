@@ -76,10 +76,17 @@ public class OpenGlPageControl : OpenGlControlBase
 
         Info = $"Renderer: {gl.GetString(GlConsts.GL_RENDERER)} Version: {gl.GetString(GlConsts.GL_VERSION)}";
 
-        lapp = new(new AvaloniaApi(this, gl), Console.WriteLine)
+        try
         {
-            BGColor = new(0, 0, 0, 0)
-        };
+            lapp = new(new AvaloniaApi(this, gl), Console.WriteLine)
+            {
+                BGColor = new(0, 0, 0, 0)
+            };
+        }
+        catch(Exception e)
+        { 
+            
+        }
         var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources", "Mao");
         CheckError(gl);
     }

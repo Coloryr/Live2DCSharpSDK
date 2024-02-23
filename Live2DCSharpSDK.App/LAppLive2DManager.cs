@@ -143,10 +143,14 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
         {
             dir = Path.GetFullPath(dir + '/');
         }
-        var modelJsonName = Path.GetFullPath($"{dir}{name}.model3.json");
+        var modelJsonName = Path.GetFullPath($"{dir}{name}");
         if (!File.Exists(modelJsonName))
         {
-            dir= Path.GetFullPath(dir + name + '/');
+            modelJsonName = Path.GetFullPath($"{dir}{name}.model3.json");
+        }
+        if (!File.Exists(modelJsonName))
+        {
+            dir = Path.GetFullPath(dir + name + '/');
             modelJsonName = Path.GetFullPath($"{dir}{name}.model3.json");
         }
         if (!File.Exists(modelJsonName))

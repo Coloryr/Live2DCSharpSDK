@@ -27,7 +27,7 @@ public class AvaloniaApi(OpenGlControlBase con, GlInterface gl) : OpenGLApi
 
     public Func1 GLBlendFunc = Marshal.GetDelegateForFunctionPointer<Func1>(gl.GetProcAddress("glBlendFunc"));
     public Func2 GLBlendFuncSeparate = Marshal.GetDelegateForFunctionPointer<Func2>(gl.GetProcAddress("glBlendFuncSeparate"));
-    public Func3 GLClearDepth = Marshal.GetDelegateForFunctionPointer<Func3>(gl.GetProcAddress("glClearDepth"));
+    public Func3 GLClearDepthf = Marshal.GetDelegateForFunctionPointer<Func3>(gl.GetProcAddress("glClearDepthf"));
     public Func4 GLColorMask = Marshal.GetDelegateForFunctionPointer<Func4>(gl.GetProcAddress("glColorMask"));
     public Func1 GLDetachShader = Marshal.GetDelegateForFunctionPointer<Func1>(gl.GetProcAddress("glDetachShader"));
     public Func5 GLDisable = Marshal.GetDelegateForFunctionPointer<Func5>(gl.GetProcAddress("glDisable"));
@@ -101,7 +101,7 @@ public class AvaloniaApi(OpenGlControlBase con, GlInterface gl) : OpenGLApi
 
     public override void ClearDepthf(float data)
     {
-        GLClearDepth(data);
+        GLClearDepthf(data);
     }
 
     public override void ColorMask(bool a, bool b, bool c, bool d)

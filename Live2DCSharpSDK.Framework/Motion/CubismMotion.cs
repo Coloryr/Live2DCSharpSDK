@@ -282,7 +282,7 @@ public class CubismMotion : ACubismMotion
 
         using var stream = File.Open(buffer, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         var obj = JsonSerializer.Deserialize(stream, CubismMotionObjContext.Default.CubismMotionObj)
-            ?? throw new Exception("motion3.json error");
+            ?? throw new Exception("Load Motion error");
 
         _motionData = new()
         {

@@ -331,7 +331,7 @@ public class CubismClippingManager
             for (int index = 0; index < ClippingContextListForMask.Count; index++)
             {
                 CubismClippingContext cc = ClippingContextListForMask[index];
-                cc.LayoutChannelNo = 0; // どうせ毎回消すので固定で良い
+                cc.LayoutChannelIndex = 0; // どうせ毎回消すので固定で良い
                 cc.LayoutBounds.X = 0.0f;
                 cc.LayoutBounds.Y = 0.0f;
                 cc.LayoutBounds.Width = 1.0f;
@@ -346,28 +346,31 @@ public class CubismClippingManager
 
         // ひとつのRenderTextureを極力いっぱいに使ってマスクをレイアウトする
         // マスクグループの数が4以下ならRGBA各チャンネルに１つずつマスクを配置し、5以上6以下ならRGBAを2,2,1,1と配置する
-        int countPerSheetDiv = usingClipCount / RenderTextureCount; // レンダーテクスチャ1枚あたり何枚割り当てるか
-        int countPerSheetMod = usingClipCount % RenderTextureCount; // この番号のレンダーテクスチャまでに一つずつ配分する
+        int countPerSheetDiv = (usingClipCount + RenderTextureCount - 1) / RenderTextureCount; // レンダーテクスチャ1枚あたり何枚割り当てるか（切り上げ）
+        int reduceLayoutTextureCount = usingClipCount % RenderTextureCount; // レイアウトの数を1枚減らすレンダーテクスチャの数（この数だけのレンダーテクスチャが対象）
 
-        // RGBAを順番に使っていく。
-        int div = countPerSheetDiv / ColorChannelCount; //１チャンネルに配置する基本のマスク個数
-        int mod = countPerSheetDiv % ColorChannelCount; //余り、この番号のチャンネルまでに１つずつ配分する
+        // RGBAを順番に使っていく
+        int divCount = countPerSheetDiv / ColorChannelCount; //１チャンネルに配置する基本のマスク個数
+        int modCount = countPerSheetDiv % ColorChannelCount; //余り、この番号のチャンネルまでに１つずつ配分する
 
         // RGBAそれぞれのチャンネルを用意していく(0:R , 1:G , 2:B, 3:A, )
         int curClipIndex = 0; //順番に設定していく
 
-        for (int renderTextureNo = 0; renderTextureNo < RenderTextureCount; renderTextureNo++)
+        for (int renderTextureIndex = 0; renderTextureIndex < RenderTextureCount; renderTextureIndex++)
         {
-            for (int channelNo = 0; channelNo < ColorChannelCount; channelNo++)
+            for (int channelIndex = 0; channelIndex < ColorChannelCount; channelIndex++)
             {
                 // このチャンネルにレイアウトする数
-                int layoutCount = div + (channelNo < mod ? 1 : 0);
+                // NOTE: レイアウト数 = 1チャンネルに配置する基本のマスク + 余りのマスクを置くチャンネルなら1つ追加
+                int layoutCount = divCount + (channelIndex < modCount ? 1 : 0);
 
-                // このレンダーテクスチャにまだ割り当てられていなければ追加する
-                int checkChannelNo = mod + 1 >= ColorChannelCount ? 0 : mod + 1;
-                if (layoutCount < layoutCountMaxValue && channelNo == checkChannelNo)
+                // レイアウトの数を1枚減らす場合にそれを行うチャンネルを決定
+                // divが0の時は正常なインデックスの範囲内になるように調整
+                int checkChannelIndex = modCount + (divCount < 1 ? -1 : 0);
+                if (layoutCount < layoutCountMaxValue && channelIndex == checkChannelIndex)
                 {
-                    layoutCount += renderTextureNo < countPerSheetMod ? 1 : 0;
+                    // 現在のレンダーテクスチャが、対象のレンダーテクスチャであればレイアウトの数を1枚減らす
+                    layoutCount -= !(renderTextureIndex < reduceLayoutTextureCount) ? 1 : 0;
                 }
 
                 // 分割方法を決定する
@@ -379,12 +382,12 @@ public class CubismClippingManager
                 {
                     //全てをそのまま使う
                     CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
-                    cc.LayoutChannelNo = channelNo;
+                    cc.LayoutChannelIndex = channelIndex;
                     cc.LayoutBounds.X = 0.0f;
                     cc.LayoutBounds.Y = 0.0f;
                     cc.LayoutBounds.Width = 1.0f;
                     cc.LayoutBounds.Height = 1.0f;
-                    cc.BufferIndex = renderTextureNo;
+                    cc.BufferIndex = renderTextureIndex;
                 }
                 else if (layoutCount == 2)
                 {
@@ -393,13 +396,13 @@ public class CubismClippingManager
                         int xpos = i % 2;
 
                         CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
-                        cc.LayoutChannelNo = channelNo;
+                        cc.LayoutChannelIndex = channelIndex;
 
                         cc.LayoutBounds.X = xpos * 0.5f;
                         cc.LayoutBounds.Y = 0.0f;
                         cc.LayoutBounds.Width = 0.5f;
                         cc.LayoutBounds.Height = 1.0f;
-                        cc.BufferIndex = renderTextureNo;
+                        cc.BufferIndex = renderTextureIndex;
                         //UVを2つに分解して使う
                     }
                 }
@@ -412,13 +415,13 @@ public class CubismClippingManager
                         int ypos = i / 2;
 
                         CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
-                        cc.LayoutChannelNo = channelNo;
+                        cc.LayoutChannelIndex = channelIndex;
 
                         cc.LayoutBounds.X = xpos * 0.5f;
                         cc.LayoutBounds.Y = ypos * 0.5f;
                         cc.LayoutBounds.Width = 0.5f;
                         cc.LayoutBounds.Height = 0.5f;
-                        cc.BufferIndex = renderTextureNo;
+                        cc.BufferIndex = renderTextureIndex;
                     }
                 }
                 else if (layoutCount <= layoutCountMaxValue)
@@ -430,13 +433,13 @@ public class CubismClippingManager
                         int ypos = i / 3;
 
                         CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
-                        cc.LayoutChannelNo = channelNo;
+                        cc.LayoutChannelIndex = channelIndex;
 
                         cc.LayoutBounds.X = xpos / 3.0f;
                         cc.LayoutBounds.Y = ypos / 3.0f;
                         cc.LayoutBounds.Width = 1.0f / 3.0f;
                         cc.LayoutBounds.Height = 1.0f / 3.0f;
-                        cc.BufferIndex = renderTextureNo;
+                        cc.BufferIndex = renderTextureIndex;
                     }
                 }
                 // マスクの制限枚数を超えた場合の処理
@@ -454,7 +457,7 @@ public class CubismClippingManager
                     for (int i = 0; i < layoutCount; i++)
                     {
                         CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
-                        cc.LayoutChannelNo = 0;
+                        cc.LayoutChannelIndex = 0;
                         cc.LayoutBounds.X = 0.0f;
                         cc.LayoutBounds.Y = 0.0f;
                         cc.LayoutBounds.Width = 1.0f;

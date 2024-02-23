@@ -71,9 +71,9 @@ public static class CubismFramework
             uint major = (version & 0xFF000000) >> 24;
             uint minor = (version & 0x00FF0000) >> 16;
             uint patch = version & 0x0000FFFF;
-            uint vesionNumber = version;
+            uint versionNumber = version;
 
-            CubismLog.Info($"[Live2D SDK]Cubism Core version: {major:##}.{minor:#}.{patch:####} ({vesionNumber})");
+            CubismLog.Info($"[Live2D SDK]Cubism Core version: {major:##}.{minor:#}.{patch:####} ({versionNumber})");
         }
 
         CubismLog.Info("[Live2D SDK]CubismFramework.StartUp() is complete.");

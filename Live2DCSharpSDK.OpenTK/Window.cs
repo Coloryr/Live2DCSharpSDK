@@ -20,11 +20,12 @@ public class Window : GameWindow
     protected unsafe override void OnLoad()
     {
         base.OnLoad();
-        lapp = new(new OpenTKApi(this), Console.WriteLine);
-        lapp.BGColor = new(0, 1, 0, 1);
-        //var model = lapp.Live2dManager.LoadModel("F:\\live2d\\koharu_haruto\\偙偼傞\\runtime\\", "koharu");
+        lapp = new(new OpenTKApi(this), Console.WriteLine)
+        {
+            BGColor = new(0, 1, 0, 1)
+        };
 
-        var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Haru\\", "Haru");
+        var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Mao", "Mao");
         //model.ModelMatrix.TranslateX(0.9f);
 
         //model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
@@ -88,7 +89,7 @@ public class Window : GameWindow
     {
         base.OnRenderFrame(e);
 
-        lapp.Run((float)RenderTime);
+        lapp.Run((float)UpdateTime);
 
         var code = GL.GetError();
         if (code != ErrorCode.NoError)
