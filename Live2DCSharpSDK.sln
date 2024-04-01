@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Live2DCSharpSDK.WPF", "Live2DCSharpSDK.WPF\Live2DCSharpSDK.WPF.csproj", "{31F12B93-E865-43F0-9967-00733D967F76}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{7A072212-FDAC-46D1-9B78-6D37BB5F57D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A072212-FDAC-46D1-9B78-6D37BB5F57D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A072212-FDAC-46D1-9B78-6D37BB5F57D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31F12B93-E865-43F0-9967-00733D967F76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31F12B93-E865-43F0-9967-00733D967F76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31F12B93-E865-43F0-9967-00733D967F76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31F12B93-E865-43F0-9967-00733D967F76}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -47,6 +53,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{8107A4BA-F80E-47F7-AF7B-4F9467101E93} = {C1A91469-B605-4DDC-964A-137C82ABEF7B}
 		{7A072212-FDAC-46D1-9B78-6D37BB5F57D1} = {C1A91469-B605-4DDC-964A-137C82ABEF7B}
+		{31F12B93-E865-43F0-9967-00733D967F76} = {C1A91469-B605-4DDC-964A-137C82ABEF7B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {53197E4D-3AAB-4AC2-91AF-DDBB326E65FD}
