@@ -25,24 +25,17 @@ namespace Live2DCSharpSDK.WPF
     {
         GLWpfControl GLControl;
         private LAppDelegate lapp;
-        private const float UpdateTime = 1f / 60f; // 60 FPS
 
         public MainWindow()
         {
             InitializeComponent();
             GLControl = new();
 
-            GLControl.Loaded += GLControl_Loaded;
             GLControl.SizeChanged += GLControl_Resized;
-
+            GLControl.Render += GLControl_Render;
             BorderOpenTK.Child = GLControl;
+            //CompositionTarget.Rendering += CompositionTarget_Rendering;
 
-            CompositionTarget.Rendering += CompositionTarget_Rendering;
-
-        }
-        LAppModel model;
-        private void GLControl_Loaded(object sender, RoutedEventArgs e)
-        {
             var settings = new GLWpfControlSettings
             {
                 MajorVersion = 3,
@@ -53,21 +46,18 @@ namespace Live2DCSharpSDK.WPF
             {
                 BGColor = new(0, 1, 0, 1)
             };
-
             var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Mao", "Mao");
             //model = lapp.Live2dManager.LoadModel("F:\\Downloads\\haru_greeter_pro_jp\\haru_greeter_pro_jp\\runtime", "haru_greeter_t05");
         }
-        private void CompositionTarget_Rendering(object? sender, EventArgs e)
+
+        private void GLControl_Render(TimeSpan obj)
         {
-            if (lapp == null)
-                return;
-            lapp.Run(UpdateTime);
-            var code = GL.GetError();
-            if (code != ErrorCode.NoError)
-            {
-                throw new Exception(code.ToString());
-            }
+            GL.ClearColor(Color4.Blue);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            lapp.Run((float)obj.TotalSeconds);
         }
+
+        LAppModel model;
 
         private void GLControl_Resized(object sender, SizeChangedEventArgs e)
         {
