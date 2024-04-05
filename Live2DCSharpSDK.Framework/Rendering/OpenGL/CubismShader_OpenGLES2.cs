@@ -326,7 +326,7 @@ gl_FragColor = col_formask;
         SetupTexture(renderer, model, index, shaderSet);
 
         // テクスチャ頂点の設定
-        SetVertexAttributes(model, index, shaderSet);
+        SetVertexAttributes(shaderSet);
 
         if (masked)
         {
@@ -354,7 +354,7 @@ gl_FragColor = col_formask;
         CubismTextureColor baseColor = renderer.GetModelColorWithOpacity(model.GetDrawableOpacity(index));
         CubismTextureColor multiplyColor = model.GetMultiplyColor(index);
         CubismTextureColor screenColor = model.GetScreenColor(index);
-        SetColorUniformVariables(renderer, model, index, shaderSet, baseColor, multiplyColor, screenColor);
+        SetColorUniformVariables(shaderSet, baseColor, multiplyColor, screenColor);
 
         gl.BlendFuncSeparate(SRC_COLOR, DST_COLOR, SRC_ALPHA, DST_ALPHA);
     }
@@ -381,7 +381,7 @@ gl_FragColor = col_formask;
         SetupTexture(renderer, model, index, shaderSet);
 
         // 頂点配列の設定
-        SetVertexAttributes(model, index, shaderSet);
+        SetVertexAttributes(shaderSet);
 
         // 使用するカラーチャンネルを設定
         SetColorChannelUniformVariables(shaderSet, draw);
@@ -392,7 +392,7 @@ gl_FragColor = col_formask;
         CubismTextureColor baseColor = new(rect.X * 2.0f - 1.0f, rect.Y * 2.0f - 1.0f, rect.GetRight() * 2.0f - 1.0f, rect.GetBottom() * 2.0f - 1.0f);
         CubismTextureColor multiplyColor = model.GetMultiplyColor(index);
         CubismTextureColor screenColor = model.GetScreenColor(index);
-        SetColorUniformVariables(renderer, model, index, shaderSet, baseColor, multiplyColor, screenColor);
+        SetColorUniformVariables(shaderSet, baseColor, multiplyColor, screenColor);
 
         gl.BlendFuncSeparate(SRC_COLOR, DST_COLOR, SRC_ALPHA, DST_ALPHA);
     }
@@ -873,7 +873,7 @@ gl_FragColor = col_formask;
     /// <param name="model">描画対象のモデル</param>
     /// <param name="index">描画対象のメッシュのインデックス</param>
     /// <param name="shaderSet">シェーダープログラムのセット</param>
-    public void SetVertexAttributes(CubismModel model, int index, CubismShaderSet shaderSet)
+    public void SetVertexAttributes(CubismShaderSet shaderSet)
     {
         // 頂点位置属性の設定
         gl.EnableVertexAttribArray(shaderSet.AttributePositionLocation);
@@ -910,7 +910,7 @@ gl_FragColor = col_formask;
     /// <param name="baseColor">ベースカラー</param>
     /// <param name="multiplyColor">乗算カラー</param>
     /// <param name="screenColor">スクリーンカラー</param>
-    public void SetColorUniformVariables(CubismRenderer_OpenGLES2 renderer, CubismModel model, int index, CubismShaderSet shaderSet,
+    public void SetColorUniformVariables(CubismShaderSet shaderSet,
                                                           CubismTextureColor baseColor, CubismTextureColor multiplyColor, CubismTextureColor screenColor)
     {
         gl.Uniform4f(shaderSet.UniformBaseColorLocation, baseColor.R, baseColor.G, baseColor.B, baseColor.A);

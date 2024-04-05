@@ -229,10 +229,7 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         }
 
         GL.BindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, IndexBuffer);
-
         GL.BufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(ushort), new IntPtr(indexArray), GL.GL_STATIC_DRAW);
-
-        GL.BindVertexArray(VertexArray);
 
         if (IsGeneratingMask())  // マスク生成時
         {
