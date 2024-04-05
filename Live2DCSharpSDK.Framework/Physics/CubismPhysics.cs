@@ -482,6 +482,10 @@ public class CubismPhysics
             for (settingIndex = 0; settingIndex < _physicsRig.SubRigCount; ++settingIndex)
             {
                 currentSetting = _physicsRig.Settings[settingIndex];
+                if(currentSetting.BaseOutputIndex >= _physicsRig.Outputs.Length)
+                {
+                    continue;
+                }
                 currentOutputs = _physicsRig.Outputs[currentSetting.BaseOutputIndex];
                 for (i = 0; i < currentSetting.OutputCount; ++i)
                 {
