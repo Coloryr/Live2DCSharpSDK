@@ -367,7 +367,9 @@ public class CubismClippingManager
                 // レイアウトの数を1枚減らす場合にそれを行うチャンネルを決定
                 // divが0の時は正常なインデックスの範囲内になるように調整
                 int checkChannelIndex = modCount + (divCount < 1 ? -1 : 0);
-                if (layoutCount < layoutCountMaxValue && channelIndex == checkChannelIndex)
+
+                // 今回が対象のチャンネルかつ、レイアウトの数を1枚減らすレンダーテクスチャが存在する場合
+                if (channelIndex == checkChannelIndex && reduceLayoutTextureCount > 0)
                 {
                     // 現在のレンダーテクスチャが、対象のレンダーテクスチャであればレイアウトの数を1枚減らす
                     layoutCount -= !(renderTextureIndex < reduceLayoutTextureCount) ? 1 : 0;
