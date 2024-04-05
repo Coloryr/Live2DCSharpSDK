@@ -33,6 +33,10 @@ public class CubismExpressionMotion : ACubismMotion
     /// </summary>
     public List<ExpressionParameter> Parameters { get; init; } = [];
 
+    /// <summary>
+    /// 表情のフェードのウェイト値
+    /// </summary>
+    [Obsolete("CubismExpressionMotion._fadeWeightが削除予定のため非推奨\nCubismExpressionMotionManager.getFadeWeight(int index) を使用してください。")]
     public float FadeWeight { get; private set; }
 
     /// <summary>
@@ -137,30 +141,21 @@ public class CubismExpressionMotion : ACubismMotion
     /// <param name="motionQueueEntry">CubismMotionQueueManagerで管理されているモーション</param>
     /// <param name="expressionParameterValues">モデルに適用する各パラメータの値</param>
     /// <param name="expressionIndex">表情のインデックス</param>
-    public void CalculateExpressionParameters(CubismModel model, float userTimeSeconds, CubismMotionQueueEntry motionQueueEntry,
-    List<ExpressionParameterValue> expressionParameterValues, int expressionIndex)
+    public void CalculateExpressionParameters(CubismModel model, float userTimeSeconds, CubismMotionQueueEntry? motionQueueEntry,
+    List<ExpressionParameterValue>? expressionParameterValues, int expressionIndex, float fadeWeight)
     {
-        if (!motionQueueEntry.Available || motionQueueEntry.Finished)
+        if (motionQueueEntry == null || expressionParameterValues == null)
         {
             return;
         }
 
-        if (!motionQueueEntry.Started)
+        if (!motionQueueEntry.Available)
         {
-            motionQueueEntry.Started = true;
-            motionQueueEntry.StartTime = userTimeSeconds - OffsetSeconds; //モーションの開始時刻を記録
-            motionQueueEntry.FadeInStartTime = userTimeSeconds; //フェードインの開始時刻
-
-            float duration = GetDuration();
-
-            if (motionQueueEntry.EndTime < 0.0f)
-            {
-                //開始していないうちに終了設定している場合がある。
-                motionQueueEntry.EndTime = (duration <= 0.0f) ? -1 : motionQueueEntry.StartTime + duration;
-                //duration == -1 の場合はループする
-            }
+            return;
         }
 
+        // CubismExpressionMotion._fadeWeight は廃止予定です。
+        // 互換性のために処理は残りますが、実際には使用しておりません。
         FadeWeight = UpdateFadeWeight(motionQueueEntry, userTimeSeconds);
 
         // モデルに適用する値を計算
@@ -204,13 +199,13 @@ public class CubismExpressionMotion : ACubismMotion
                 else
                 {
                     expressionParameterValues[i].AdditiveValue =
-                        CalculateValue(expressionParameterValue.AdditiveValue, DefaultAdditiveValue);
+                        CalculateValue(expressionParameterValue.AdditiveValue, DefaultAdditiveValue, fadeWeight);
 
                     expressionParameterValues[i].MultiplyValue =
-                        CalculateValue(expressionParameterValue.MultiplyValue, DefaultMultiplyValue);
+                        CalculateValue(expressionParameterValue.MultiplyValue, DefaultMultiplyValue, fadeWeight);
 
                     expressionParameterValues[i].OverwriteValue =
-                        CalculateValue(expressionParameterValue.OverwriteValue, currentParameterValue);
+                        CalculateValue(expressionParameterValue.OverwriteValue, currentParameterValue, fadeWeight);
                 }
                 continue;
             }
@@ -254,8 +249,8 @@ public class CubismExpressionMotion : ACubismMotion
         }
     }
 
-    private float CalculateValue(float source, float destination)
+    private float CalculateValue(float source, float destination, float fadeWeight)
     {
-        return (source * (1.0f - FadeWeight)) + (destination * FadeWeight);
+        return (source * (1.0f - fadeWeight)) + (destination * fadeWeight);
     }
 }

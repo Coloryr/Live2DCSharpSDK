@@ -427,4 +427,9 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     {
         Shader.ReleaseShaderProgram();
     }
+
+    public int GetBindedTextureId(int textureId)
+    {
+        return (_textures[textureId] != 0) ? _textures[textureId] : -1;
+    }
 }

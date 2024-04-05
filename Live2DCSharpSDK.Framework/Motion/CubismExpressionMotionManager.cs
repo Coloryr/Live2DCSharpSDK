@@ -30,6 +30,8 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
 {
     // モデルに適用する各パラメータの値
     private readonly List<ExpressionParameterValue> _expressionParameterValues = [];
+    // 再生中の表情のウェイト
+    private readonly List<float> _fadeWeights;
 
     /// <summary>
     /// 現在再生中のモーションの優先度
@@ -53,6 +55,8 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
             ReservePriority = 0;           // 予約を解除
         }
         CurrentPriority = priority;        // 再生中モーションの優先度を設定
+
+        _fadeWeights.Add(0.0f);
 
         return StartMotion(motion, UserTimeSeconds);
     }
@@ -126,8 +130,10 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
             }
 
             // ------ 値を計算する ------
+            expressionMotion.SetupMotionQueueEntry(item, UserTimeSeconds);
+            _fadeWeights[expressionIndex] = expressionMotion.UpdateFadeWeight(item, UserTimeSeconds);
             expressionMotion.CalculateExpressionParameters(model, UserTimeSeconds,
-                item, _expressionParameterValues, expressionIndex);
+                item, _expressionParameterValues, expressionIndex, _fadeWeights[expressionIndex]);
 
             expressionWeight += expressionMotion.FadeInSeconds == 0.0f
                 ? 1.0f
@@ -147,14 +153,14 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
         // ----- 最新のExpressionのフェードが完了していればそれ以前を削除する ------
         if (motions.Count > 1)
         {
-            CubismExpressionMotion expressionMotion =
-                (CubismExpressionMotion)(motions[^1]).Motion;
-            if (expressionMotion.FadeWeight >= 1.0f)
+            float latestFadeWeight = _fadeWeights[_fadeWeights.Count - 1];
+            if (latestFadeWeight >= 1.0f)
             {
                 // 配列の最後の要素は削除しない
                 for (int i = motions.Count - 2; i >= 0; i--)
                 {
                     motions.RemoveAt(i);
+                    _fadeWeights.RemoveAt(i);
                 }
             }
         }
@@ -178,4 +184,13 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
         return updated;
     }
 
+    /// <summary>
+    /// 現在の表情のフェードのウェイト値を取得する。
+    /// </summary>
+    /// <param name="index">取得する表情モーションのインデックス</param>
+    /// <returns>表情のフェードのウェイト値</returns>
+    public float GetFadeWeight(int index)
+    {
+        return _fadeWeights[index];
+    }
 }
