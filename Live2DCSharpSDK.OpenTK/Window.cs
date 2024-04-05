@@ -25,10 +25,10 @@ public class Window : GameWindow
             BGColor = new(0, 1, 0, 1)
         };
 
-        var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Mao", "Mao");
+        //var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Mao", "Mao");
         //model.ModelMatrix.TranslateX(0.9f);
 
-        //model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");
+        var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Haru\\", "Haru");
         //model.ModelMatrix.TranslateX(0.8f);
 
         //model = lapp.Live2dManager.LoadModel("E:\\code\\Live2DCSharpSDK\\Resources\\Haru\\", "Haru");

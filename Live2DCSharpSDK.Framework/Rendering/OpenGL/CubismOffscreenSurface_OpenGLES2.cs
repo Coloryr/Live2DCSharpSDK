@@ -92,7 +92,7 @@ public class CubismOffscreenSurface_OpenGLES2(OpenGLApi gl)
     /// <param name="displayBufferWidth">作成するバッファ幅</param>
     /// <param name="displayBufferHeight">作成するバッファ高さ</param>
     /// <param name="colorBuffer">0以外の場合、ピクセル格納領域としてcolorBufferを使用する</param>
-    public unsafe bool CreateOffscreenFrame(int displayBufferWidth, int displayBufferHeight, int colorBuffer = 0)
+    public unsafe bool CreateOffscreenSurface(int displayBufferWidth, int displayBufferHeight, int colorBuffer = 0)
     {
         // 一旦削除
         DestroyOffscreenSurface();

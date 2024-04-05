@@ -288,7 +288,7 @@ gl_FragColor = col_formask;
         // _shaderSets用のオフセット計算
         bool masked = renderer.ClippingContextBufferForDraw != null;  // この描画オブジェクトはマスク対象か
         bool invertedMask = model.GetDrawableInvertedMask(index);
-        bool isPremultipliedAlpha = renderer.IsPremultipliedAlpha();
+        bool isPremultipliedAlpha = renderer.IsPremultipliedAlpha;
         int offset = (masked ? (invertedMask ? 2 : 1) : 0) + (isPremultipliedAlpha ? 3 : 0);
 
         CubismShaderSet shaderSet;
