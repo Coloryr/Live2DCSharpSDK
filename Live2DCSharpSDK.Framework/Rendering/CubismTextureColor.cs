@@ -52,7 +52,7 @@ public struct CubismTextureColor
     {
         R = R > 1.0f ? 1f : R;
         G = G > 1.0f ? 1f : G;
-        R = R > 1.0f ? 1f : R;
-        R = R > 1.0f ? 1f : R;
+        B = B > 1.0f ? 1f : B;
+        A = A > 1.0f ? 1f : A;
     }
 }

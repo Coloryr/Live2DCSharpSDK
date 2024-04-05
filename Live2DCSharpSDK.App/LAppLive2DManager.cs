@@ -71,7 +71,7 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
     /// <param name="y">画面のY座標</param>
     public void OnTap(float x, float y)
     {
-        CubismLog.Debug($"[Live2D]tap point: x:{x:#.##} y:{y:#.##}");
+        CubismLog.Debug($"[Live2D]tap point: x:{x:0.00} y:{y:0.00}");
 
         for (int i = 0; i < _models.Count; i++)
         {
@@ -105,10 +105,9 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
         lapp.GL.GetWindowSize(out int width, out int height);
 
         int modelCount = _models.Count;
-        for (int i = 0; i < modelCount; ++i)
+        foreach (var model in _models)
         {
             _projection.LoadIdentity();
-            LAppModel model = GetModel(i);
 
             if (model.Model.GetCanvasWidth() > 1.0f && width < height)
             {

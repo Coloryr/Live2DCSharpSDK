@@ -53,21 +53,7 @@ public abstract class ACubismMotion
             return;
         }
 
-        if (!motionQueueEntry.Started)
-        {
-            motionQueueEntry.Started = true;
-            motionQueueEntry.StartTime = userTimeSeconds - OffsetSeconds;//モーションの開始時刻を記録
-            motionQueueEntry.FadeInStartTime = userTimeSeconds; //フェードインの開始時刻
-
-            float duration = GetDuration();
-
-            if (motionQueueEntry.EndTime < 0)
-            {
-                //開始していないうちに終了設定している場合がある。
-                motionQueueEntry.EndTime = (duration <= 0) ? -1 : motionQueueEntry.StartTime + duration;
-                //duration == -1 の場合はループする
-            }
-        }
+        SetupMotionQueueEntry(motionQueueEntry, userTimeSeconds);
 
         var fadeWeight = UpdateFadeWeight(motionQueueEntry, userTimeSeconds);
 
@@ -83,14 +69,51 @@ public abstract class ACubismMotion
     }
 
     /// <summary>
+    /// モーションの再生を開始するためのセットアップを行う。
+    /// </summary>
+    /// <param name="motionQueueEntry">CubismMotionQueueManagerによって管理されるモーション</param>
+    /// <param name="userTimeSeconds">総再生時間（秒）</param>
+    public void SetupMotionQueueEntry(CubismMotionQueueEntry motionQueueEntry, float userTimeSeconds)
+    {
+        if (!motionQueueEntry.Available || motionQueueEntry.Finished)
+        {
+            return;
+        }
+
+        if (motionQueueEntry.Started)
+        {
+            return;
+        }
+
+        motionQueueEntry.Started = true;
+        motionQueueEntry.StartTime = userTimeSeconds - OffsetSeconds; //モーションの開始時刻を記録
+        motionQueueEntry.FadeInStartTime = userTimeSeconds; //フェードインの開始時刻
+
+        var duration = GetDuration();
+
+        if (motionQueueEntry.EndTime < 0)
+        {
+            //開始していないうちに終了設定している場合がある。
+            motionQueueEntry.EndTime = (duration <= 0) ? -1 : motionQueueEntry.StartTime + duration;
+            //duration == -1 の場合はループする
+        }
+    }
+
+    /// <summary>
     /// モーションのウェイトを更新する。
     /// </summary>
     /// <param name="motionQueueEntry">CubismMotionQueueManagerで管理されているモーション</param>
     /// <param name="userTimeSeconds">デルタ時間の積算値[秒]</param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public float UpdateFadeWeight(CubismMotionQueueEntry motionQueueEntry, float userTimeSeconds)
+    public float UpdateFadeWeight(CubismMotionQueueEntry? motionQueueEntry, float userTimeSeconds)
     {
+        if (motionQueueEntry == null)
+        {
+            CubismLog.Error("motionQueueEntry is null.");
+            return 0;
+        }
+
         float fadeWeight = Weight; //現在の値と掛け合わせる割合
 
         //---- フェードイン・アウトの処理 ----
@@ -179,7 +202,7 @@ public abstract class ACubismMotion
         return "";
     }
 
-    protected virtual float GetModelOpacityValue()
+    public virtual float GetModelOpacityValue()
     {
         return 1.0f;
     }

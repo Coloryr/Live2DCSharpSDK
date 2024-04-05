@@ -293,4 +293,29 @@ public static class CubismMath
 
         return val;
     }
+
+    /// <summary>
+    /// 浮動小数点の余りを求める。
+    /// </summary>
+    /// <param name="dividend">被除数（割られる値）</param>
+    /// <param name="divisor">除数（割る値）</param>
+    /// <returns>余り</returns>
+    public static float ModF(float dividend, float divisor)
+    {
+        if (!float.IsFinite(dividend) || divisor == 0 || float.IsNaN(dividend) || float.IsNaN(divisor))
+        {
+            CubismLog.Warning("dividend: %f, divisor: %f ModF() returns 'NaN'.", dividend, divisor);
+            return float.NaN;
+        }
+
+        // 絶対値に変換する。
+        float absDividend = MathF.Abs(dividend);
+        float absDivisor = MathF.Abs(divisor);
+
+        // 絶対値で割り算する。
+        float result = absDividend - MathF.Floor(absDividend / absDivisor) * absDivisor;
+
+        // 符号を被除数のものに指定する。
+        return MathF.CopySign(result, dividend);
+    }
 }

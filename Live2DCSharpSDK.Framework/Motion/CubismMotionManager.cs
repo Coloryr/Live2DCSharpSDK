@@ -32,7 +32,7 @@ public class CubismMotionManager : CubismMotionQueueManager
 
         CurrentPriority = priority;        // 再生中モーションの優先度を設定
 
-        return StartMotion(motion, UserTimeSeconds);
+        return StartMotion(motion);
     }
 
     /// <summary>

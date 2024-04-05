@@ -137,7 +137,7 @@ public class CubismPose
     /// 不透明度の初期値が0でないパラメータは、不透明度を1に設定する。
     /// </summary>
     /// <param name="model">対象のモデル</param>
-    private void Reset(CubismModel model)
+    public void Reset(CubismModel model)
     {
         int beginIndex = 0;
 

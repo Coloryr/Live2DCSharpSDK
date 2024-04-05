@@ -87,7 +87,8 @@ public class OpenGlPageControl : OpenGlControlBase
         { 
             
         }
-        var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources", "Mao");
+        //var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources", "Mao");
+        var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Haru\\", "Haru");
         CheckError(gl);
     }
 

@@ -17,6 +17,18 @@ public abstract class CubismRenderer : IDisposable
     /// レンダリング対象のモデル
     /// </summary>
     public CubismModel Model { get; private set; }
+    /// <summary>
+    /// 乗算済みαならtrue
+    /// </summary>
+    public bool IsPremultipliedAlpha { get; set; }
+    /// <summary>
+    /// カリングが有効ならtrue
+    /// </summary>
+    public bool IsCulling { get; set; }
+    /// <summary>
+    /// falseの場合、マスクを纏めて描画する trueの場合、マスクはパーツ描画ごとに書き直す
+    /// </summary>
+    public bool UseHighPrecisionMask { get; set; }
 
     /// <summary>
     /// モデル自体のカラー(RGBA)
@@ -29,18 +41,6 @@ public abstract class CubismRenderer : IDisposable
     /// Model-View-Projection 行列
     /// </summary>
     private readonly CubismMatrix44 _mvpMatrix4x4 = new();
-    /// <summary>
-    /// カリングが有効ならtrue
-    /// </summary>
-    private bool _isCulling;
-    /// <summary>
-    /// 乗算済みαならtrue
-    /// </summary>
-    private bool _isPremultipliedAlpha;
-    /// <summary>
-    /// falseの場合、マスクを纏めて描画する trueの場合、マスクはパーツ描画ごとに書き直す
-    /// </summary>
-    private bool _useHighPrecisionMask;
 
     /// <summary>
     /// レンダラのインスタンスを生成して取得する
@@ -104,7 +104,7 @@ public abstract class CubismRenderer : IDisposable
     {
         CubismTextureColor modelColorRGBA = new(ModelColor);
         modelColorRGBA.A *= opacity;
-        if (IsPremultipliedAlpha())
+        if (IsPremultipliedAlpha)
         {
             modelColorRGBA.R *= modelColorRGBA.A;
             modelColorRGBA.G *= modelColorRGBA.A;
@@ -139,65 +139,6 @@ public abstract class CubismRenderer : IDisposable
         ModelColor.G = green;
         ModelColor.B = blue;
         ModelColor.A = alpha;
-    }
-
-    /// <summary>
-    /// 乗算済みαの有効・無効をセットする。
-    /// 有効にするならtrue, 無効にするならfalseをセットする。
-    /// </summary>
-    /// <param name="enable"></param>
-    public void IsPremultipliedAlpha(bool enable)
-    {
-        _isPremultipliedAlpha = enable;
-    }
-
-    /// <summary>
-    /// 乗算済みαの有効・無効を取得する。
-    /// </summary>
-    /// <returns>true    ->  乗算済みα有効
-    /// false   ->  乗算済みα無効</returns>
-    public bool IsPremultipliedAlpha()
-    {
-        return _isPremultipliedAlpha;
-    }
-
-    /// <summary>
-    /// カリング（片面描画）の有効・無効をセットする。
-    /// 有効にするならtrue, 無効にするならfalseをセットする。
-    /// </summary>
-    public void IsCulling(bool culling)
-    {
-        _isCulling = culling;
-    }
-
-    /// <summary>
-    /// カリング（片面描画）の有効・無効を取得する。
-    /// </summary>
-    /// <returns>true    ->  カリング有効
-    /// false   ->  カリング無効</returns>
-    public bool IsCulling()
-    {
-        return _isCulling;
-    }
-
-    /// <summary>
-    /// マスク描画の方式を変更する。
-    ///  falseの場合、マスクを1枚のテクスチャに分割してレンダリングする（デフォルトはこちら）。
-    ///  高速だが、マスク個数の上限が36に限定され、質も荒くなる。
-    ///  trueの場合、パーツ描画の前にその都度必要なマスクを描き直す
-    ///  レンダリング品質は高いが描画処理負荷は増す。
-    /// </summary>
-    public void UseHighPrecisionMask(bool high)
-    {
-        _useHighPrecisionMask = high;
-    }
-
-    /// <summary>
-    /// マスク描画の方式を取得する。
-    /// </summary>
-    public bool IsUsingHighPrecisionMask()
-    {
-        return _useHighPrecisionMask;
     }
 
     /// <summary>

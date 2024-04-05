@@ -21,7 +21,7 @@ public class CubismClippingManager_OpenGLES2(OpenGLApi gl) : CubismClippingManag
         for (int clipIndex = 0; clipIndex < ClippingContextListForMask.Count; clipIndex++)
         {
             // １つのクリッピングマスクに関して
-            var cc = ClippingContextListForMask[clipIndex] as CubismClippingContext_OpenGLES2;
+            var cc = ClippingContextListForMask[clipIndex];
 
             // このクリップを利用する描画オブジェクト群全体を囲む矩形を計算
             CalcClippedDrawTotalBounds(model, cc!);
@@ -75,8 +75,7 @@ public class CubismClippingManager_OpenGLES2(OpenGLApi gl) : CubismClippingManag
         for (int clipIndex = 0; clipIndex < ClippingContextListForMask.Count; clipIndex++)
         {
             // --- 実際に１つのマスクを描く ---
-            var clipContext = ClippingContextListForMask[clipIndex]
-                as CubismClippingContext_OpenGLES2;
+            var clipContext = ClippingContextListForMask[clipIndex];
             RectF allClippedDrawRect = clipContext!.AllClippedDrawRect; //このマスクを使う、全ての描画オブジェクトの論理座標上の囲み矩形
             RectF layoutBoundsOnTex01 = clipContext.LayoutBounds; //この中にマスクを収める
             float MARGIN = 0.05f;
@@ -123,7 +122,7 @@ public class CubismClippingManager_OpenGLES2(OpenGLApi gl) : CubismClippingManag
                     continue;
                 }
 
-                renderer.IsCulling(model.GetDrawableCulling(clipDrawIndex));
+                renderer.IsCulling = model.GetDrawableCulling(clipDrawIndex);
 
                 // マスクがクリアされていないなら処理する
                 if (!ClearedMaskBufferFlags[clipContext.BufferIndex])

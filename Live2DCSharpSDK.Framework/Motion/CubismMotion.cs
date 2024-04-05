@@ -933,7 +933,7 @@ public class CubismMotion : ACubismMotion
     /// 更新後の値を取るにはUpdateParameters() の後に呼び出す。
     /// </summary>
     /// <returns>モーションの現在時間のOpacityの値</returns>
-    protected override float GetModelOpacityValue()
+    public override float GetModelOpacityValue()
     {
         return _modelOpacity;
     }

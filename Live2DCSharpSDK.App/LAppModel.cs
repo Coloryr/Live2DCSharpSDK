@@ -19,10 +19,6 @@ public class LAppModel : CubismUserModel
     /// </summary>
     private readonly string _modelHomeDir;
     /// <summary>
-    /// デルタ時間の積算値[秒]
-    /// </summary>
-    private float _userTimeSeconds;
-    /// <summary>
     /// モデルに設定されたまばたき機能用パラメータID
     /// </summary>
     private readonly List<string> _eyeBlinkIds = [];
@@ -56,6 +52,11 @@ public class LAppModel : CubismUserModel
         }
     }
     public List<string> Parameters => new(Model.ParameterIds);
+
+    /// <summary>
+    /// デルタ時間の積算値[秒]
+    /// </summary>
+    public float UserTimeSeconds { get; set; }
 
     public bool RandomMotion { get; set; } = true;
     public bool CustomValueUpdate { get; set; }
@@ -346,7 +347,7 @@ public class LAppModel : CubismUserModel
     public void Update()
     {
         float deltaTimeSeconds = LAppPal.DeltaTime;
-        _userTimeSeconds += deltaTimeSeconds;
+        UserTimeSeconds += deltaTimeSeconds;
 
         _dragManager.Update(deltaTimeSeconds);
         _dragX = _dragManager.FaceX;

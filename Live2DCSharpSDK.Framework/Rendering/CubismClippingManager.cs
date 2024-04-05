@@ -179,7 +179,7 @@ public class CubismClippingManager
     /// </summary>
     /// <param name="model">モデルのインスタンス</param>
     /// <param name="isRightHanded">処理が右手系であるか</param>
-    private void SetupMatrixForHighPrecision(CubismModel model, bool isRightHanded)
+    public void SetupMatrixForHighPrecision(CubismModel model, bool isRightHanded)
     {
         // 全てのクリッピングを用意する
         // 同じクリップ（複数の場合はまとめて１つのクリップ）を使う場合は１度だけ設定する
@@ -187,7 +187,7 @@ public class CubismClippingManager
         for (int clipIndex = 0; clipIndex < ClippingContextListForMask.Count; clipIndex++)
         {
             // １つのクリッピングマスクに関して
-            CubismClippingContext cc = ClippingContextListForMask[clipIndex];
+            var cc = ClippingContextListForMask[clipIndex];
 
             // このクリップを利用する描画オブジェクト群全体を囲む矩形を計算
             CalcClippedDrawTotalBounds(model, cc);
@@ -229,9 +229,9 @@ public class CubismClippingManager
         for (int clipIndex = 0; clipIndex < ClippingContextListForMask.Count; clipIndex++)
         {
             // --- 実際に１つのマスクを描く ---
-            CubismClippingContext clipContext = ClippingContextListForMask[clipIndex];
-            RectF allClippedDrawRect = clipContext.AllClippedDrawRect; //このマスクを使う、全ての描画オブジェクトの論理座標上の囲み矩形
-            RectF layoutBoundsOnTex01 = clipContext.LayoutBounds; //この中にマスクを収める
+            var clipContext = ClippingContextListForMask[clipIndex];
+            var allClippedDrawRect = clipContext.AllClippedDrawRect; //このマスクを使う、全ての描画オブジェクトの論理座標上の囲み矩形
+            var layoutBoundsOnTex01 = clipContext.LayoutBounds; //この中にマスクを収める
             float MARGIN = 0.05f;
             float scaleX;
             float scaleY;
@@ -381,7 +381,7 @@ public class CubismClippingManager
                 else if (layoutCount == 1)
                 {
                     //全てをそのまま使う
-                    CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
+                    var cc = ClippingContextListForMask[curClipIndex++];
                     cc.LayoutChannelIndex = channelIndex;
                     cc.LayoutBounds.X = 0.0f;
                     cc.LayoutBounds.Y = 0.0f;
@@ -395,7 +395,7 @@ public class CubismClippingManager
                     {
                         int xpos = i % 2;
 
-                        CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
+                        var cc = ClippingContextListForMask[curClipIndex++];
                         cc.LayoutChannelIndex = channelIndex;
 
                         cc.LayoutBounds.X = xpos * 0.5f;
@@ -414,7 +414,7 @@ public class CubismClippingManager
                         int xpos = i % 2;
                         int ypos = i / 2;
 
-                        CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
+                        var cc = ClippingContextListForMask[curClipIndex++];
                         cc.LayoutChannelIndex = channelIndex;
 
                         cc.LayoutBounds.X = xpos * 0.5f;
@@ -432,7 +432,7 @@ public class CubismClippingManager
                         int xpos = i % 3;
                         int ypos = i / 3;
 
-                        CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
+                        var cc = ClippingContextListForMask[curClipIndex++];
                         cc.LayoutChannelIndex = channelIndex;
 
                         cc.LayoutBounds.X = xpos / 3.0f;
@@ -446,24 +446,9 @@ public class CubismClippingManager
                 else
                 {
                     int count = usingClipCount - useClippingMaskMaxCount;
-                    CubismLog.Error("not supported mask count : %d\n[Details] render texture count: %d\n, mask count : %d"
-                        , count, RenderTextureCount, usingClipCount);
 
                     // 開発モードの場合は停止させる
-                    //CSM_ASSERT(0);
-
-                    // 引き続き実行する場合、 SetupShaderProgramでオーバーアクセスが発生するので仕方なく適当に入れておく
-                    // もちろん描画結果はろくなことにならない
-                    for (int i = 0; i < layoutCount; i++)
-                    {
-                        CubismClippingContext cc = ClippingContextListForMask[curClipIndex++];
-                        cc.LayoutChannelIndex = 0;
-                        cc.LayoutBounds.X = 0.0f;
-                        cc.LayoutBounds.Y = 0.0f;
-                        cc.LayoutBounds.Width = 1.0f;
-                        cc.LayoutBounds.Height = 1.0f;
-                        cc.BufferIndex = 0;
-                    }
+                    throw new Exception($"not supported mask count : {count}\n[Details] render texture count: {RenderTextureCount}\n, mask count : {usingClipCount}");
                 }
             }
         }
@@ -478,7 +463,7 @@ public class CubismClippingManager
     {
         // 被クリッピングマスク（マスクされる描画オブジェクト）の全体の矩形
         float clippedDrawTotalMinX = float.MaxValue, clippedDrawTotalMinY = float.MaxValue;
-        float clippedDrawTotalMaxX = -float.MaxValue, clippedDrawTotalMaxY = -float.MaxValue;
+        float clippedDrawTotalMaxX = float.MinValue, clippedDrawTotalMaxY = float.MinValue;
 
         // このマスクが実際に必要か判定する
         // このクリッピングを利用する「描画オブジェクト」がひとつでも使用可能であればマスクを生成する必要がある
@@ -490,10 +475,10 @@ public class CubismClippingManager
             int drawableIndex = clippingContext.ClippedDrawableIndexList[clippedDrawableIndex];
 
             int drawableVertexCount = model.GetDrawableVertexCount(drawableIndex);
-            float* drawableVertexes = (float*)(model.GetDrawableVertices(drawableIndex));
+            var drawableVertexes = model.GetDrawableVertices(drawableIndex);
 
             float minX = float.MaxValue, minY = float.MaxValue;
-            float maxX = -float.MaxValue, maxY = -float.MaxValue;
+            float maxX = float.MinValue, maxY = float.MinValue;
 
             int loop = drawableVertexCount * CubismFramework.VertexStep;
             for (int pi = CubismFramework.VertexOffset; pi < loop; pi += CubismFramework.VertexStep)
