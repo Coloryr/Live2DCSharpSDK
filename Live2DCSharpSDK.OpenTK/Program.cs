@@ -10,7 +10,7 @@ public static class Program
     {
         var nativeWindowSettings = new NativeWindowSettings()
         {
-            Size = new Vector2i(600, 600),
+            ClientSize = new Vector2i(600, 600),
             Title = "Live2D",
             // This is needed to run on macos
             Flags = ContextFlags.ForwardCompatible,
