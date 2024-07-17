@@ -31,7 +31,7 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
     // モデルに適用する各パラメータの値
     private readonly List<ExpressionParameterValue> _expressionParameterValues = [];
     // 再生中の表情のウェイト
-    private readonly List<float> _fadeWeights;
+    private readonly List<float> _fadeWeights = [];
 
     /// <summary>
     /// 現在再生中のモーションの優先度
