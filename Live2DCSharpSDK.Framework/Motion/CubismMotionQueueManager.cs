@@ -73,7 +73,7 @@ public class CubismMotionQueueManager
     [Obsolete("Please use StartMotion(ACubismMotion motion")]
     public CubismMotionQueueEntry StartMotion(ACubismMotion motion, float userTimeSeconds)
     {
-        CubismLog.Warning("StartMotion(ACubismMotion motion, float userTimeSeconds) is a deprecated function. Please use StartMotion(ACubismMotion motion).");
+        CubismLog.Warning("[Live2D SDK] StartMotion(ACubismMotion motion, float userTimeSeconds) is a deprecated function. Please use StartMotion(ACubismMotion motion).");
 
         CubismMotionQueueEntry motionQueueEntry;
 

@@ -1,13 +1,16 @@
 ﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
-using Live2DCSharpSDK.Framework.Rendering.OpenGL;
 using Live2DCSharpSDK.Framework.Type;
 using System.Numerics;
 
 namespace Live2DCSharpSDK.Framework.Rendering;
 
-public class CubismClippingManager
+public abstract class CubismClippingManager
 {
+    public abstract RenderType RenderType { get; }
+    public unsafe abstract CubismClippingContext CreateClippingContext(CubismClippingManager manager, 
+        CubismModel model, int* clippingDrawableIndices, int clipCount);
+
     /// <summary>
     /// 実験時に1チャンネルの場合は1、RGBだけの場合は3、アルファも含める場合は4
     /// </summary>
@@ -24,7 +27,7 @@ public class CubismClippingManager
     /// <summary>
     /// オフスクリーンサーフェイスのアドレス
     /// </summary>
-    protected CubismOffscreenSurface_OpenGLES2 CurrentMaskBuffer;
+    protected CubismOffscreenSurface CurrentMaskBuffer;
     /// <summary>
     /// マスクのクリアフラグの配列
     /// </summary>
@@ -65,11 +68,8 @@ public class CubismClippingManager
     /// </summary>
     protected RectF TmpBoundsOnModel = new();
 
-    private readonly RenderType _renderType;
-
-    public CubismClippingManager(RenderType render)
+    public CubismClippingManager()
     {
-        _renderType = render;
         ClippingMaskBufferSize = new(256, 256);
 
         ChannelColors.Add(new(1.0f, 0f, 0f, 0f));
@@ -78,7 +78,7 @@ public class CubismClippingManager
         ChannelColors.Add(new(0f, 0f, 0f, 1.0f));
     }
 
-    public void Close()
+    public void Dispose()
     {
         ClippingContextListForDraw.Clear();
         ClippingContextListForMask.Clear();
@@ -118,14 +118,7 @@ public class CubismClippingManager
             if (cc == null)
             {
                 // 同一のマスクが存在していない場合は生成する
-                if (_renderType == RenderType.OpenGL)
-                {
-                    cc = new CubismClippingContext_OpenGLES2(this, model, model.GetDrawableMasks()[i], model.GetDrawableMaskCounts()[i]);
-                }
-                else
-                {
-                    throw new Exception("Only OpenGL");
-                }
+                cc = CreateClippingContext(this, model, model.GetDrawableMasks()[i], model.GetDrawableMaskCounts()[i]);
                 ClippingContextListForMask.Add(cc);
             }
 
@@ -323,7 +316,7 @@ public class CubismClippingManager
             {
                 // マスクの制限数の警告を出す
                 int count = usingClipCount - useClippingMaskMaxCount;
-                CubismLog.Error("not supported mask count : %d\n[Details] render texture count: %d\n, mask count : %d"
+                CubismLog.Error("[Live2D SDK]not supported mask count : %d\n[Details] render texture count: %d\n, mask count : %d"
                     , count, RenderTextureCount, usingClipCount);
             }
 

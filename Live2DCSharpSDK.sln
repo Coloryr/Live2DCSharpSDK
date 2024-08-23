@@ -7,18 +7,22 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Live2DCSharpSDK.Framework",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Live2DCSharpSDK.App", "Live2DCSharpSDK.App\Live2DCSharpSDK.App.csproj", "{1D854B32-EC36-46A1-A9A2-2B06E9421338}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Live2DCSharpSDK.OpenTK", "Live2DCSharpSDK.OpenTK\Live2DCSharpSDK.OpenTK.csproj", "{8107A4BA-F80E-47F7-AF7B-4F9467101E93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Live2DCSharpSDK.OpenGL.OpenTK", "Live2DCSharpSDK.OpenGL.OpenTK\Live2DCSharpSDK.OpenGL.OpenTK.csproj", "{8107A4BA-F80E-47F7-AF7B-4F9467101E93}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Live2DCSharpSDK.Avalonia", "Live2DCSharpSDK.Avalonia\Live2DCSharpSDK.Avalonia.csproj", "{7A072212-FDAC-46D1-9B78-6D37BB5F57D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Live2DCSharpSDK.OpenGL.Avalonia", "Live2DCSharpSDK.OpenGL.Avalonia\Live2DCSharpSDK.OpenGL.Avalonia.csproj", "{7A072212-FDAC-46D1-9B78-6D37BB5F57D1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Windows", "Windows", "{C1A91469-B605-4DDC-964A-137C82ABEF7B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenGL", "OpenGL", "{C1A91469-B605-4DDC-964A-137C82ABEF7B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{48E55F3F-9D1F-4D46-A2B6-58608590A8F6}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Live2DCSharpSDK.WPF", "Live2DCSharpSDK.WPF\Live2DCSharpSDK.WPF.csproj", "{31F12B93-E865-43F0-9967-00733D967F76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Live2DCSharpSDK.OpenGL.WPF", "Live2DCSharpSDK.OpenGL.WPF\Live2DCSharpSDK.OpenGL.WPF.csproj", "{31F12B93-E865-43F0-9967-00733D967F76}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Live2DCSharpSDK.Vulkan", "Live2DCSharpSDK.Vulkan\Live2DCSharpSDK.Vulkan.csproj", "{9B1C3543-86E2-4D30-8C24-7EA5DA96E1A5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Live2DCSharpSDK.OpenGL", "Live2DCSharpSDK.OpenGL\Live2DCSharpSDK.OpenGL.csproj", "{803D5E9A-7C78-4218-A521-7C6C195FFB22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +50,14 @@ Global
 		{31F12B93-E865-43F0-9967-00733D967F76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31F12B93-E865-43F0-9967-00733D967F76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31F12B93-E865-43F0-9967-00733D967F76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B1C3543-86E2-4D30-8C24-7EA5DA96E1A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B1C3543-86E2-4D30-8C24-7EA5DA96E1A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B1C3543-86E2-4D30-8C24-7EA5DA96E1A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B1C3543-86E2-4D30-8C24-7EA5DA96E1A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{803D5E9A-7C78-4218-A521-7C6C195FFB22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{803D5E9A-7C78-4218-A521-7C6C195FFB22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{803D5E9A-7C78-4218-A521-7C6C195FFB22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{803D5E9A-7C78-4218-A521-7C6C195FFB22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

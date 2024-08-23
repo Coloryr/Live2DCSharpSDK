@@ -1,0 +1,69 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Live2DCSharpSDK.App;
+using Live2DCSharpSDK.Framework.Core;
+using Live2DCSharpSDK.Framework.Model;
+using Live2DCSharpSDK.Framework.Rendering;
+
+namespace Live2DCSharpSDK.OpenGL;
+
+public class LAppDelegateOpenGL : LAppDelegate
+{
+    public OpenGLApi GL { get; }
+
+    public LAppDelegateOpenGL(OpenGLApi gl, LogFunction log) : base(log)
+    {
+        GL = gl;
+
+        //テクスチャサンプリング設定
+        GL.TexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        GL.TexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+
+        //透過設定
+        GL.Enable(GL.GL_BLEND);
+        GL.BlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+
+        InitView();
+    }
+
+    public override void GetWindowSize(out int width, out int height)
+    {
+        GL.GetWindowSize(out width, out height);
+    }
+
+    public override void RunInit()
+    {
+        // 画面の初期化
+        GL.ClearColor(BGColor.R, BGColor.G, BGColor.B, BGColor.A);
+        GL.Clear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+        GL.ClearDepthf(1.0f);
+    }
+
+    public override CubismRenderer CreateRenderer(CubismModel model)
+    {
+        return new CubismRenderer_OpenGLES2(GL, model);
+    }
+
+    public override TextureInfo CreateTexture(LAppModel model, int index, int width, int height, nint data)
+    {
+        int textureId = GL.GenTexture();
+        GL.BindTexture(GL.GL_TEXTURE_2D, textureId);
+        GL.TexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, width, height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, data);
+        GL.GenerateMipmap(GL.GL_TEXTURE_2D);
+        GL.TexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR_MIPMAP_LINEAR);
+        GL.TexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        GL.BindTexture(GL.GL_TEXTURE_2D, 0);
+
+        (model.Renderer as CubismRenderer_OpenGLES2)?.BindTexture(index, textureId);
+
+        return new TextureInfoOpenGL()
+        {
+            Width = width,
+            Height = height,
+            ID = textureId
+        };
+    }
+}

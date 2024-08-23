@@ -7,7 +7,7 @@ namespace Live2DCSharpSDK.Framework.Rendering;
 /// モデル描画を処理するレンダラ
 /// サブクラスに環境依存の描画命令を記述する
 /// </summary>
-public abstract class CubismRenderer : IDisposable
+public abstract class CubismRenderer
 {
     /// <summary>
     /// テクスチャの異方性フィルタリングのパラメータ
@@ -159,7 +159,7 @@ public abstract class CubismRenderer : IDisposable
     /// <param name="opacity">不透明度</param>
     /// <param name="colorBlendMode">カラーブレンディングのタイプ</param>
     /// <param name="invertedMask">マスク使用時のマスクの反転使用</param>
-    internal abstract unsafe void DrawMesh(int textureNo, int indexCount, int vertexCount
+    public abstract unsafe void DrawMesh(int textureNo, int indexCount, int vertexCount
                           , ushort* indexArray, float* vertexArray, float* uvArray
                           , float opacity, CubismBlendMode colorBlendMode, bool invertedMask);
 

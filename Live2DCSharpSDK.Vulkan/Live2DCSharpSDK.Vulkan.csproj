@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="glsl\spv\**" />
+    <EmbeddedResource Remove="glsl\spv\**" />
+    <None Remove="glsl\spv\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="spv\FragShaderSrc.spv" />
+    <None Remove="spv\FragShaderSrcMask.spv" />
+    <None Remove="spv\FragShaderSrcMaskInverted.spv" />
+    <None Remove="spv\FragShaderSrcMaskInvertedPremultipliedAlpha.spv" />
+    <None Remove="spv\FragShaderSrcMaskPremultipliedAlpha.spv" />
+    <None Remove="spv\FragShaderSrcPremultipliedAlpha.spv" />
+    <None Remove="spv\FragShaderSrcSetupMask.spv" />
+    <None Remove="spv\VertShaderSrc.spv" />
+    <None Remove="spv\VertShaderSrcMasked.spv" />
+    <None Remove="spv\VertShaderSrcSetupMask.spv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="spv\FragShaderSrc.spv" />
+    <EmbeddedResource Include="spv\FragShaderSrcMask.spv" />
+    <EmbeddedResource Include="spv\FragShaderSrcMaskInverted.spv" />
+    <EmbeddedResource Include="spv\FragShaderSrcMaskInvertedPremultipliedAlpha.spv" />
+    <EmbeddedResource Include="spv\FragShaderSrcMaskPremultipliedAlpha.spv" />
+    <EmbeddedResource Include="spv\FragShaderSrcPremultipliedAlpha.spv" />
+    <EmbeddedResource Include="spv\FragShaderSrcSetupMask.spv" />
+    <EmbeddedResource Include="spv\VertShaderSrc.spv" />
+    <EmbeddedResource Include="spv\VertShaderSrcMasked.spv" />
+    <EmbeddedResource Include="spv\VertShaderSrcSetupMask.spv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Silk.NET.Vulkan" Version="2.21.0" />
+    <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.21.0" />
+    <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.21.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Live2DCSharpSDK.App\Live2DCSharpSDK.App.csproj" />
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="PowerShell glsl/glslbuild.ps1" />
+  </Target>
+
+</Project>

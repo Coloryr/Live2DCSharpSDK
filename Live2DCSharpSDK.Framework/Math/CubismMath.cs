@@ -304,7 +304,7 @@ public static class CubismMath
     {
         if (!float.IsFinite(dividend) || divisor == 0 || float.IsNaN(dividend) || float.IsNaN(divisor))
         {
-            CubismLog.Warning("dividend: %f, divisor: %f ModF() returns 'NaN'.", dividend, divisor);
+            CubismLog.Warning("[Live2D SDK]dividend: %f, divisor: %f ModF() returns 'NaN'.", dividend, divisor);
             return float.NaN;
         }
 

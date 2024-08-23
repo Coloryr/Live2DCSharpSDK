@@ -2,7 +2,7 @@
 
 public static class CubismLog
 {
-    public static void CubismLogPrintln(LogLevel level, string head, string fmt, params object?[] args)
+    private static void CubismLogPrintln(LogLevel level, string head, string fmt, params object?[] args)
     {
         string data = $"[CSM] {head} {string.Format(fmt, args)}";
         if (level < CubismFramework.GetLoggingLevel())
@@ -34,5 +34,6 @@ public static class CubismLog
     public static void Error(string fmt, params object?[] args)
     {
         CubismLogPrintln(LogLevel.Error, "[E]", fmt, args);
+        throw new Exception(string.Format(fmt, args));
     }
 }

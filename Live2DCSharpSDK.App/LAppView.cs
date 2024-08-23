@@ -29,8 +29,8 @@ public class LAppView(LAppDelegate lapp)
     /// </summary>
     public void Initialize()
     {
-        lapp.GL.GetWindowSize(out int width, out int height);
-
+        int width = lapp.WindowWidth;
+        int height = lapp.WindowHeight;
         if (width == 0 || height == 0)
         {
             return;
@@ -90,9 +90,9 @@ public class LAppView(LAppDelegate lapp)
     /// <param name="pointX">スクリーンX座標</param>
     /// <param name="pointY">スクリーンY座標</param>
     public void OnTouchesBegan(float pointX, float pointY)
-    {
+    { 
         _touchManager.TouchesBegan(pointX, pointY);
-        CubismLog.Debug($"[Live2D]touchesBegan x:{pointX:#.##} y:{pointY:#.##}");
+        CubismLog.Debug($"[Live2D App]touchesBegan x:{pointX:#.##} y:{pointY:#.##}");
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public class LAppView(LAppDelegate lapp)
         // シングルタップ
         float x = _deviceToScreen.TransformX(_touchManager.GetX()); // 論理座標変換した座標を取得。
         float y = _deviceToScreen.TransformY(_touchManager.GetY()); // 論理座標変換した座標を取得。
-        CubismLog.Debug($"[Live2D]touchesEnded x:{x:#.##} y:{y:#.##}");
+        CubismLog.Debug($"[Live2D App]touchesEnded x:{x:#.##} y:{y:#.##}");
         live2DManager.OnTap(x, y);
     }
 

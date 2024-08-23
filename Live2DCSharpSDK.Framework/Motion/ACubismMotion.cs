@@ -110,7 +110,7 @@ public abstract class ACubismMotion
     {
         if (motionQueueEntry == null)
         {
-            CubismLog.Error("motionQueueEntry is null.");
+            CubismLog.Error("[Live2D SDK]motionQueueEntry is null.");
             return 0;
         }
 

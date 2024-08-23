@@ -71,18 +71,18 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
     /// <param name="y">画面のY座標</param>
     public void OnTap(float x, float y)
     {
-        CubismLog.Debug($"[Live2D]tap point: x:{x:0.00} y:{y:0.00}");
+        CubismLog.Debug($"[Live2D App]tap point: x:{x:0.00} y:{y:0.00}");
 
         for (int i = 0; i < _models.Count; i++)
         {
             if (_models[i].HitTest(LAppDefine.HitAreaNameHead, x, y))
             {
-                CubismLog.Debug($"[Live2D]hit area: [{LAppDefine.HitAreaNameHead}]");
+                CubismLog.Debug($"[Live2D App]hit area: [{LAppDefine.HitAreaNameHead}]");
                 _models[i].SetRandomExpression();
             }
             else if (_models[i].HitTest(LAppDefine.HitAreaNameBody, x, y))
             {
-                CubismLog.Debug($"[Live2D]hit area: [{LAppDefine.HitAreaNameBody}]");
+                CubismLog.Debug($"[Live2D App]hit area: [{LAppDefine.HitAreaNameBody}]");
                 _models[i].StartRandomMotion(LAppDefine.MotionGroupTapBody, MotionPriority.PriorityNormal, OnFinishedMotion);
             }
         }
@@ -90,7 +90,7 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
 
     private void OnFinishedMotion(CubismModel model, ACubismMotion self)
     {
-        CubismLog.Info($"[Live2D]Motion Finished: {self}");
+        CubismLog.Info($"[Live2D App]Motion Finished: {self}");
         MotionFinished?.Invoke(model, self);
     }
 
@@ -102,9 +102,8 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
     /// </summary>
     public void OnUpdate()
     {
-        lapp.GL.GetWindowSize(out int width, out int height);
-
-        int modelCount = _models.Count;
+        int width = lapp.WindowWidth;
+        int height = lapp.WindowHeight;
         foreach (var model in _models)
         {
             _projection.LoadIdentity();
@@ -133,7 +132,7 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
 
     public LAppModel LoadModel(string dir, string name)
     {
-        CubismLog.Debug($"[Live2D]model load: {name}");
+        CubismLog.Debug($"[Live2D App]model load: {name}");
 
         // ModelDir[]に保持したディレクトリ名から
         // model3.jsonのパスを決定する.

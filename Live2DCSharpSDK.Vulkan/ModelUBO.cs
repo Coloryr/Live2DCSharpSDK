@@ -1,0 +1,45 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Live2DCSharpSDK.Vulkan;
+
+public class ModelUBOInfo
+{
+    public const int Size = 4 * 16 + 4 * 16 + 4 * 4 + 4 * 4 + 4 * 4 + 4 * 4;
+}
+
+/// <summary>
+/// モデル用ユニフォームバッファオブジェクトの中身を保持する構造体
+/// </summary>
+[StructLayout(LayoutKind.Sequential)]
+public unsafe struct ModelUBO
+{
+    /// <summary>
+    /// シェーダープログラムに渡すデータ(ProjectionMatrix)
+    /// </summary>
+    public fixed float ProjectionMatrix[16];
+    /// <summary>
+    /// シェーダープログラムに渡すデータ(ClipMatrix)
+    /// </summary>
+    public fixed float ClipMatrix[16];
+    /// <summary>
+    /// シェーダープログラムに渡すデータ(BaseColor)
+    /// </summary>
+    public fixed float BaseColor[4];
+    /// <summary>
+    /// シェーダープログラムに渡すデータ(MultiplyColor)
+    /// </summary>
+    public fixed float MultiplyColor[4];
+    /// <summary>
+    /// シェーダープログラムに渡すデータ(ScreenColor)
+    /// </summary>
+    public fixed float ScreenColor[4];
+    /// <summary>
+    /// シェーダープログラムに渡すデータ(ChannelFlag)
+    /// </summary>
+    public fixed float ChannelFlag[4];
+}
