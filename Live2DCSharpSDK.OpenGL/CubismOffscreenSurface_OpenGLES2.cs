@@ -38,7 +38,7 @@ public class CubismOffscreenSurface_OpenGLES2(OpenGLApi gl) : CubismOffscreenSur
     /// 指定の描画ターゲットに向けて描画開始
     /// </summary>
     /// <param name="restoreFBO">0以上の場合、EndDrawでこの値をglBindFramebufferする</param>
-    public override void BeginDraw(int restoreFBO = -1)
+    public void BeginDraw(int restoreFBO = -1)
     {
         if (RenderTexture == 0)
         {
@@ -62,7 +62,7 @@ public class CubismOffscreenSurface_OpenGLES2(OpenGLApi gl) : CubismOffscreenSur
     /// <summary>
     /// 描画終了
     /// </summary>
-    public override void EndDraw()
+    public void EndDraw()
     {
         if (RenderTexture == 0)
         {

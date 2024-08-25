@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Live2DCSharpSDK.Framework.Rendering;
 using Silk.NET.Vulkan;
 
 namespace Live2DCSharpSDK.Vulkan;
@@ -10,7 +11,7 @@ namespace Live2DCSharpSDK.Vulkan;
 /// <summary>
 /// オフスクリーン描画用構造体
 /// </summary>
-public class CubismOffscreenSurface_Vulkan(Vk vk)
+public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
 {
     /// <summary>
     /// オフスクリーンの横幅

@@ -11,6 +11,6 @@ public class CubismClippingContext_Vulkan : CubismClippingContext
 {
     public unsafe CubismClippingContext_Vulkan(CubismClippingManager manager, int* clippingDrawableIndices, int clipCount) : base(manager, clippingDrawableIndices, clipCount)
     {
-
+        
     }
 }

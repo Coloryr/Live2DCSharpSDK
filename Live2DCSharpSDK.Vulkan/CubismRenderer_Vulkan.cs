@@ -590,7 +590,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
         if (model.IsUsingMasking())
         {
             //モデルがマスクを使用している時のみにする
-            _clippingManager = new CubismClippingManager_Vulkan();
+            _clippingManager = new CubismClippingManager_Vulkan(_vk);
             _clippingManager.Initialize(model, maskBufferCount);
         }
 
@@ -1078,7 +1078,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
         //FrameBufferのサイズを変更するためにインスタンスを破棄・再作成する
         _clippingManager.Dispose();
 
-        _clippingManager = new CubismClippingManager_Vulkan();
+        _clippingManager = new CubismClippingManager_Vulkan(_vk);
 
         _clippingManager.SetClippingMaskBufferSize(width, height);
 

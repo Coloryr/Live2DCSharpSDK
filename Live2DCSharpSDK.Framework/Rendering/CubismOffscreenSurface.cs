@@ -8,6 +8,5 @@ namespace Live2DCSharpSDK.Framework.Rendering;
 
 public abstract class CubismOffscreenSurface
 {
-    public abstract void EndDraw();
-    public abstract void BeginDraw(int fbo);
+    
 }
