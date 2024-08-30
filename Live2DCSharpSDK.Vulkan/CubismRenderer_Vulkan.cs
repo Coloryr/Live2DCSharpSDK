@@ -112,11 +112,11 @@ public class CubismRenderer_Vulkan : CubismRenderer
         vkVec4[3] = a;
     }
 
-    private static unsafe void SetColorChannel(ModelUBO ubo, CubismClippingContext_Vulkan contextBuffer)
+    private static unsafe void SetColorChannel(ModelUBO* ubo, CubismClippingContext_Vulkan contextBuffer)
     {
         int channelIndex = contextBuffer.LayoutChannelIndex;
         var colorChannel = contextBuffer.Manager.GetChannelFlagAsColor(channelIndex);
-        UpdateColor(ubo.ChannelFlag, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
+        UpdateColor(ubo->ChannelFlag, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
     }
 
     private static unsafe void SetColorUniformBuffer(ModelUBO* ubo, CubismTextureColor baseColor,
@@ -811,7 +811,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
             UpdateMatrix(ubo.ClipMatrix, ClippingContextBufferForDraw!.MatrixForDraw); // テクスチャ座標の変換に使用するのでy軸の向きは反転しない
 
             // カラーチャンネルの設定
-            SetColorChannel(ubo, ClippingContextBufferForDraw);
+            SetColorChannel(&ubo, ClippingContextBufferForDraw);
         }
 
         // MVP行列の設定
@@ -866,7 +866,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
         UpdateMatrix(ubo.ClipMatrix, ClippingContextBufferForMask!.MatrixForMask);
 
         // カラーチャンネルの設定
-        SetColorChannel(ubo, ClippingContextBufferForMask);
+        SetColorChannel(&ubo, ClippingContextBufferForMask);
 
         // 色定数バッファの設定
         var rect = ClippingContextBufferForMask.LayoutBounds;

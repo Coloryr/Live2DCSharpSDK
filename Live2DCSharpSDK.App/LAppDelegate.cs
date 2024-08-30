@@ -119,6 +119,10 @@ public abstract class LAppDelegate : IDisposable
         }
     }
 
+    /// <summary>
+    /// Need skip
+    /// </summary>
+    /// <returns></returns>
     public abstract bool RunPre();
     public abstract void RunPost();
 
@@ -132,7 +136,7 @@ public abstract class LAppDelegate : IDisposable
         // 時間更新
         LAppPal.DeltaTime = tick;
 
-        if (!RunPre())
+        if (RunPre())
         {
             return;
         }

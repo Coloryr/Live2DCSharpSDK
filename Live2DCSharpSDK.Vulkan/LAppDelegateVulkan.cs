@@ -75,12 +75,7 @@ public class LAppDelegateVulkan : LAppDelegate
     {
         VulkanManager.UpdateDrawFrame();
 
-        if (RecreateSwapchain())
-        {
-            return false;
-        }
-
-        return true;
+        return RecreateSwapchain();
     }
 
     private bool RecreateSwapchain()
@@ -90,7 +85,7 @@ public class LAppDelegateVulkan : LAppDelegate
             GetWindowSize(out var width, out var height);
             if (width == 0 || height == 0)
             {
-                return false;
+                return true;
             }
 
             VulkanManager.RecreateSwapchain();
