@@ -225,19 +225,16 @@ public class SwapchainManager
             CompositeAlpha = CompositeAlphaFlagsKHR.OpaqueBitKhr,
             PresentMode = presentMode,
             Clipped = true,
-            OldSwapchain = new()
+            OldSwapchain = default
         };
 
-        IntPtr ptr1 = IntPtr.Zero;
+        var ptr1 = stackalloc[] { (uint)graphicsFamily, (uint)presentFamily };
 
         if (graphicsFamily != presentFamily)
         {
-            ptr1 = Marshal.AllocHGlobal(sizeof(uint) * 2);
-            createInfo.PQueueFamilyIndices = (uint*)ptr1;
-            createInfo.ImageSharingMode =  SharingMode.Concurrent;
+            createInfo.PQueueFamilyIndices = ptr1;
+            createInfo.ImageSharingMode = SharingMode.Concurrent;
             createInfo.QueueFamilyIndexCount = 2;
-            createInfo.PQueueFamilyIndices[0] = (uint)graphicsFamily;
-            createInfo.PQueueFamilyIndices[1] = (uint)presentFamily;
         }
         else
         {
@@ -246,7 +243,7 @@ public class SwapchainManager
             createInfo.PQueueFamilyIndices = null;
         }
 
-        if (_khrs.CreateSwapchain(device, &createInfo, null, out _swapchain) != Result.Success)
+        if (_khrs.CreateSwapchain(device, ref createInfo, null, out _swapchain) != Result.Success)
         {
             CubismLog.Error("failed to create swap chain");
         }
@@ -254,10 +251,7 @@ public class SwapchainManager
         // swapchain imageを取得する
         _khrs.GetSwapchainImages(device, _swapchain, ref _imageCount, null);
         Images = new Image[_imageCount];
-        for (int a = 0; a < _imageCount; a++)
-        {
-            Images[a] = new();
-        }
+
         fixed (Image* ptr = Images)
         {
             _khrs.GetSwapchainImages(device, _swapchain, ref _imageCount, ptr);
@@ -272,32 +266,14 @@ public class SwapchainManager
                 Image = Images[i],
                 ViewType = ImageViewType.Type2D,
                 Format = SwapchainFormat,
-                Components = new()
-                { 
-                    R = ComponentSwizzle.Identity,
-                    G = ComponentSwizzle.Identity,
-                    B = ComponentSwizzle.Identity,
-                    A = ComponentSwizzle.Identity,
-                },
-                SubresourceRange = new()
-                { 
-                    AspectMask = ImageAspectFlags.ColorBit,
-                    BaseMipLevel = 0,
-                    LevelCount = 1,
-                    BaseArrayLayer = 0,
-                    LayerCount = 1
-                }
+                Components = new(0, 0, 0, 0),
+                SubresourceRange = new(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
             };
 
-            if (_vk.CreateImageView(device, &viewInfo, null, out ImageViews[i]) !=  Result.Success)
+            if (_vk.CreateImageView(device, ref viewInfo, null, out ImageViews[i]) != Result.Success)
             {
                 CubismLog.Error("failed to create texture image view");
             }
-        }
-
-        if (ptr1 != IntPtr.Zero)
-        {
-            Marshal.FreeHGlobal(ptr1);
         }
     }
 
@@ -336,18 +312,11 @@ public class SwapchainManager
         {
             var barrier = new ImageMemoryBarrier
             {
-                SType = StructureType.MemoryBarrier,
+                SType = StructureType.ImageMemoryBarrier,
                 OldLayout = ImageLayout.Undefined,
                 NewLayout = ImageLayout.PresentSrcKhr,
                 Image = Images[i],
-                SubresourceRange = new()
-                { 
-                    AspectMask = ImageAspectFlags.ColorBit,
-                    BaseMipLevel =0,
-                    LevelCount = 1,
-                    BaseArrayLayer = 0,
-                    LayerCount = 1
-                },
+                SubresourceRange = new(ImageAspectFlags.ColorBit, 0, 1, 0, 1),
                 SrcAccessMask = 0
             };
 
@@ -362,7 +331,7 @@ public class SwapchainManager
                 CommandBufferCount = 1
             };
 
-            _vk.AllocateCommandBuffers(device, &allocInfo, out var commandBuffer);
+            _vk.AllocateCommandBuffers(device, ref allocInfo, out var commandBuffer);
 
             var beginInfo = new CommandBufferBeginInfo
             {
@@ -370,7 +339,7 @@ public class SwapchainManager
                 Flags = CommandBufferUsageFlags.OneTimeSubmitBit
             };
 
-            _vk.BeginCommandBuffer(commandBuffer, &beginInfo);
+            _vk.BeginCommandBuffer(commandBuffer, ref beginInfo);
 
             _vk.CmdPipelineBarrier(
                 commandBuffer,
@@ -394,9 +363,9 @@ public class SwapchainManager
                 PCommandBuffers = &commandBuffer
             };
 
-            _vk.QueueSubmit(queue, 1, &submitInfo, new());
+            _vk.QueueSubmit(queue, 1, ref submitInfo, default);
             _vk.QueueWaitIdle(queue);
-            _vk.FreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+            _vk.FreeCommandBuffers(device, commandPool, 1, ref commandBuffer);
         }
 
 

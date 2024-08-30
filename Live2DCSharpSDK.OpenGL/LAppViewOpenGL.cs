@@ -9,11 +9,6 @@ namespace Live2DCSharpSDK.OpenGL;
 
 public class LAppViewOpenGL(LAppDelegate lapp) : LAppView(lapp)
 {
-    public override void PreModelDraw(LAppModel model)
-    {
-        
-    }
-
     public override void RenderPost()
     {
        

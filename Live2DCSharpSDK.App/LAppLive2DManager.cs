@@ -102,6 +102,8 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
     /// </summary>
     public void OnUpdate()
     {
+        lapp.OnUpdatePre();
+
         int width = lapp.WindowWidth;
         int height = lapp.WindowHeight;
         foreach (var model in _models)
@@ -124,8 +126,6 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
             {
                 _projection.MultiplyByMatrix(ViewMatrix);
             }
-
-            lapp.View.PreModelDraw(model);
 
             model.Update();
             model.Draw(_projection); // 参照渡しなのでprojectionは変質する

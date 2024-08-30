@@ -55,6 +55,7 @@ public abstract class LAppDelegate : IDisposable
     /// </summary>
     public int WindowHeight { get; protected set; }
 
+    public abstract void OnUpdatePre();
     public abstract void GetWindowSize(out int width, out int height);
     public abstract CubismRenderer CreateRenderer(CubismModel model);
     public abstract TextureInfo CreateTexture(LAppModel model, int index, int width, int height, IntPtr data);

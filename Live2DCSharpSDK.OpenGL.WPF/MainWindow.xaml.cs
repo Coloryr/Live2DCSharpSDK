@@ -58,8 +58,6 @@ public partial class MainWindow : Window
         lapp.Run((float)obj.TotalSeconds);
     }
 
-    LAppModel model;
-
     private void GLControl_Resized(object sender, SizeChangedEventArgs e)
     {
         if (lapp == null)

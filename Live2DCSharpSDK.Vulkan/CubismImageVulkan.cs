@@ -143,17 +143,10 @@ public class CubismImageVulkan(Vk vk)
             Image = Image,
             ViewType = ImageViewType.Type2D,
             Format = format,
-            SubresourceRange = new()
-            {
-                AspectMask = aspectFlags,
-                BaseMipLevel = 0,
-                LevelCount = mipLevel,
-                BaseArrayLayer = 0,
-                LayerCount = 1
-            }
+            SubresourceRange = new(aspectFlags, 0, mipLevel, 0, 1)
         };
 
-        if (vk.CreateImageView(device, ref viewInfo, null, out _view) !=  Result.Success)
+        if (vk.CreateImageView(device, ref viewInfo, null, out _view) != Result.Success)
         {
             CubismLog.Error("[Live2D Vulkan]failed to create texture image view!");
         }
@@ -208,14 +201,7 @@ public class CubismImageVulkan(Vk vk)
             OldLayout = CurrentLayout,
             NewLayout = newLayout,
             Image = Image,
-            SubresourceRange = new()
-            {
-                AspectMask = aspectMask,
-                BaseMipLevel = 0,
-                LevelCount = mipLevels,
-                BaseArrayLayer = 0,
-                LayerCount = 1
-            }
+            SubresourceRange = new(aspectMask, 0, mipLevels, 0, 1)
         };
 
         var sourceStage = PipelineStageFlags.AllCommandsBit;

@@ -15,13 +15,11 @@ public struct ModelVertex
     /// <summary>
     /// Position
     /// </summary>
-    public Vector2 pos;
+    public Vector2 Pos;
     /// <summary>
     /// UVs
     /// </summary>
-    public Vector2 texCoord;
-
-    public const int Size = 2 * 2 * 4;
+    public Vector2 TexCoord;
 
     public static VertexInputBindingDescription GetBindingDescription()
     {
@@ -33,12 +31,8 @@ public struct ModelVertex
         };
     }
 
-    public static void GetAttributeDescriptions(VertexInputAttributeDescription[] attributeDescriptions)
+    public static unsafe void GetAttributeDescriptions(VertexInputAttributeDescription* attributeDescriptions)
     {
-        if (attributeDescriptions.Length != 2)
-        {
-            throw new Exception("attributeDescriptions length is not 2");
-        }
         attributeDescriptions[0].Binding = 0;
         attributeDescriptions[0].Location = 0;
         attributeDescriptions[0].Format = Format.R32G32Sfloat;

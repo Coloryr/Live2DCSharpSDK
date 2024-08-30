@@ -1,4 +1,5 @@
-﻿using Live2DCSharpSDK.Framework;
+﻿using Live2DCSharpSDK.App;
+using Live2DCSharpSDK.Framework;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Rendering;
 using System.Runtime.InteropServices;
@@ -71,10 +72,13 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
         Shader.ReleaseShaderProgram();
     }
 
-    public unsafe CubismRenderer_OpenGLES2(OpenGLApi gl, CubismModel model, int maskBufferCount = 1) : base(model)
+    private readonly LAppDelegate _lapp;
+
+    public unsafe CubismRenderer_OpenGLES2(OpenGLApi gl, LAppDelegate lapp, CubismModel model, int maskBufferCount = 1) : base(model)
     {
         GL = gl;
         Shader = new(gl);
+        _lapp = lapp;
         _rendererProfile = new(gl);
         _textures = new Dictionary<int, int>(32);
 
@@ -156,13 +160,6 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
     public CubismOffscreenSurface_OpenGLES2 GetMaskBuffer(int index)
     {
         return _offscreenFrameBuffers[index];
-    }
-
-    public override unsafe void DrawMesh(int textureNo, int indexCount, int vertexCount
-            , ushort* indexArray, float* vertexArray, float* uvArray
-            , float opacity, CubismBlendMode colorBlendMode, bool invertedMask)
-    {
-        throw new Exception("[Live2D Core]Use 'DrawMeshOpenGL' function");
     }
 
     public bool IsGeneratingMask()
@@ -345,10 +342,8 @@ public class CubismRenderer_OpenGLES2 : CubismRenderer
 
         if (GL.AlwaysClear)
         {
-            GL.ClearColor(ClearColor.R,
-                            ClearColor.G,
-                            ClearColor.B,
-                            ClearColor.A);
+            var color = _lapp.BGColor;
+            GL.ClearColor(color.R, color.G, color.B, color.A);
             GL.Clear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         }
 

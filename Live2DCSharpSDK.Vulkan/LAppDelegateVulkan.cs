@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Live2DCSharpSDK.App;
+﻿using Live2DCSharpSDK.App;
 using Live2DCSharpSDK.Framework.Core;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Rendering;
 using Silk.NET.Vulkan;
-using Silk.NET.Vulkan.Extensions.KHR;
 
 namespace Live2DCSharpSDK.Vulkan;
 
@@ -39,8 +33,7 @@ public class LAppDelegateVulkan : LAppDelegate
             VulkanManager.DepthFormat
         );
 
-        var view = new LAppViewVulkan(this);
-        View = view;
+        View = new LAppViewVulkan(this);
         InitApp();
     }
 
@@ -51,6 +44,8 @@ public class LAppDelegateVulkan : LAppDelegate
 
     public override TextureInfo CreateTexture(LAppModel model, int index, int width, int height, nint data)
     {
+        _vk.DeviceWaitIdle(VulkanManager.Device);
+
         return new TextureInfoVulkan(_vk, this, model, VulkanManager.SurfaceFormat, ImageTiling.Optimal,
                    ImageUsageFlags.TransferSrcBit | ImageUsageFlags.TransferDstBit | ImageUsageFlags.SampledBit,
                     (uint)width, (uint)height, data);
@@ -61,6 +56,11 @@ public class LAppDelegateVulkan : LAppDelegate
         _api.GetWindowSize(out width, out height);
     }
 
+    public override void OnUpdatePre()
+    {
+        CubismRenderer_Vulkan.UpdateRendererSettings(VulkanManager.GetSwapchainImage(), VulkanManager.GetSwapchainImageView());
+    }
+
     public override void RunPost()
     {
         VulkanManager.PostDraw();
@@ -69,6 +69,8 @@ public class LAppDelegateVulkan : LAppDelegate
 
     public override bool RunPre()
     {
+        VulkanManager.UpdateDrawFrame();
+
         if (RecreateSwapchain())
         {
             return false;

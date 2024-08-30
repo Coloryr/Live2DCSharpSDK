@@ -258,7 +258,11 @@ public class LAppModel : CubismUserModel
 
         Updating = false;
         Initialized = true;
-        CreateRenderer(lapp.CreateRenderer(Model));
+        if (Renderer != null)
+        {
+            DeleteRenderer();
+        }
+        Renderer = lapp.CreateRenderer(Model);
 
         SetupTextures();
     }
@@ -452,7 +456,6 @@ public class LAppModel : CubismUserModel
         matrix.MultiplyByMatrix(ModelMatrix);
         if (Renderer != null)
         {
-            Renderer.ClearColor = _lapp.BGColor;
             Renderer.SetMvpMatrix(matrix);
         }
 

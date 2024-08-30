@@ -24,8 +24,6 @@ public abstract class LAppView(LAppDelegate lapp)
     /// </summary>
     private readonly CubismViewMatrix _viewMatrix = new();
 
-    public abstract void PreModelDraw(LAppModel model);
-
     public abstract void RenderPre();
     public abstract void RenderPost();
 
@@ -80,7 +78,7 @@ public abstract class LAppView(LAppDelegate lapp)
     /// <summary>
     /// 描画する。
     /// </summary>
-    public void Render()
+    internal void Render()
     {
         RenderPre();
 

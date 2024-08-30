@@ -117,33 +117,14 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
         vk.EnumerateInstanceLayerProperties(ref layerCount, null);
 
         var availableLayers = new LayerProperties[layerCount];
-        for (int a = 0; a < layerCount; a++)
+        fixed (LayerProperties* availableLayersPtr = availableLayers)
         {
-            availableLayers[a] = new();
-        }
-        vk.EnumerateInstanceLayerProperties(&layerCount, availableLayers);
-
-        foreach (var layerName in validationLayers)
-        {
-            bool layerFound = false;
-
-            for (int i = 0; i < availableLayers.Length; i++)
-            {
-                var item = availableLayers[i];
-                if (SilkMarshal.PtrToString(new(item.LayerName)) == layerName)
-                {
-                    layerFound = true;
-                    break;
-                }
-            }
-
-            if (!layerFound)
-            {
-                return false;
-            }
+            vk.EnumerateInstanceLayerProperties(ref layerCount, availableLayersPtr);
         }
 
-        return true;
+        var availableLayerNames = availableLayers.Select(layer => Marshal.PtrToStringAnsi((IntPtr)layer.LayerName)).ToHashSet();
+
+        return validationLayers.All(availableLayerNames.Contains);
     }
 
     /// <summary>
@@ -215,6 +196,8 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
         var extensions = GetRequiredExtensions();
         createInfo.EnabledExtensionCount = (uint)extensions.Length;
         createInfo.PpEnabledExtensionNames = (byte**)SilkMarshal.StringArrayToPtr(extensions);
+        createInfo.EnabledLayerCount = 0;
+        createInfo.PNext = null;
 
         if (EnableValidationLayers)
         {
@@ -235,6 +218,16 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
         {
             throw new Exception("failed to create instance!");
         }
+
+        Marshal.FreeHGlobal((IntPtr)appInfo.PApplicationName);
+        Marshal.FreeHGlobal((IntPtr)appInfo.PEngineName);
+        SilkMarshal.Free((nint)createInfo.PpEnabledExtensionNames);
+#if DEBUG
+        if (EnableValidationLayers)
+        {
+            SilkMarshal.Free((nint)createInfo.PpEnabledLayerNames);
+        }
+#endif
     }
 
     /// <summary>
@@ -282,7 +275,7 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
     /// </summary>
     public unsafe void CreateSurface()
     {
-        if (vk.TryGetInstanceExtension(_instance, out khrSurface))
+        if (!vk.TryGetInstanceExtension(_instance, out khrSurface))
         {
             throw new NotSupportedException("KHR_surface extension not found.");
         }
@@ -398,20 +391,11 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
             };
         }
 
-        PhysicalDeviceFeatures deviceFeatures = new()
-        {
-            SamplerAnisotropy = true,
-        };
-
-
         DeviceCreateInfo createInfo = new()
         {
             SType = StructureType.DeviceCreateInfo,
             QueueCreateInfoCount = (uint)uniqueQueueFamilies.Length,
             PQueueCreateInfos = queueCreateInfos,
-
-            PEnabledFeatures = &deviceFeatures,
-
             EnabledExtensionCount = (uint)deviceExtensions.Length,
             PpEnabledExtensionNames = (byte**)SilkMarshal.StringArrayToPtr(deviceExtensions)
         };
@@ -425,6 +409,27 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
         {
             createInfo.EnabledLayerCount = 0;
         }
+
+        var dynamicRenderingF = new PhysicalDeviceDynamicRenderingFeatures
+        {
+            SType = StructureType.PhysicalDeviceDynamicRenderingFeaturesKhr,
+            DynamicRendering = true
+        };
+
+        var dynamicStateF = new PhysicalDeviceExtendedDynamicStateFeaturesEXT
+        {
+            SType = StructureType.PhysicalDeviceExtendedDynamicStateFeaturesExt,
+            ExtendedDynamicState = true,
+            PNext = &dynamicRenderingF
+        };
+
+        var deviceFeatures2 = new PhysicalDeviceFeatures2
+        {
+            SType = StructureType.PhysicalDeviceFeatures2,
+            PNext = &dynamicStateF
+        };
+        vk.GetPhysicalDeviceFeatures2(PhysicalDevice, &deviceFeatures2);
+        createInfo.PNext = &deviceFeatures2;
 
         if (vk.CreateDevice(PhysicalDevice, in createInfo, null, out _device) != Result.Success)
         {
@@ -474,10 +479,12 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
     /// </summary>
     public unsafe void CreateCommandPool()
     {
-        var poolInfo = new CommandPoolCreateInfo(); ;
-        poolInfo.SType = StructureType.CommandPoolCreateInfo;
-        poolInfo.Flags = CommandPoolCreateFlags.ResetCommandBufferBit;
-        poolInfo.QueueFamilyIndex = (uint)Indices.GraphicsFamily;
+        var poolInfo = new CommandPoolCreateInfo
+        {
+            SType = StructureType.CommandPoolCreateInfo,
+            Flags = CommandPoolCreateFlags.ResetCommandBufferBit,
+            QueueFamilyIndex = (uint)Indices.GraphicsFamily
+        };
 
         if (vk.CreateCommandPool(_device, ref poolInfo, null, out _commandPool) != Result.Success)
         {
@@ -494,7 +501,7 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
         {
             SType = StructureType.SemaphoreCreateInfo
         };
-        vk.CreateSemaphore(_device, &semaphoreInfo, null, out _imageAvailableSemaphore);
+        vk.CreateSemaphore(_device, ref semaphoreInfo, null, out _imageAvailableSemaphore);
     }
 
     /// <summary>
@@ -546,7 +553,7 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
             Flags = CommandBufferUsageFlags.OneTimeSubmitBit
         };
 
-        vk.BeginCommandBuffer(commandBuffer, &beginInfo);
+        vk.BeginCommandBuffer(commandBuffer, ref beginInfo);
 
         return commandBuffer;
     }

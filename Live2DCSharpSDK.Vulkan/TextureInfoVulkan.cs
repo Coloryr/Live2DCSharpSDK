@@ -16,24 +16,6 @@ public class TextureInfoVulkan : TextureInfo
 {
     private static int _sequenceId;
 
-    /// <summary>
-    /// プリマルチプライ処理
-    /// </summary>
-    /// <param name="red">画像のRed値</param>
-    /// <param name="green">画像のGreen値</param>
-    /// <param name="blue">画像のBlue値</param>
-    /// <param name="alpha">画像のAlpha値</param>
-    /// <returns></returns>
-    public static uint Premultiply(byte red, byte green, byte blue, byte alpha)
-    {
-        return (uint)(
-            (red * (alpha + 1) >> 8) |
-            ((green * (alpha + 1) >> 8) << 8) |
-            ((blue * (alpha + 1) >> 8) << 16) |
-            (((alpha)) << 24)
-        );
-    }
-
     private readonly Vk _vk;
     private readonly LAppDelegateVulkan _lapp;
     private readonly CubismImageVulkan _image;

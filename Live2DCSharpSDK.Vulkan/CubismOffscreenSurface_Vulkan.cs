@@ -57,10 +57,7 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
             ImageLayout = ImageLayout.AttachmentOptimalKhr,
             LoadOp = AttachmentLoadOp.Clear,
             StoreOp = AttachmentStoreOp.Store,
-            ClearValue = new()
-            {
-                Color = new(r, g, b, a)
-            }
+            ClearValue = new(new(r, g, b, a))
         };
 
         if (_depthImage == null)
@@ -79,21 +76,13 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
             ImageLayout = ImageLayout.DepthStencilAttachmentOptimal,
             LoadOp = AttachmentLoadOp.Clear,
             StoreOp = AttachmentStoreOp.DontCare,
-            ClearValue = new()
-            {
-                Color = new(1.0f),
-                DepthStencil = new(0)
-            }
+            ClearValue = new(new(1.0f, 0.0f))
         };
 
         var renderingInfo = new RenderingInfo
         {
             SType = StructureType.RenderingInfo,
-            RenderArea = new()
-            {
-                Offset = new(0, 0),
-                Extent = new(BufferWidth, BufferHeight)
-            },
+            RenderArea = new(new(0, 0), new(BufferWidth, BufferHeight)),
             LayerCount = 1,
             ColorAttachmentCount = 1,
             PColorAttachments = &colorAttachment,
@@ -125,14 +114,7 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
             OldLayout = ImageLayout.ColorAttachmentOptimal,
             NewLayout = ImageLayout.ShaderReadOnlyOptimal,
             Image = _colorImage.Image,
-            SubresourceRange = new()
-            {
-                AspectMask = ImageAspectFlags.ColorBit,
-                BaseMipLevel = 0,
-                LayerCount = 1,
-                BaseArrayLayer = 0,
-                LevelCount = 1
-            }
+            SubresourceRange = new(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
         };
 
         vk.CmdPipelineBarrier(commandBuffer, PipelineStageFlags.ColorAttachmentOutputBit,
@@ -149,14 +131,7 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
         memoryBarrier.OldLayout = ImageLayout.DepthStencilAttachmentOptimal;
         memoryBarrier.NewLayout = ImageLayout.DepthStencilAttachmentOptimal;
         memoryBarrier.Image = _depthImage.Image;
-        memoryBarrier.SubresourceRange = new()
-        {
-            AspectMask = ImageAspectFlags.DepthBit | ImageAspectFlags.StencilBit,
-            BaseMipLevel = 0,
-            LevelCount = 1,
-            BaseArrayLayer = 0,
-            LayerCount = 1
-        };
+        memoryBarrier.SubresourceRange = new(ImageAspectFlags.DepthBit | ImageAspectFlags.StencilBit, 0, 1, 0, 1);
 
         vk.CmdPipelineBarrier(commandBuffer, PipelineStageFlags.ColorAttachmentOutputBit,
             PipelineStageFlags.BottomOfPipeBit, 0, 0, null, 0, null, 1, ref memoryBarrier);

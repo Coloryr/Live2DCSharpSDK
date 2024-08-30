@@ -10,11 +10,6 @@ namespace Live2DCSharpSDK.Vulkan;
 
 public class LAppViewVulkan(LAppDelegateVulkan lapp) : LAppView(lapp)
 {
-    public override void PreModelDraw(LAppModel model)
-    {
-
-    }
-
     public override void RenderPost()
     {
 
@@ -23,10 +18,6 @@ public class LAppViewVulkan(LAppDelegateVulkan lapp) : LAppView(lapp)
     public override unsafe void RenderPre()
     {
         var vkManager = lapp.VulkanManager;
-        var beginInfo = new CommandBufferBeginInfo
-        {
-            SType = StructureType.CommandBufferBeginInfo
-        };
         var commandBuffer = vkManager.BeginSingleTimeCommands();
 
         var color = lapp.BGColor;
@@ -56,7 +47,5 @@ public class LAppViewVulkan(LAppDelegateVulkan lapp) : LAppView(lapp)
         lapp._vk.CmdBeginRendering(commandBuffer, &renderingInfo);
         lapp._vk.CmdEndRendering(commandBuffer);
         vkManager.SubmitCommand(commandBuffer, true);
-
-        CubismRenderer_Vulkan.UpdateRendererSettings(vkManager.GetSwapchainImage(), vkManager.GetSwapchainImageView());
     }
 }

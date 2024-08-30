@@ -7,11 +7,6 @@ using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Vulkan;
 
-public class ModelUBOInfo
-{
-    public const int Size = 4 * 16 + 4 * 16 + 4 * 4 + 4 * 4 + 4 * 4 + 4 * 4;
-}
-
 /// <summary>
 /// モデル用ユニフォームバッファオブジェクトの中身を保持する構造体
 /// </summary>

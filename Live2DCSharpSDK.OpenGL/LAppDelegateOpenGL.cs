@@ -48,7 +48,7 @@ public class LAppDelegateOpenGL : LAppDelegate
 
     public override CubismRenderer CreateRenderer(CubismModel model)
     {
-        return new CubismRenderer_OpenGLES2(GL, model);
+        return new CubismRenderer_OpenGLES2(GL, this, model);
     }
 
     public override TextureInfo CreateTexture(LAppModel model, int index, int width, int height, nint data)
@@ -72,5 +72,10 @@ public class LAppDelegateOpenGL : LAppDelegate
     public override void RunPost()
     {
         
+    }
+
+    public override void OnUpdatePre()
+    {
+        throw new NotImplementedException();
     }
 }

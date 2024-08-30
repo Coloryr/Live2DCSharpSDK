@@ -14,7 +14,7 @@ public abstract class CubismUserModel : IDisposable
     /// <summary>
     /// レンダラ
     /// </summary>
-    public CubismRenderer? Renderer { get; private set; }
+    public CubismRenderer? Renderer { get; protected set; }
     /// <summary>
     /// モデル行列
     /// </summary>
@@ -269,10 +269,6 @@ public abstract class CubismUserModel : IDisposable
     /// </summary>
     protected void CreateRenderer(CubismRenderer renderer)
     {
-        if (Renderer != null)
-        {
-            DeleteRenderer();
-        }
         Renderer = renderer;
     }
 
