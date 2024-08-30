@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Live2DCSharpSDK.Vulkan;
 
-public class Blend
+public static class Blend
 {
-    public const int Blend_Normal = 0;
-    public const int Blend_Add = 1;
-    public const int Blend_Mult = 2;
-    public const int Blend_Mask = 3;
+    public const int Normal = 0;
+    public const int Add = 1;
+    public const int Mult = 2;
+    public const int Mask = 3;
 };

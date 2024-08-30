@@ -100,7 +100,7 @@ public class CubismClippingManager_Vulkan(Vk vk) : CubismClippingManager
             var MARGIN = 0.05f;
 
             // clipContextに設定したオフスクリーンサーフェイスをインデックスで取得
-            var clipContextOffscreenSurface = (renderer.GetMaskBuffer(clipContext.BufferIndex) as CubismOffscreenSurface_Vulkan)!;
+            var clipContextOffscreenSurface = renderer.GetMaskBuffer(clipContext.BufferIndex)!;
 
             // 現在のオフスクリーンサーフェイスがclipContextのものと異なる場合
             if (CurrentMaskBuffer != clipContextOffscreenSurface)

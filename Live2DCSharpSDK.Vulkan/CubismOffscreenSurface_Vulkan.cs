@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Live2DCSharpSDK.Framework;
 using Live2DCSharpSDK.Framework.Rendering;
 using Silk.NET.Vulkan;
 
@@ -43,7 +44,8 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
     {
         if (_colorImage == null)
         {
-            throw new Exception("colorImage is null.");
+            CubismLog.Error("colorImage is null.");
+            return;
         }
 
         _colorImage.SetImageLayout(commandBuffer, ImageLayout.ColorAttachmentOptimal, 1, ImageAspectFlags.ColorBit);
@@ -63,7 +65,8 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
 
         if (_depthImage == null)
         {
-            throw new Exception("depthImage is null.");
+            CubismLog.Error("depthImage is null.");
+            return;
         }
 
         _depthImage.SetImageLayout(commandBuffer, ImageLayout.DepthStencilAttachmentOptimal,
@@ -108,7 +111,8 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
     {
         if (_colorImage == null)
         {
-            throw new Exception("colorImage is null.");
+            CubismLog.Error("colorImage is null.");
+            return;
         }
 
         vk.CmdEndRendering(commandBuffer);
@@ -138,7 +142,8 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
 
         if (_depthImage == null)
         {
-            throw new Exception("depthImage is null.");
+            CubismLog.Error("depthImage is null.");
+            return;
         }
 
         memoryBarrier.OldLayout = ImageLayout.DepthStencilAttachmentOptimal;
@@ -169,7 +174,7 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
     /// <param name="surfaceFormat">サーフェスフォーマット</param>
     /// <param name="depthFormat">深度フォーマット</param>
     public void CreateOffscreenSurface(Device device, PhysicalDevice physicalDevice,
-        int displayBufferWidth, int displayBufferHeight, Format surfaceFormat, Format depthFormat)
+        uint displayBufferWidth, uint displayBufferHeight, Format surfaceFormat, Format depthFormat)
     {
         _colorImage = new(vk);
         _colorImage.CreateImage(device, physicalDevice, displayBufferWidth, displayBufferHeight,
@@ -186,8 +191,8 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
 
         _depthImage.CreateView(device, depthFormat, ImageAspectFlags.DepthBit | ImageAspectFlags.StencilBit, 1);
 
-        BufferWidth = (uint)displayBufferWidth;
-        BufferHeight = (uint)displayBufferHeight;
+        BufferWidth = displayBufferWidth;
+        BufferHeight = displayBufferHeight;
     }
 
     /// <summary>
@@ -216,7 +221,8 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
     {
         if (_colorImage == null)
         {
-            throw new Exception("colorImage is null.");
+            CubismLog.Error("colorImage is null.");
+            return default;
         }
 
         return _colorImage.Image;
@@ -230,7 +236,8 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
     {
         if (_colorImage == null)
         {
-            throw new Exception("colorImage is null.");
+            CubismLog.Error("colorImage is null.");
+            return default;
         }
 
         return _colorImage.View;
@@ -244,7 +251,8 @@ public class CubismOffscreenSurface_Vulkan(Vk vk) : CubismOffscreenSurface
     {
         if (_colorImage == null)
         {
-            throw new Exception("colorImage is null.");
+            CubismLog.Error("colorImage is null.");
+            return default;
         }
 
         return _colorImage.Sampler;

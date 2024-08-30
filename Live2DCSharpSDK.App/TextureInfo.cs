@@ -3,8 +3,13 @@
 /// <summary>
 /// 画像情報構造体
 /// </summary>
-public abstract record TextureInfo
+public abstract class TextureInfo
 {
+    public int Index;
+    /// <summary>
+    /// テクスチャID
+    /// </summary>
+    public int Id;
     /// <summary>
     /// 横幅
     /// </summary>
@@ -17,4 +22,9 @@ public abstract record TextureInfo
     /// ファイル名
     /// </summary>
     public string FileName;
+
+    /// <summary>
+    /// 画像の解放
+    /// </summary>
+    public abstract void Dispose();
 };

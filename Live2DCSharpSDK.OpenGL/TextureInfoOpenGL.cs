@@ -7,10 +7,10 @@ using Live2DCSharpSDK.App;
 
 namespace Live2DCSharpSDK.OpenGL;
 
-public record TextureInfoOpenGL : TextureInfo
+public class TextureInfoOpenGL(OpenGLApi api) : TextureInfo
 {
-    /// <summary>
-    /// テクスチャID
-    /// </summary>
-    public int ID;
+    public override void Dispose()
+    {
+        api.DeleteTexture(Id);
+    }
 }

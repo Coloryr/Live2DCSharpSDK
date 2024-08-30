@@ -9,7 +9,7 @@ namespace Live2DCSharpSDK.App;
 /// <remarks>
 /// コンストラクタ
 /// </remarks>
-public class LAppView(LAppDelegate lapp)
+public abstract class LAppView(LAppDelegate lapp)
 {
     /// <summary>
     /// タッチマネージャー
@@ -23,6 +23,11 @@ public class LAppView(LAppDelegate lapp)
     /// viewMatrix
     /// </summary>
     private readonly CubismViewMatrix _viewMatrix = new();
+
+    public abstract void PreModelDraw(LAppModel model);
+
+    public abstract void RenderPre();
+    public abstract void RenderPost();
 
     /// <summary>
     /// 初期化する。
@@ -77,11 +82,15 @@ public class LAppView(LAppDelegate lapp)
     /// </summary>
     public void Render()
     {
-        var Live2DManager = lapp.Live2dManager;
-        Live2DManager.ViewMatrix.SetMatrix(_viewMatrix);
+        RenderPre();
+
+        var manager = lapp.Live2dManager;
+        manager.ViewMatrix.SetMatrix(_viewMatrix);
 
         // Cubism更新・描画
-        Live2DManager.OnUpdate();
+        manager.OnUpdate();
+
+        RenderPost();
     }
 
     /// <summary>

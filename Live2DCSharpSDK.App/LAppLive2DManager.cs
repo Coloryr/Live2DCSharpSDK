@@ -125,6 +125,8 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
                 _projection.MultiplyByMatrix(ViewMatrix);
             }
 
+            lapp.View.PreModelDraw(model);
+
             model.Update();
             model.Draw(_projection); // 参照渡しなのでprojectionは変質する
         }

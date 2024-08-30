@@ -37,13 +37,14 @@ public class CubismBufferVulkan(Vk vk)
     /// <param name="typeFilter">メモリタイプが存在していたら設定されるビットマスク</param>
     /// <param name="properties">メモリがデバイスにアクセスするときのタイプ</param>
     /// <returns></returns>
-    public unsafe int FindMemoryType(PhysicalDevice physicalDevice, int typeFilter, MemoryPropertyFlags properties)
+    public unsafe int FindMemoryType(PhysicalDevice physicalDevice, uint typeFilter, MemoryPropertyFlags properties)
     {
         vk.GetPhysicalDeviceMemoryProperties(physicalDevice, out var memProperties);
 
         for (int i = 0; i < memProperties.MemoryTypeCount; i++)
         {
-            if ((typeFilter & (1 << i)) != 0 && (memProperties.MemoryTypes[i].PropertyFlags & properties) == properties)
+            if ((typeFilter & (1 << i)) != 0 
+                && (memProperties.MemoryTypes[i].PropertyFlags & properties) == properties)
             {
                 return i;
             }
@@ -70,6 +71,7 @@ public class CubismBufferVulkan(Vk vk)
             Usage = usage,
             SharingMode = SharingMode.Exclusive
         };
+
         if (vk.CreateBuffer(device, ref bufferInfo, null, out _buffer) != Result.Success)
         {
             CubismLog.Error("[Live2D Vulkan]failed to create buffer!");
@@ -81,7 +83,7 @@ public class CubismBufferVulkan(Vk vk)
         {
             SType = StructureType.MemoryAllocateInfo,
             AllocationSize = memRequirements.Size,
-            MemoryTypeIndex = (uint)FindMemoryType(physicalDevice, (int)memRequirements.MemoryTypeBits, properties)
+            MemoryTypeIndex = (uint)FindMemoryType(physicalDevice, memRequirements.MemoryTypeBits, properties)
         };
         if (vk.AllocateMemory(device, ref allocInfo, null, out _memory) != Result.Success)
         {
@@ -105,7 +107,7 @@ public class CubismBufferVulkan(Vk vk)
     /// </summary>
     /// <param name="src">コピーするデータ</param>
     /// <param name="size">コピーするサイズ</param>
-    public unsafe void MemCpy(void* src, long size)
+    public unsafe void MemCpy(void* src, ulong size)
     {
         System.Buffer.MemoryCopy(src, _mapped, size, size);
     }

@@ -3,7 +3,7 @@ using Live2DCSharpSDK.Framework.Type;
 
 namespace Live2DCSharpSDK.Framework.Rendering;
 
-public unsafe class CubismClippingContext(CubismClippingManager manager, int* clippingDrawableIndices, int clipCount)
+public unsafe abstract class CubismClippingContext(CubismClippingManager manager, int* clippingDrawableIndices, int clipCount)
 {
     /// <summary>
     /// 現在の描画状態でマスクの準備が必要ならtrue

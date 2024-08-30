@@ -49,8 +49,4 @@
     <ProjectReference Include="..\Live2DCSharpSDK.App\Live2DCSharpSDK.App.csproj" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="PowerShell glsl/glslbuild.ps1" />
-  </Target>
-
 </Project>

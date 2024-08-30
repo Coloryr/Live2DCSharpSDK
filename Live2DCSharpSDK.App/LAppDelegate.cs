@@ -21,7 +21,7 @@ public abstract class LAppDelegate : IDisposable
     /// <summary>
     /// View情報
     /// </summary>
-    public LAppView View { get; private set; }
+    public LAppView View { get; protected set; }
 
     public CubismTextureColor BGColor { get; set; } = new(0, 0, 0, 0);
 
@@ -71,9 +71,8 @@ public abstract class LAppDelegate : IDisposable
         CubismFramework.StartUp(_cubismAllocator, _cubismOption);
     }
 
-    public void InitView()
+    public void InitApp()
     {
-        View = new LAppView(this);
         TextureManager = new LAppTextureManager(this);
 
         // ウィンドウサイズ記憶
@@ -119,7 +118,8 @@ public abstract class LAppDelegate : IDisposable
         }
     }
 
-    public abstract void RunInit();
+    public abstract bool RunPre();
+    public abstract void RunPost();
 
     /// <summary>
     /// 実行処理。
@@ -131,10 +131,15 @@ public abstract class LAppDelegate : IDisposable
         // 時間更新
         LAppPal.DeltaTime = tick;
 
-        RunInit();
+        if (!RunPre())
+        {
+            return;
+        }
 
         //描画更新
         View.Render();
+
+        RunPost();
     }
 
     /// <summary>

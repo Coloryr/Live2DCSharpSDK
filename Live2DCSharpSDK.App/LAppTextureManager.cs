@@ -29,6 +29,9 @@ public class LAppTextureManager(LAppDelegate lapp)
         // OpenGL用のテクスチャを生成する
         var info = lapp.CreateTexture(model, index, image.Width, image.Height, image.GetPixels());
         info.FileName = fileName;
+        info.Width = image.Width;
+        info.Index = index;
+        info.Height = image.Height;
 
         _textures.Add(info);
 
@@ -41,6 +44,7 @@ public class LAppTextureManager(LAppDelegate lapp)
     /// <param name="textureId">解放するテクスチャID</param>
     public void ReleaseTexture(TextureInfo info)
     {
+        info.Dispose();
         _textures.Remove(info);
     }
 }

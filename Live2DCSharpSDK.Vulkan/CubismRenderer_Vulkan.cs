@@ -15,20 +15,20 @@ public class CubismRenderer_Vulkan : CubismRenderer
 {
     public delegate void FvkCmdSetCullMode(CommandBuffer commandBuffer, CullModeFlags cullMode);
 
-    public static Device s_device;
-    public static PhysicalDevice s_physicalDevice;
-    public static CommandPool s_commandPool;
-    public static Queue s_queue;
-    public static Extent2D s_swapchainExtent;
-    public static Format s_swapchainImageFormat;
-    public static Format s_imageFormat;
-    public static Image s_swapchainImage;
-    public static ImageView s_swapchainImageView;
-    public static Format s_depthFormat;
-    public static bool s_useRenderTarget = false;
-    public static Image s_renderTargetImage;
-    public static ImageView s_renderTargetImageView;
-    public static CubismPipeline_Vulkan cubismPipeline_Vulkan;
+    public static Device Device { get; set; }
+    public static PhysicalDevice PhysicalDevice { get; set; }
+    public static CommandPool CommandPool { get; set; }
+    public static Queue Queue { get; set; }
+    public static Extent2D SwapchainExtent { get; set; }
+    public static Format SwapchainImageFormat { get; set; }
+    public static Format ImageFormat { get; set; }
+    public static Image SwapchainImage { get; set; }
+    public static ImageView SwapchainImageView { get; set; }
+    public static Format DepthFormat { get; set; }
+    public static bool UseRenderTarget { get; set; }
+    public static Image RenderTargetImage { get; set; }
+    public static ImageView RenderTargetImageView { get; set; }
+    public static CubismPipeline_Vulkan CubismPipeline_Vulkan { get; set; }
 
     /// <summary>
     /// レンダラを作成するための各種設定
@@ -51,16 +51,16 @@ public class CubismRenderer_Vulkan : CubismRenderer
                                            ImageView swapchainImageView,
                                            Format dFormat)
     {
-        s_device = device;
-        s_physicalDevice = physicalDevice;
-        s_commandPool = commandPool;
-        s_queue = queue;
-        s_swapchainExtent = extent;
-        s_swapchainImageFormat = depthFormat;
-        s_imageFormat = surfaceFormat;
-        s_swapchainImage = swapchainImage;
-        s_swapchainImageView = swapchainImageView;
-        s_depthFormat = dFormat;
+        Device = device;
+        PhysicalDevice = physicalDevice;
+        CommandPool = commandPool;
+        Queue = queue;
+        SwapchainExtent = extent;
+        SwapchainImageFormat = depthFormat;
+        ImageFormat = surfaceFormat;
+        SwapchainImage = swapchainImage;
+        SwapchainImageView = swapchainImageView;
+        DepthFormat = dFormat;
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
     /// </summary>
     public static void EnableChangeRenderTarget()
     {
-        s_useRenderTarget = true;
+        UseRenderTarget = true;
     }
 
     /// <summary>
@@ -78,8 +78,8 @@ public class CubismRenderer_Vulkan : CubismRenderer
     /// <param name="imageview">イメージビュー</param>
     public static void SetRenderTarget(Image image, ImageView imageview)
     {
-        s_renderTargetImage = image;
-        s_renderTargetImageView = imageview;
+        RenderTargetImage = image;
+        RenderTargetImageView = imageview;
     }
 
     /// <summary>
@@ -184,11 +184,14 @@ public class CubismRenderer_Vulkan : CubismRenderer
     /// </summary>
     private CommandBuffer _drawCommandBuffer;
 
-    public CubismRenderer_Vulkan(Vk vk, CubismModel model) : base(model)
+    private VulkanManager _vulkanManager;
+
+    public CubismRenderer_Vulkan(Vk vk, VulkanManager manager, CubismModel model) : base(model)
     {
         _vk = vk;
+        _vulkanManager = manager;
 
-        cubismPipeline_Vulkan = new(vk, s_device);
+        CubismPipeline_Vulkan = new(vk, Device);
     }
 
     /// <summary>
@@ -199,9 +202,9 @@ public class CubismRenderer_Vulkan : CubismRenderer
     /// <param name="imageView">イメージビュー</param>
     public static void UpdateSwapchainVariable(Extent2D extent, Image image, ImageView imageView)
     {
-        s_swapchainExtent = extent;
-        s_swapchainImage = image;
-        s_swapchainImageView = imageView;
+        SwapchainExtent = extent;
+        SwapchainImage = image;
+        SwapchainImageView = imageView;
     }
 
     /// <summary>
@@ -211,8 +214,8 @@ public class CubismRenderer_Vulkan : CubismRenderer
     /// <param name="imageView">イメージビュー</param>
     public static void UpdateRendererSettings(Image image, ImageView imageView)
     {
-        s_swapchainImage = image;
-        s_swapchainImageView = imageView;
+        SwapchainImage = image;
+        SwapchainImageView = imageView;
     }
 
     public static Viewport GetViewport(float width, float height, float minDepth, float maxDepth)
@@ -253,11 +256,11 @@ public class CubismRenderer_Vulkan : CubismRenderer
         {
             SType = StructureType.CommandBufferAllocateInfo,
             Level = CommandBufferLevel.Primary,
-            CommandPool = s_commandPool,
+            CommandPool = CommandPool,
             CommandBufferCount = 1
         };
 
-        _vk.AllocateCommandBuffers(s_device, ref allocInfo, out var commandBuffer);
+        _vk.AllocateCommandBuffers(Device, ref allocInfo, out var commandBuffer);
 
         var beginInfo = new CommandBufferBeginInfo
         {
@@ -298,21 +301,21 @@ public class CubismRenderer_Vulkan : CubismRenderer
             fixed (PipelineStageFlags* ptr = waitStages)
             {
                 submitInfo.PWaitDstStageMask = ptr;
-                _vk.QueueSubmit(s_queue, 1, ref submitInfo, new Fence());
+                _vk.QueueSubmit(Queue, 1, ref submitInfo, new Fence());
             }
-            _vk.QueueWaitIdle(s_queue);
+            _vk.QueueWaitIdle(Queue);
         }
         else if (signalUpdateFinishedSemaphore is { } sem2)
         {
             submitInfo.SignalSemaphoreCount = 1;
             submitInfo.PSignalSemaphores = &sem2;
-            _vk.QueueSubmit(s_queue, 1, ref submitInfo, new Fence());
+            _vk.QueueSubmit(Queue, 1, ref submitInfo, new Fence());
         }
         else
         {
-            _vk.QueueSubmit(s_queue, 1, ref submitInfo, new Fence());
-            _vk.QueueWaitIdle(s_queue);
-            _vk.FreeCommandBuffers(s_device, s_commandPool, 1, ref commandBuffer);
+            _vk.QueueSubmit(Queue, 1, ref submitInfo, new Fence());
+            _vk.QueueWaitIdle(Queue);
+            _vk.FreeCommandBuffers(Device, CommandPool, 1, ref commandBuffer);
         }
     }
 
@@ -324,13 +327,13 @@ public class CubismRenderer_Vulkan : CubismRenderer
         var allocInfo = new CommandBufferAllocateInfo
         {
             SType = StructureType.CommandBufferAllocateInfo,
-            CommandPool = s_commandPool,
+            CommandPool = CommandPool,
             Level = CommandBufferLevel.Primary,
             CommandBufferCount = 1
         };
 
-        if (_vk.AllocateCommandBuffers(s_device, ref allocInfo, out _updateCommandBuffer) != Result.Success
-            || _vk.AllocateCommandBuffers(s_device, ref allocInfo, out _drawCommandBuffer) != Result.Success)
+        if (_vk.AllocateCommandBuffers(Device, ref allocInfo, out _updateCommandBuffer) != Result.Success
+            || _vk.AllocateCommandBuffers(Device, ref allocInfo, out _drawCommandBuffer) != Result.Success)
         {
             CubismLog.Error("[Live2D Vulkan]failed to allocate command buffers!");
         }
@@ -353,14 +356,14 @@ public class CubismRenderer_Vulkan : CubismRenderer
 
                 var bufferSize = (ulong)(ModelVertex.Size * vcount); // 総長 構造体サイズ*個数
                 var stagingBuffer = new CubismBufferVulkan(_vk);
-                stagingBuffer.CreateBuffer(s_device, s_physicalDevice, bufferSize, BufferUsageFlags.TransferSrcBit,
+                stagingBuffer.CreateBuffer(Device, PhysicalDevice, bufferSize, BufferUsageFlags.TransferSrcBit,
                                           MemoryPropertyFlags.HostVisibleBit | MemoryPropertyFlags.HostCoherentBit);
 
-                stagingBuffer.Map(s_device, bufferSize);
+                stagingBuffer.Map(Device, bufferSize);
                 _stagingBuffers.Add(stagingBuffer);
 
                 var vertexBuffer = new CubismBufferVulkan(_vk);
-                vertexBuffer.CreateBuffer(s_device, s_physicalDevice, bufferSize,
+                vertexBuffer.CreateBuffer(Device, PhysicalDevice, bufferSize,
                                            BufferUsageFlags.TransferDstBit | BufferUsageFlags.VertexBufferBit,
                                            MemoryPropertyFlags.DeviceLocalBit);
                 _vertexBuffers[drawAssign] = vertexBuffer;
@@ -385,14 +388,14 @@ public class CubismRenderer_Vulkan : CubismRenderer
                 var indices = Model.GetDrawableVertexIndices(drawAssign);
 
                 var stagingBuffer = new CubismBufferVulkan(_vk);
-                stagingBuffer.CreateBuffer(s_device, s_physicalDevice, bufferSize, BufferUsageFlags.TransferSrcBit,
+                stagingBuffer.CreateBuffer(Device, PhysicalDevice, bufferSize, BufferUsageFlags.TransferSrcBit,
                                            MemoryPropertyFlags.HostVisibleBit | MemoryPropertyFlags.HostCoherentBit);
-                stagingBuffer.Map(s_device, bufferSize);
-                stagingBuffer.MemCpy(indices, (long)bufferSize);
-                stagingBuffer.UnMap(s_device);
+                stagingBuffer.Map(Device, bufferSize);
+                stagingBuffer.MemCpy(indices, bufferSize);
+                stagingBuffer.UnMap(Device);
 
                 var indexBuffer = new CubismBufferVulkan(_vk);
-                indexBuffer.CreateBuffer(s_device, s_physicalDevice, bufferSize,
+                indexBuffer.CreateBuffer(Device, PhysicalDevice, bufferSize,
                                          BufferUsageFlags.TransferDstBit | BufferUsageFlags.IndexBufferBit,
                                          MemoryPropertyFlags.DeviceLocalBit);
 
@@ -405,7 +408,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
                 _vk.CmdCopyBuffer(commandBuffer, stagingBuffer.Buffer, indexBuffer.Buffer, 1, ref copyRegion);
                 SubmitCommand(commandBuffer);
                 _indexBuffers[drawAssign] = indexBuffer;
-                stagingBuffer.Destroy(s_device);
+                stagingBuffer.Destroy(Device);
             }
         }
     }
@@ -445,7 +448,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
         {
             poolInfo.PPoolSizes = ptr;
             poolInfo.MaxSets = (uint)descriptorSetCount;
-            if (_vk.CreateDescriptorPool(s_device, ref poolInfo, null, out _descriptorPool) != Result.Success)
+            if (_vk.CreateDescriptorPool(Device, ref poolInfo, null, out _descriptorPool) != Result.Success)
             {
                 CubismLog.Error("failed to create descriptor pool!");
             }
@@ -488,7 +491,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
         fixed (DescriptorSetLayoutBinding* ptr = bindings)
         {
             layoutInfo.PBindings = ptr;
-            if (_vk.CreateDescriptorSetLayout(s_device, ref layoutInfo, null, out _descriptorSetLayout) != Result.Success)
+            if (_vk.CreateDescriptorSetLayout(Device, ref layoutInfo, null, out _descriptorSetLayout) != Result.Success)
             {
                 CubismLog.Error("failed to create descriptor set layout!");
             }
@@ -503,11 +506,11 @@ public class CubismRenderer_Vulkan : CubismRenderer
                 UniformBuffer = new CubismBufferVulkan(_vk)
             };
 
-            desc.UniformBuffer.CreateBuffer(s_device, s_physicalDevice, ModelUBOInfo.Size,
+            desc.UniformBuffer.CreateBuffer(Device, PhysicalDevice, ModelUBOInfo.Size,
                                        BufferUsageFlags.UniformBufferBit,
                                       MemoryPropertyFlags.HostVisibleBit |
                                       MemoryPropertyFlags.HostCoherentBit);
-            desc.UniformBuffer.Map(s_device, ulong.MaxValue);
+            desc.UniformBuffer.Map(Device, ulong.MaxValue);
             _descriptorSets.Add(desc);
         }
 
@@ -526,7 +529,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
         {
             allocInfo.PSetLayouts = ptr;
             var descriptorSets = new DescriptorSet[descriptorSetCount];
-            if (_vk.AllocateDescriptorSets(s_device, &allocInfo, descriptorSets) != Result.Success)
+            if (_vk.AllocateDescriptorSets(Device, &allocInfo, descriptorSets) != Result.Success)
             {
                 CubismLog.Error("failed to allocate descriptor sets!");
             }
@@ -544,10 +547,10 @@ public class CubismRenderer_Vulkan : CubismRenderer
     /// </summary>
     public void CreateDepthBuffer()
     {
-        _depthImage.CreateImage(s_device, s_physicalDevice, (int)s_swapchainExtent.Width, (int)s_swapchainExtent.Height,
-        1, s_depthFormat, ImageTiling.Optimal,
+        _depthImage.CreateImage(Device, PhysicalDevice, SwapchainExtent.Width, SwapchainExtent.Height,
+        1, DepthFormat, ImageTiling.Optimal,
          ImageUsageFlags.DepthStencilAttachmentBit);
-        _depthImage.CreateView(s_device, s_depthFormat,
+        _depthImage.CreateView(Device, DepthFormat,
              ImageAspectFlags.DepthBit | ImageAspectFlags.StencilBit, 1);
     }
 
@@ -556,20 +559,20 @@ public class CubismRenderer_Vulkan : CubismRenderer
     /// </summary>
     public unsafe void InitializeRenderer()
     {
-        vkCmdSetCullModeEXT = Marshal.GetDelegateForFunctionPointer<FvkCmdSetCullMode>(_vk.GetDeviceProcAddr(s_device, "vkCmdSetCullModeEXT"));
+        vkCmdSetCullModeEXT = Marshal.GetDelegateForFunctionPointer<FvkCmdSetCullMode>(_vk.GetDeviceProcAddr(Device, "vkCmdSetCullModeEXT"));
 
         var semaphoreInfo = new SemaphoreCreateInfo
         {
             SType = StructureType.SemaphoreCreateInfo
         };
-        _vk.CreateSemaphore(s_device, ref semaphoreInfo, null, out _updateFinishedSemaphore);
+        _vk.CreateSemaphore(Device, ref semaphoreInfo, null, out _updateFinishedSemaphore);
 
         CreateCommandBuffer();
         CreateVertexBuffer();
         CreateIndexBuffer();
         CreateDescriptorSets();
         CreateDepthBuffer();
-        cubismPipeline_Vulkan.CreatePipelines(_descriptorSetLayout);
+        CubismPipeline_Vulkan.CreatePipelines(_descriptorSetLayout);
     }
 
     /// <summary>
@@ -581,7 +584,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
     /// <param name="maskBufferCount">マスクバッファの数</param>
     public void Initialize(CubismModel model, int maskBufferCount)
     {
-        if (s_device.Handle == 0)
+        if (Device.Handle == 0)
         {
             CubismLog.Error("Device has not been set.");
             return;
@@ -611,16 +614,16 @@ public class CubismRenderer_Vulkan : CubismRenderer
         }
         if (model.IsUsingMasking())
         {
-            var bufferWidth = (int)_clippingManager.ClippingMaskBufferSize.X;
-            var bufferHeight = (int)_clippingManager.ClippingMaskBufferSize.Y;
+            var bufferWidth = (uint)_clippingManager.ClippingMaskBufferSize.X;
+            var bufferHeight = (uint)_clippingManager.ClippingMaskBufferSize.Y;
 
             _offscreenFrameBuffers = new CubismOffscreenSurface_Vulkan[maskBufferCount];
             // バックバッファ分確保
             for (int i = 0; i < maskBufferCount; i++)
             {
                 _offscreenFrameBuffers[i] = new(_vk);
-                _offscreenFrameBuffers[i].CreateOffscreenSurface(s_device, s_physicalDevice, bufferWidth, bufferHeight,
-                    s_imageFormat, s_depthFormat);
+                _offscreenFrameBuffers[i].CreateOffscreenSurface(Device, PhysicalDevice, bufferWidth, bufferHeight,
+                    ImageFormat, DepthFormat);
             }
         }
 
@@ -654,7 +657,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
 
         fixed (void* ptr = vertices)
         {
-            _stagingBuffers[drawAssign].MemCpy(ptr, bufferSize);
+            _stagingBuffers[drawAssign].MemCpy(ptr, (ulong)bufferSize);
         }
 
         var copyRegion = new BufferCopy
@@ -753,7 +756,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
 
         fixed (WriteDescriptorSet* ptr = descriptorWrites)
         {
-            _vk.UpdateDescriptorSets(s_device, (uint)(isMasked ? 3 : 2), ptr, 0, null);
+            _vk.UpdateDescriptorSets(Device, (uint)(isMasked ? 3 : 2), ptr, 0, null);
         }
     }
 
@@ -776,17 +779,17 @@ public class CubismRenderer_Vulkan : CubismRenderer
         {
             default:
                 shaderIndex = ShaderNames.ShaderNames_Normal + offset;
-                blendIndex = Blend.Blend_Normal;
+                blendIndex = Blend.Normal;
                 break;
 
             case CubismBlendMode.Additive:
                 shaderIndex = ShaderNames.ShaderNames_Add + offset;
-                blendIndex = Blend.Blend_Add;
+                blendIndex = Blend.Add;
                 break;
 
             case CubismBlendMode.Multiplicative:
                 shaderIndex = ShaderNames.ShaderNames_Mult + offset;
-                blendIndex = Blend.Blend_Mult;
+                blendIndex = Blend.Mult;
                 break;
         }
 
@@ -824,12 +827,12 @@ public class CubismRenderer_Vulkan : CubismRenderer
         var descriptorSet = masked ? _descriptorSets[index].DescriptorSetMasked
                                                  : _descriptorSets[index].DescriptorSet;
         _vk.CmdBindDescriptorSets(cmdBuffer, PipelineBindPoint.Graphics,
-                                    cubismPipeline_Vulkan.GetPipelineLayout(shaderIndex, blendIndex), 0, 1,
+                                    CubismPipeline_Vulkan.GetPipelineLayout(shaderIndex, blendIndex), 0, 1,
                                     ref descriptorSet, 0, null);
 
         // パイプラインのバインド
         _vk.CmdBindPipeline(cmdBuffer, PipelineBindPoint.Graphics,
-                          cubismPipeline_Vulkan.GetPipeline(shaderIndex, blendIndex));
+                          CubismPipeline_Vulkan.GetPipeline(shaderIndex, blendIndex));
 
         // 描画
         _vk.CmdDrawIndexed(cmdBuffer, (uint)model.GetDrawableVertexIndexCount(index), 1, 0, 0, 0);
@@ -844,7 +847,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
     public unsafe void ExecuteDrawForMask(CubismModel model, int index, CommandBuffer cmdBuffer)
     {
         int shaderIndex = ShaderNames.ShaderNames_SetupMask;
-        int blendIndex = Blend.Blend_Mask;
+        int blendIndex = Blend.Mask;
 
         var descriptor = _descriptorSets[index];
         var ubo = new ModelUBO();
@@ -874,12 +877,12 @@ public class CubismRenderer_Vulkan : CubismRenderer
         // ディスクリプタセットのバインド
         UpdateDescriptorSet(descriptor, textureIndex, false);
         _vk.CmdBindDescriptorSets(cmdBuffer, PipelineBindPoint.Graphics,
-                                cubismPipeline_Vulkan.GetPipelineLayout(shaderIndex, blendIndex), 0, 1,
+                                CubismPipeline_Vulkan.GetPipelineLayout(shaderIndex, blendIndex), 0, 1,
                                 ref _descriptorSets[index].DescriptorSet, 0, null);
 
         // パイプラインのバインド
         _vk.CmdBindPipeline(cmdBuffer, PipelineBindPoint.Graphics,
-                          cubismPipeline_Vulkan.GetPipeline(shaderIndex, blendIndex));
+                          CubismPipeline_Vulkan.GetPipeline(shaderIndex, blendIndex));
 
         // 描画
         _vk.CmdDrawIndexed(cmdBuffer, (uint)model.GetDrawableVertexIndexCount(index), 1, 0, 0, 0);
@@ -897,7 +900,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
     public unsafe void DrawMeshVulkan(CubismModel model, int index,
                         CommandBuffer commandBuffer, CommandBuffer updateCommandBuffer)
     {
-        if (s_device.Handle == 0)
+        if (Device.Handle == 0)
         {
             // デバイス未設定
             return;
@@ -963,9 +966,9 @@ public class CubismRenderer_Vulkan : CubismRenderer
         {
             SType = StructureType.RenderingAttachmentInfoKhr
         };
-        if (s_useRenderTarget)
+        if (UseRenderTarget)
         {
-            colorAttachment.ImageView = s_renderTargetImageView;
+            colorAttachment.ImageView = RenderTargetImageView;
             if (isResume)
             {
                 colorAttachment.LoadOp = AttachmentLoadOp.Load;
@@ -977,7 +980,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
         }
         else
         {
-            colorAttachment.ImageView = s_swapchainImageView;
+            colorAttachment.ImageView = SwapchainImageView;
             colorAttachment.LoadOp = AttachmentLoadOp.Load;
         }
         colorAttachment.ImageLayout = ImageLayout.AttachmentOptimal;
@@ -994,17 +997,19 @@ public class CubismRenderer_Vulkan : CubismRenderer
             ClearValue = new(new(1.0f), new(0))
         };
 
-        var renderingInfo = new RenderingInfo();
-        renderingInfo.SType = StructureType.RenderingInfo;
-        renderingInfo.RenderArea = new()
+        var renderingInfo = new RenderingInfo
         {
-            Offset = new(),
-            Extent = s_swapchainExtent
+            SType = StructureType.RenderingInfo,
+            RenderArea = new()
+            {
+                Offset = new(),
+                Extent = SwapchainExtent
+            },
+            LayerCount = 1,
+            ColorAttachmentCount = 1,
+            PColorAttachments = &colorAttachment,
+            PDepthAttachment = &depthStencilAttachment
         };
-        renderingInfo.LayerCount = 1;
-        renderingInfo.ColorAttachmentCount = 1;
-        renderingInfo.PColorAttachments = &colorAttachment;
-        renderingInfo.PDepthAttachment = &depthStencilAttachment;
 
         _vk.CmdBeginRendering(drawCommandBuffer, &renderingInfo);
     }
@@ -1018,14 +1023,14 @@ public class CubismRenderer_Vulkan : CubismRenderer
         _vk.CmdEndRendering(drawCommandBuffer);
 
         // レイアウト変更
-        if (s_useRenderTarget)
+        if (UseRenderTarget)
         {
             var memoryBarrier = new ImageMemoryBarrier();
             memoryBarrier.SType = StructureType.ImageMemoryBarrier;
             memoryBarrier.SrcAccessMask = AccessFlags.ColorAttachmentWriteBit;
             memoryBarrier.OldLayout = ImageLayout.Undefined;
             memoryBarrier.NewLayout = ImageLayout.ShaderReadOnlyOptimal;
-            memoryBarrier.Image = s_renderTargetImage;
+            memoryBarrier.Image = RenderTargetImage;
             memoryBarrier.SubresourceRange = new()
             {
                 AspectMask = ImageAspectFlags.ColorBit,
@@ -1040,19 +1045,21 @@ public class CubismRenderer_Vulkan : CubismRenderer
         }
         else
         {
-            var memoryBarrier = new ImageMemoryBarrier();
-            memoryBarrier.SType = StructureType.ImageMemoryBarrier;
-            memoryBarrier.SrcAccessMask = AccessFlags.ColorAttachmentWriteBit;
-            memoryBarrier.OldLayout = ImageLayout.Undefined;
-            memoryBarrier.NewLayout = ImageLayout.PresentSrcKhr;
-            memoryBarrier.Image = s_swapchainImage;
-            memoryBarrier.SubresourceRange = new()
+            var memoryBarrier = new ImageMemoryBarrier
             {
-                AspectMask = ImageAspectFlags.ColorBit,
-                BaseMipLevel = 0,
-                LevelCount = 1,
-                BaseArrayLayer = 0,
-                LayerCount = 1
+                SType = StructureType.ImageMemoryBarrier,
+                SrcAccessMask = AccessFlags.ColorAttachmentWriteBit,
+                OldLayout = ImageLayout.Undefined,
+                NewLayout = ImageLayout.PresentSrcKhr,
+                Image = SwapchainImage,
+                SubresourceRange = new()
+                {
+                    AspectMask = ImageAspectFlags.ColorBit,
+                    BaseMipLevel = 0,
+                    LevelCount = 1,
+                    BaseArrayLayer = 0,
+                    LayerCount = 1
+                }
             };
 
             _vk.CmdPipelineBarrier(drawCommandBuffer, PipelineStageFlags.ColorAttachmentOutputBit,
@@ -1127,34 +1134,34 @@ public class CubismRenderer_Vulkan : CubismRenderer
         // オフスクリーンを作成していたのなら開放
         for (int i = 0; i < _offscreenFrameBuffers.Length; i++)
         {
-            _offscreenFrameBuffers[i].DestroyOffscreenSurface(s_device);
+            _offscreenFrameBuffers[i].DestroyOffscreenSurface(Device);
         }
 
         _offscreenFrameBuffers = [];
 
-        _depthImage.Destroy(s_device);
-        _vk.DestroySemaphore(s_device, _updateFinishedSemaphore, null);
-        _vk.DestroyDescriptorPool(s_device, _descriptorPool, null);
-        _vk.DestroyDescriptorSetLayout(s_device, _descriptorSetLayout, null);
+        _depthImage.Destroy(Device);
+        _vk.DestroySemaphore(Device, _updateFinishedSemaphore, null);
+        _vk.DestroyDescriptorPool(Device, _descriptorPool, null);
+        _vk.DestroyDescriptorSetLayout(Device, _descriptorSetLayout, null);
 
         for (int i = 0; i < _vertexBuffers.Length; i++)
         {
-            _vertexBuffers[i].Destroy(s_device);
+            _vertexBuffers[i].Destroy(Device);
         }
 
         for (int i = 0; i < _stagingBuffers.Count; i++)
         {
-            _stagingBuffers[i].Destroy(s_device);
+            _stagingBuffers[i].Destroy(Device);
         }
 
         for (int i = 0; i < _indexBuffers.Length; i++)
         {
-            _indexBuffers[i].Destroy(s_device);
+            _indexBuffers[i].Destroy(Device);
         }
 
         for (int i = 0; i < _descriptorSets.Count; i++)
         {
-            _descriptorSets[i].UniformBuffer.Destroy(s_device);
+            _descriptorSets[i].UniformBuffer.Destroy(Device);
         }
 
         _clippingManager.Dispose();
@@ -1181,12 +1188,12 @@ public class CubismRenderer_Vulkan : CubismRenderer
                 if (_offscreenFrameBuffers[i].BufferWidth != _clippingManager.ClippingMaskBufferSize.X
                     || _offscreenFrameBuffers[i].BufferHeight != _clippingManager.ClippingMaskBufferSize.Y)
                 {
-                    _offscreenFrameBuffers[i].DestroyOffscreenSurface(s_device);
+                    _offscreenFrameBuffers[i].DestroyOffscreenSurface(Device);
                     _offscreenFrameBuffers[i].CreateOffscreenSurface(
-                        s_device, s_physicalDevice,
-                        (int)_clippingManager.ClippingMaskBufferSize.X,
-                        (int)_clippingManager.ClippingMaskBufferSize.Y,
-                        s_imageFormat, s_depthFormat
+                        Device, PhysicalDevice,
+                        (uint)_clippingManager.ClippingMaskBufferSize.X,
+                        (uint)_clippingManager.ClippingMaskBufferSize.Y,
+                        ImageFormat, DepthFormat
                     );
                 }
             }
@@ -1203,9 +1210,9 @@ public class CubismRenderer_Vulkan : CubismRenderer
         SubmitCommand(_drawCommandBuffer, null, _updateFinishedSemaphore);
 
         // スワップチェーンを再作成した際に深度バッファのサイズを更新する
-        if (_depthImage.Width != s_swapchainExtent.Width || _depthImage.Height != s_swapchainExtent.Height)
+        if (_depthImage.Width != SwapchainExtent.Width || _depthImage.Height != SwapchainExtent.Height)
         {
-            _depthImage.Destroy(s_device);
+            _depthImage.Destroy(Device);
             CreateDepthBuffer();
         }
 
@@ -1290,10 +1297,10 @@ public class CubismRenderer_Vulkan : CubismRenderer
             }
 
             // ビューポートを設定する
-            var viewport = GetViewport(s_swapchainExtent.Width, s_swapchainExtent.Height, 0.0f, 1.0f);
+            var viewport = GetViewport(SwapchainExtent.Width, SwapchainExtent.Height, 0.0f, 1.0f);
             _vk.CmdSetViewport(_drawCommandBuffer, 0, 1, &viewport);
 
-            var rect = GetScissor(0.0f, 0.0f, s_swapchainExtent.Width, s_swapchainExtent.Height);
+            var rect = GetScissor(0.0f, 0.0f, SwapchainExtent.Width, SwapchainExtent.Height);
             _vk.CmdSetScissor(_drawCommandBuffer, 0, 1, &rect);
 
             // クリッピングマスクをセットする

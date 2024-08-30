@@ -50,6 +50,9 @@ public class LAppModel : CubismUserModel
             return list;
         }
     }
+
+    public List<TextureInfo> Textures = [];
+
     public List<string> Parameters => new(Model.ParameterIds);
 
     /// <summary>
@@ -274,6 +277,12 @@ public class LAppModel : CubismUserModel
                 ReleaseMotionGroup(item.Key);
             }
         }
+
+        foreach (var item in Textures)
+        {
+            _lapp.TextureManager.ReleaseTexture(item);
+        }
+        Textures.Clear();
     }
 
     public void LoadBreath()
@@ -663,13 +672,14 @@ public class LAppModel : CubismUserModel
     {
         if (_modelSetting.FileReferences?.Textures?.Count > 0)
         {
-            for (int modelTextureNumber = 0; modelTextureNumber < _modelSetting.FileReferences.Textures.Count; modelTextureNumber++)
+            for (int index = 0; index < _modelSetting.FileReferences.Textures.Count; index++)
             {
-                var texturePath = _modelSetting.FileReferences.Textures[modelTextureNumber];
+                var texturePath = _modelSetting.FileReferences.Textures[index];
                 if (string.IsNullOrWhiteSpace(texturePath))
                     continue;
                 texturePath = Path.GetFullPath(_modelHomeDir + texturePath);
-                _lapp.TextureManager.CreateTextureFromPngFile(this, modelTextureNumber, texturePath);
+                var texture = _lapp.TextureManager.CreateTextureFromPngFile(this, index, texturePath);
+                Textures.Add(texture);
             }
         }
     }

@@ -1,5 +1,4 @@
 ﻿using Live2DCSharpSDK.Framework;
-using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Rendering;
 using Live2DCSharpSDK.Framework.Type;

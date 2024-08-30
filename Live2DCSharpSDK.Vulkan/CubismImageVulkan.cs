@@ -45,8 +45,8 @@ public class CubismImageVulkan(Vk vk)
     /// 現在のイメージレイアウト
     /// </summary>
     public ImageLayout CurrentLayout { get; private set; }
-    public int Width { get; private set; }
-    public int Height { get; private set; }
+    public uint Width { get; private set; }
+    public uint Height { get; private set; }
 
     /// <summary>
     /// 物理デバイスのメモリタイプのインデックスを探す
@@ -81,8 +81,8 @@ public class CubismImageVulkan(Vk vk)
     /// <param name="format">フォーマット</param>
     /// <param name="tiling">タイリング配置の設定</param>
     /// <param name="usage">イメージの使用目的を指定するビットマスク</param>
-    public unsafe void CreateImage(Device device, PhysicalDevice physicalDevice, int w, int h,
-                     int mipLevel, Format format, ImageTiling tiling, ImageUsageFlags usage)
+    public unsafe void CreateImage(Device device, PhysicalDevice physicalDevice, uint w, uint h,
+                     uint mipLevel, Format format, ImageTiling tiling, ImageUsageFlags usage)
     {
         Width = w;
         Height = h;
@@ -91,7 +91,7 @@ public class CubismImageVulkan(Vk vk)
         {
             SType = StructureType.ImageCreateInfo,
             ImageType = ImageType.Type2D,
-            MipLevels = (uint)mipLevel,
+            MipLevels = mipLevel,
             ArrayLayers = 1,
             Format = format,
             Tiling = tiling,
@@ -101,8 +101,8 @@ public class CubismImageVulkan(Vk vk)
             SharingMode = SharingMode.Exclusive,
             Extent = new()
             { 
-                Width = (uint)w,
-                Height = (uint)h,
+                Width = w,
+                Height = h,
                 Depth = 1
             }
         };
@@ -135,7 +135,7 @@ public class CubismImageVulkan(Vk vk)
     /// <param name="format">フォーマット</param>
     /// <param name="aspectFlags">どのアスペクトマスクがビューに含まれるかを指定するビットマスク</param>
     /// <param name="mipLevel">ミップマップのレベル</param>
-    public unsafe void CreateView(Device device, Format format, ImageAspectFlags aspectFlags, int mipLevel)
+    public unsafe void CreateView(Device device, Format format, ImageAspectFlags aspectFlags, uint mipLevel)
     {
         var viewInfo = new ImageViewCreateInfo()
         {
@@ -147,7 +147,7 @@ public class CubismImageVulkan(Vk vk)
             {
                 AspectMask = aspectFlags,
                 BaseMipLevel = 0,
-                LevelCount = (uint)mipLevel,
+                LevelCount = mipLevel,
                 BaseArrayLayer = 0,
                 LayerCount = 1
             }

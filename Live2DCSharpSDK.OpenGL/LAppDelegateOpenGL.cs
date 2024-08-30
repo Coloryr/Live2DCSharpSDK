@@ -26,7 +26,9 @@ public class LAppDelegateOpenGL : LAppDelegate
         GL.Enable(GL.GL_BLEND);
         GL.BlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
-        InitView();
+        View = new LAppViewOpenGL(this);
+
+        InitApp();
     }
 
     public override void GetWindowSize(out int width, out int height)
@@ -34,12 +36,14 @@ public class LAppDelegateOpenGL : LAppDelegate
         GL.GetWindowSize(out width, out height);
     }
 
-    public override void RunInit()
+    public override bool RunPre()
     {
         // 画面の初期化
         GL.ClearColor(BGColor.R, BGColor.G, BGColor.B, BGColor.A);
         GL.Clear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         GL.ClearDepthf(1.0f);
+
+        return true;
     }
 
     public override CubismRenderer CreateRenderer(CubismModel model)
@@ -59,11 +63,14 @@ public class LAppDelegateOpenGL : LAppDelegate
 
         (model.Renderer as CubismRenderer_OpenGLES2)?.BindTexture(index, textureId);
 
-        return new TextureInfoOpenGL()
+        return new TextureInfoOpenGL(GL)
         {
-            Width = width,
-            Height = height,
-            ID = textureId
+            Id = textureId
         };
+    }
+
+    public override void RunPost()
+    {
+        
     }
 }
