@@ -97,15 +97,10 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
     /// <summary>
     /// フレームバッファのサイズが変わったか
     /// </summary>
-    private bool _framebufferResized = false;
+    public bool FramebufferResized { get; set; }
 
     private ExtDebugUtils? debugUtils;
     private DebugUtilsMessengerEXT debugMessenger;
-
-    public void FramebufferResizeCallback(int width, int height)
-    {
-        lapp._framebufferResized = true;
-    }
 
     /// <summary>
     /// 検証レイヤーのサポートを確認する
@@ -138,7 +133,7 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
 
         if (EnableValidationLayers)
         {
-            return extensions.Append(ExtDebugUtils.ExtensionName).ToArray();
+            return [.. extensions, ExtDebugUtils.ExtensionName];
         }
 
         return extensions;
@@ -612,9 +607,9 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
     public void PostDraw()
     {
         Result result = SwapchainManager.QueuePresent(_presentQueue, _imageIndex);
-        if (result == Result.ErrorOutOfDateKhr || result ==  Result.SuboptimalKhr || _framebufferResized)
+        if (result == Result.ErrorOutOfDateKhr || result ==  Result.SuboptimalKhr || FramebufferResized)
         {
-            _framebufferResized = false;
+            FramebufferResized = false;
             IsSwapchainInvalid = true;
         }
         else if (result != Result.Success)

@@ -22,18 +22,13 @@ public class SwapchainManager
     public static unsafe SwapchainSupportDetails QuerySwapchainSupport(KhrSurface vk, PhysicalDevice physicalDevice, SurfaceKHR surface)
     {
         var details = new SwapchainSupportDetails();
-        vk.GetPhysicalDeviceSurfaceCapabilities(physicalDevice, surface, out var khr);
-        details.Capabilities = khr;
+        vk.GetPhysicalDeviceSurfaceCapabilities(physicalDevice, surface, out details.Capabilities);
 
         uint formatCount = 0;
         vk.GetPhysicalDeviceSurfaceFormats(physicalDevice, surface, ref formatCount, null);
         if (formatCount != 0)
         {
             details.Formats = new SurfaceFormatKHR[formatCount];
-            for (int a = 0; a < formatCount; a++)
-            {
-                details.Formats[a] = new();
-            }
             fixed (SurfaceFormatKHR* ptr = details.Formats)
             {
                 vk.GetPhysicalDeviceSurfaceFormats(physicalDevice, surface, ref formatCount, ptr);
@@ -46,11 +41,6 @@ public class SwapchainManager
         if (presentModeCount != 0)
         {
             details.PresentModes = new PresentModeKHR[presentModeCount];
-            for (int a = 0; a < presentModeCount; a++)
-            {
-                details.PresentModes[a] = new();
-            }
-
             fixed (PresentModeKHR* ptr = details.PresentModes)
             {
                 vk.GetPhysicalDeviceSurfacePresentModes(physicalDevice, surface, ref presentModeCount, ptr);
@@ -141,7 +131,7 @@ public class SwapchainManager
     {
         for (int i = 0; i < availableFormats.Length; i++)
         {
-            if (availableFormats[i].Format == SwapchainFormat && availableFormats[i].ColorSpace == ColorSpaceKHR.PaceSrgbNonlinearKhr)
+            if (availableFormats[i].Format == SwapchainFormat && availableFormats[i].ColorSpace == ColorSpaceKHR.SpaceSrgbNonlinearKhr)
             {
                 return availableFormats[i];
             }
@@ -199,9 +189,9 @@ public class SwapchainManager
     /// <param name="presentFamily">表示コマンドに使うキューファミリ</param>
     public unsafe void CreateSwapchain(PhysicalDevice physicalDevice, Device device, SurfaceKHR surface, int graphicsFamily, int presentFamily)
     {
-        SwapchainSupportDetails swapChainSupport = QuerySwapchainSupport(_khr, physicalDevice, surface);
-        SurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.Formats);
-        PresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.PresentModes);
+        var swapChainSupport = QuerySwapchainSupport(_khr, physicalDevice, surface);
+        var surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.Formats);
+        var presentMode = ChooseSwapPresentMode(swapChainSupport.PresentModes);
         Extent = ChooseSwapExtent(swapChainSupport.Capabilities);
 
         _imageCount = swapChainSupport.Capabilities.MinImageCount + 1;
@@ -290,14 +280,11 @@ public class SwapchainManager
             SType = StructureType.PresentInfoKhr
         };
 
-        var swapChains = new SwapchainKHR[] { _swapchain };
+        var swapChains = stackalloc SwapchainKHR[] { _swapchain };
         presentInfo.SwapchainCount = 1;
-        fixed (SwapchainKHR* ptr = swapChains)
-        {
-            presentInfo.PSwapchains = ptr;
-            presentInfo.PImageIndices = &imageIndex;
-            return _khrs.QueuePresent(queue, &presentInfo);
-        }
+        presentInfo.PSwapchains = swapChains;
+        presentInfo.PImageIndices = &imageIndex;
+        return _khrs.QueuePresent(queue, ref presentInfo);
     }
 
     /// <summary>

@@ -12,8 +12,6 @@ public class LAppDelegateVulkan : LAppDelegate
     public readonly Vk _vk;
     public readonly VulkanManager VulkanManager;
 
-    public bool _framebufferResized = false;
-
     public LAppDelegateVulkan(VulkanApi api, LogFunction log) : base(log)
     {
         _api = api;
@@ -35,6 +33,12 @@ public class LAppDelegateVulkan : LAppDelegate
 
         View = new LAppViewVulkan(this);
         InitApp();
+    }
+
+    public new void Resize()
+    {
+        VulkanManager.FramebufferResized = true;
+        base.Resize();
     }
 
     public override CubismRenderer CreateRenderer(CubismModel model)

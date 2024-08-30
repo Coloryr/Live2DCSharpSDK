@@ -76,6 +76,6 @@ public class LAppDelegateOpenGL : LAppDelegate
 
     public override void OnUpdatePre()
     {
-        throw new NotImplementedException();
+        
     }
 }

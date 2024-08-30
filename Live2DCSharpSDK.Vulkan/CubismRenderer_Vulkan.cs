@@ -119,12 +119,12 @@ public class CubismRenderer_Vulkan : CubismRenderer
         UpdateColor(ubo.ChannelFlag, colorChannel.R, colorChannel.G, colorChannel.B, colorChannel.A);
     }
 
-    private static unsafe void SetColorUniformBuffer(ModelUBO ubo, CubismTextureColor baseColor,
+    private static unsafe void SetColorUniformBuffer(ModelUBO* ubo, CubismTextureColor baseColor,
                                               CubismTextureColor multiplyColor, CubismTextureColor screenColor)
     {
-        UpdateColor(ubo.BaseColor, baseColor.R, baseColor.G, baseColor.B, baseColor.A);
-        UpdateColor(ubo.MultiplyColor, multiplyColor.R, multiplyColor.G, multiplyColor.B, multiplyColor.A);
-        UpdateColor(ubo.ScreenColor, screenColor.R, screenColor.G, screenColor.B, screenColor.A);
+        UpdateColor(ubo->BaseColor, baseColor.R, baseColor.G, baseColor.B, baseColor.A);
+        UpdateColor(ubo->MultiplyColor, multiplyColor.R, multiplyColor.G, multiplyColor.B, multiplyColor.A);
+        UpdateColor(ubo->ScreenColor, screenColor.R, screenColor.G, screenColor.B, screenColor.A);
     }
 
     private readonly Vk _vk;
@@ -821,7 +821,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
         var baseColor = GetModelColorWithOpacity(model.GetDrawableOpacity(index));
         var multiplyColor = model.GetMultiplyColor(index);
         var screenColor = model.GetScreenColor(index);
-        SetColorUniformBuffer(ubo, baseColor, multiplyColor, screenColor);
+        SetColorUniformBuffer(&ubo, baseColor, multiplyColor, screenColor);
 
         // ディスクリプタにユニフォームバッファをコピー
         descriptor.UniformBuffer.MemCpy(&ubo, (ulong)Unsafe.SizeOf<ModelUBO>());
@@ -873,7 +873,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
         var baseColor = new CubismTextureColor(rect.X * 2.0f - 1.0f, rect.Y * 2.0f - 1.0f, rect.GetRight() * 2.0f - 1.0f, rect.GetBottom() * 2.0f - 1.0f);
         var multiplyColor = model.GetMultiplyColor(index);
         var screenColor = model.GetScreenColor(index);
-        SetColorUniformBuffer(ubo, baseColor, multiplyColor, screenColor);
+        SetColorUniformBuffer(&ubo, baseColor, multiplyColor, screenColor);
 
         // ディスクリプタにユニフォームバッファをコピー
         descriptor.UniformBuffer.MemCpy(&ubo, (ulong)Unsafe.SizeOf<ModelUBO>());

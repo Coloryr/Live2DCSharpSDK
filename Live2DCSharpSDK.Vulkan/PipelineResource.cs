@@ -175,10 +175,10 @@ public class PipelineResource(Vk vk, Device device)
 
         var dynamicState = stackalloc[]
         {
-                DynamicState.Viewport,
-                DynamicState.Scissor,
-                DynamicState.CullMode
-            };
+            DynamicState.Viewport,
+            DynamicState.Scissor,
+            DynamicState.CullMode
+        };
 
         var dynamicStateCI = new PipelineDynamicStateCreateInfo
         {
