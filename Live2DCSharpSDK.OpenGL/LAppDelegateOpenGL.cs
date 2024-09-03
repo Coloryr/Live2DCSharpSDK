@@ -43,7 +43,7 @@ public class LAppDelegateOpenGL : LAppDelegate
         GL.Clear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         GL.ClearDepthf(1.0f);
 
-        return true;
+        return false;
     }
 
     public override CubismRenderer CreateRenderer(CubismModel model)
