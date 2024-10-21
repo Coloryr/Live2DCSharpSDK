@@ -72,7 +72,7 @@ public abstract class LAppDelegate : IDisposable
     /// </summary>
     public void Dispose()
     {
-        GC.SuppressFinalize(this);
+        Live2dManager.Dispose();
     }
 
     public void Resize()

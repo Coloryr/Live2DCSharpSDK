@@ -105,7 +105,7 @@ public class OpenGlPageControl : OpenGlControlBase
 
     protected override void OnOpenGlDeinit(GlInterface GL)
     {
-
+        lapp.Dispose();
     }
 
     protected override void OnOpenGlRender(GlInterface gl, int fb)
