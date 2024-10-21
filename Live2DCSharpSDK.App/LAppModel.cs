@@ -1,9 +1,9 @@
-﻿using Live2DCSharpSDK.Framework;
+﻿using System.Text.Json;
+using Live2DCSharpSDK.Framework;
 using Live2DCSharpSDK.Framework.Effect;
 using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Motion;
-using System.Text.Json;
 
 namespace Live2DCSharpSDK.App;
 

@@ -1,4 +1,6 @@
-﻿using Live2DCSharpSDK.Vulkan;
+﻿using Live2DCSharpSDK.App;
+using Live2DCSharpSDK.Framework;
+using Live2DCSharpSDK.Vulkan;
 using Silk.NET.Core.Native;
 using Silk.NET.Maths;
 using Silk.NET.Vulkan;
@@ -13,6 +15,14 @@ internal class Program : VulkanApi
 
     static void Main(string[] args)
     {
+        var cubismAllocator = new LAppAllocator();
+        var cubismOption = new CubismOption()
+        {
+            LogFunction = Console.WriteLine,
+            LoggingLevel = LAppDefine.CubismLoggingLevel
+        };
+        CubismFramework.StartUp(cubismAllocator, cubismOption);
+
         new Program().InitWindow();
     }
 
@@ -49,7 +59,7 @@ internal class Program : VulkanApi
             throw new Exception("Windowing platform doesn't support Vulkan.");
         }
         vk = Vk.GetApi();
-        var live2d = new LAppDelegateVulkan(this, Console.WriteLine)
+        var live2d = new LAppDelegateVulkan(this)
         {
             BGColor = new(0, 1, 0, 1)
         };

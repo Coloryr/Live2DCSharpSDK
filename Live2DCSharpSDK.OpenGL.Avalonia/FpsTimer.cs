@@ -1,7 +1,7 @@
-﻿using Avalonia.OpenGL.Controls;
-using Avalonia.Threading;
-using System;
+﻿using System;
 using System.Threading;
+using Avalonia.OpenGL.Controls;
+using Avalonia.Threading;
 
 namespace Live2DCSharpSDK.Avalonia;
 

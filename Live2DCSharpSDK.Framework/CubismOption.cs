@@ -36,7 +36,7 @@ public enum LogLevel
 /// <summary>
 /// CubismFrameworkに設定するオプション要素を定義するクラス
 /// </summary>
-public class Option
+public class CubismOption
 {
     /// <summary>
     /// ログ出力の関数ポイ

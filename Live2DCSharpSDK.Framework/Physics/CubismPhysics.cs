@@ -1,8 +1,8 @@
-﻿using Live2DCSharpSDK.Framework.Core;
+﻿using System.Numerics;
+using System.Text.Json;
+using Live2DCSharpSDK.Framework.Core;
 using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
-using System.Numerics;
-using System.Text.Json;
 
 namespace Live2DCSharpSDK.Framework.Physics;
 
@@ -482,7 +482,7 @@ public class CubismPhysics
             for (settingIndex = 0; settingIndex < _physicsRig.SubRigCount; ++settingIndex)
             {
                 currentSetting = _physicsRig.Settings[settingIndex];
-                if(currentSetting.BaseOutputIndex >= _physicsRig.Outputs.Length)
+                if (currentSetting.BaseOutputIndex >= _physicsRig.Outputs.Length)
                 {
                     continue;
                 }

@@ -1,21 +1,10 @@
-﻿using OpenTK.Wpf;
-using System;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using OpenTK.Graphics.OpenGL4;
+﻿using System.Windows;
 using Live2DCSharpSDK.App;
-using System.Windows.Threading;
-using System.Diagnostics;
-using OpenTK.Mathematics;
+using Live2DCSharpSDK.Framework;
 using Live2DCSharpSDK.OpenGL;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+using OpenTK.Wpf;
 
 namespace Live2DCSharpSDK.WPF;
 
@@ -37,13 +26,21 @@ public partial class MainWindow : Window
         BorderOpenTK.Child = GLControl;
         //CompositionTarget.Rendering += CompositionTarget_Rendering;
 
+        var cubismAllocator = new LAppAllocator();
+        var cubismOption = new CubismOption()
+        {
+            LogFunction = Console.WriteLine,
+            LoggingLevel = LAppDefine.CubismLoggingLevel
+        };
+        CubismFramework.StartUp(cubismAllocator, cubismOption);
+
         var settings = new GLWpfControlSettings
         {
             MajorVersion = 3,
             MinorVersion = 3
         };
         GLControl.Start(settings);
-        lapp = new LAppDelegateOpenGL(new OpenTKWPFApi(GLControl), Console.WriteLine)
+        lapp = new LAppDelegateOpenGL(new OpenTKWPFApi(GLControl))
         {
             BGColor = new(0, 1, 0, 1)
         };

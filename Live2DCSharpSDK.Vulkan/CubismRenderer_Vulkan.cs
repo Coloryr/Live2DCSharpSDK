@@ -5,7 +5,6 @@ using Live2DCSharpSDK.Framework;
 using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Rendering;
-using Silk.NET.Core;
 using Silk.NET.Vulkan;
 using Buffer = Silk.NET.Vulkan.Buffer;
 using Semaphore = Silk.NET.Vulkan.Semaphore;
@@ -408,7 +407,7 @@ public class CubismRenderer_Vulkan : CubismRenderer
             {
                 //頂点データは初期化できない
 
-                var bufferSize = (ulong)(Unsafe.SizeOf< ModelVertex >() * vcount); // 総長 構造体サイズ*個数
+                var bufferSize = (ulong)(Unsafe.SizeOf<ModelVertex>() * vcount); // 総長 構造体サイズ*個数
                 var stagingBuffer = new CubismBufferVulkan(_vk);
                 stagingBuffer.CreateBuffer(Device, PhysicalDevice, bufferSize, BufferUsageFlags.TransferSrcBit,
                                           MemoryPropertyFlags.HostVisibleBit | MemoryPropertyFlags.HostCoherentBit);

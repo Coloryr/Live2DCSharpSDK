@@ -97,7 +97,7 @@ public abstract class LAppView(LAppDelegate lapp)
     /// <param name="pointX">スクリーンX座標</param>
     /// <param name="pointY">スクリーンY座標</param>
     public void OnTouchesBegan(float pointX, float pointY)
-    { 
+    {
         _touchManager.TouchesBegan(pointX, pointY);
         CubismLog.Debug($"[Live2D App]touchesBegan x:{pointX:#.##} y:{pointY:#.##}");
     }

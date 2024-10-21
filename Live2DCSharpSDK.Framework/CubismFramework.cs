@@ -23,11 +23,10 @@ public static class CubismFramework
     /// </summary>
     public static CubismIdManager CubismIdManager { get; private set; } = new();
 
-    public static bool IsInitialized { get; private set; }
     public static bool IsStarted { get; private set; }
 
     private static ICubismAllocator? s_allocator;
-    private static Option? s_option;
+    private static CubismOption? s_option;
 
     /// <summary>
     /// Cubism FrameworkのAPIを使用可能にする。
@@ -38,7 +37,7 @@ public static class CubismFramework
     /// <param name="allocator">ICubismAllocatorクラスのインスタンス</param>
     /// <param name="option">Optionクラスのインスタンス</param>
     /// <returns>準備処理が完了したらtrueが返ります。</returns>
-    public static bool StartUp(ICubismAllocator allocator, Option option)
+    public static bool StartUp(ICubismAllocator allocator, CubismOption option)
     {
         if (IsStarted)
         {
@@ -88,59 +87,6 @@ public static class CubismFramework
     public static void CleanUp()
     {
         IsStarted = false;
-        IsInitialized = false;
-    }
-
-    /// <summary>
-    /// Cubism Framework内のリソースを初期化してモデルを表示可能な状態にします。
-    /// 再度Initialize()するには先にDispose()を実行する必要があります。
-    /// </summary>
-    public static void Initialize()
-    {
-        if (!IsStarted)
-        {
-            CubismLog.Warning("[Live2D SDK]CubismFramework is not started.");
-            return;
-        }
-
-        // --- s_isInitializedによる連続初期化ガード ---
-        // 連続してリソース確保が行われないようにする。
-        // 再度Initialize()するには先にDispose()を実行する必要がある。
-        if (IsInitialized)
-        {
-            CubismLog.Warning("[Live2D SDK]CubismFramework.Initialize() skipped, already initialized.");
-            return;
-        }
-
-        IsInitialized = true;
-
-        CubismLog.Info("[Live2D SDK]CubismFramework.Initialize() is complete.");
-    }
-
-    /// <summary>
-    /// Cubism Framework内の全てのリソースを解放します。
-    /// ただし、外部で確保されたリソースについては解放しません。
-    /// 外部で適切に破棄する必要があります。
-    /// </summary>
-    public static void Dispose()
-    {
-        if (!IsStarted)
-        {
-            CubismLog.Warning("[Live2D SDK]CubismFramework is not started.");
-            return;
-        }
-
-        // --- s_isInitializedによる未初期化解放ガード ---
-        // Dispose()するには先にInitialize()を実行する必要がある。
-        if (!IsInitialized) // false...リソース未確保の場合
-        {
-            CubismLog.Warning("[Live2D SDK]CubismFramework.Dispose() skipped, not initialized.");
-            return;
-        }
-
-        IsInitialized = false;
-
-        CubismLog.Info("[Live2D SDK]CubismFramework.Dispose() is complete.");
     }
 
     /// <summary>

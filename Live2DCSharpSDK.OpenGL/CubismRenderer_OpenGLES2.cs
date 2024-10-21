@@ -1,8 +1,8 @@
-﻿using Live2DCSharpSDK.App;
+﻿using System.Runtime.InteropServices;
+using Live2DCSharpSDK.App;
 using Live2DCSharpSDK.Framework;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Rendering;
-using System.Runtime.InteropServices;
 
 namespace Live2DCSharpSDK.OpenGL;
 

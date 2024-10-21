@@ -1,5 +1,5 @@
-﻿using Live2DCSharpSDK.Framework;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using Live2DCSharpSDK.Framework;
 
 namespace Live2DCSharpSDK.App;
 

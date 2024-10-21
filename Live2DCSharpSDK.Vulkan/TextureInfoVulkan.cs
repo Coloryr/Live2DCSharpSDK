@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using Live2DCSharpSDK.App;
-using Live2DCSharpSDK.Framework;
+﻿using Live2DCSharpSDK.App;
 using Silk.NET.Vulkan;
-using SkiaSharp;
 using Buffer = Silk.NET.Vulkan.Buffer;
 
 namespace Live2DCSharpSDK.Vulkan;

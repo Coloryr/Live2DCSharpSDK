@@ -1,5 +1,5 @@
-﻿using Live2DCSharpSDK.Framework.Model;
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
+using Live2DCSharpSDK.Framework.Model;
 
 namespace Live2DCSharpSDK.Framework.Effect;
 

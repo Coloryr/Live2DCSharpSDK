@@ -1,6 +1,6 @@
-﻿using Live2DCSharpSDK.Framework.Core;
+﻿using System.Numerics;
+using Live2DCSharpSDK.Framework.Core;
 using Live2DCSharpSDK.Framework.Rendering;
-using System.Numerics;
 
 namespace Live2DCSharpSDK.Framework.Model;
 
@@ -355,7 +355,7 @@ public class CubismModel : IDisposable
         {
             throw new IndexOutOfRangeException("Out of PartIds size");
         }
-        return PartIds[partIndex]; 
+        return PartIds[partIndex];
     }
 
     /// <summary>

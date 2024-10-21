@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using Live2DCSharpSDK.Framework;
+﻿using Live2DCSharpSDK.Framework;
 using Silk.NET.Vulkan;
 
 using Buffer = Silk.NET.Vulkan.Buffer;
@@ -43,7 +42,7 @@ public class CubismBufferVulkan(Vk vk)
 
         for (int i = 0; i < memProperties.MemoryTypeCount; i++)
         {
-            if ((typeFilter & (1 << i)) != 0 
+            if ((typeFilter & (1 << i)) != 0
                 && (memProperties.MemoryTypes[i].PropertyFlags & properties) == properties)
             {
                 return i;

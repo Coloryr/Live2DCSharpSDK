@@ -1,6 +1,4 @@
-﻿using Live2DCSharpSDK.Framework;
-using Live2DCSharpSDK.Framework.Core;
-using Live2DCSharpSDK.Framework.Model;
+﻿using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Rendering;
 
 namespace Live2DCSharpSDK.App;
@@ -25,14 +23,6 @@ public abstract class LAppDelegate : IDisposable
 
     public CubismTextureColor BGColor { get; set; } = new(0, 0, 0, 0);
 
-    /// <summary>
-    /// Cubism SDK Allocator
-    /// </summary>
-    private readonly LAppAllocator _cubismAllocator;
-    /// <summary>
-    /// Cubism SDK Option
-    /// </summary>
-    private readonly Option _cubismOption;
     /// <summary>
     /// クリックしているか
     /// </summary>
@@ -60,18 +50,6 @@ public abstract class LAppDelegate : IDisposable
     public abstract CubismRenderer CreateRenderer(CubismModel model);
     public abstract TextureInfo CreateTexture(LAppModel model, int index, int width, int height, IntPtr data);
 
-    public LAppDelegate(LogFunction log)
-    {
-        // Cubism SDK の初期化
-        _cubismAllocator = new LAppAllocator();
-        _cubismOption = new()
-        {
-            LogFunction = log,
-            LoggingLevel = LAppDefine.CubismLoggingLevel
-        };
-        CubismFramework.StartUp(_cubismAllocator, _cubismOption);
-    }
-
     public void InitApp()
     {
         TextureManager = new LAppTextureManager(this);
@@ -82,9 +60,6 @@ public abstract class LAppDelegate : IDisposable
         WindowHeight = height;
         //AppViewの初期化
         View.Initialize();
-
-        //Initialize cubism
-        CubismFramework.Initialize();
 
         //load model
         Live2dManager = new LAppLive2DManager(this);
@@ -97,12 +72,6 @@ public abstract class LAppDelegate : IDisposable
     /// </summary>
     public void Dispose()
     {
-        // リソースを解放
-        Live2dManager.Dispose();
-
-        //Cubism SDK の解放
-        CubismFramework.Dispose();
-
         GC.SuppressFinalize(this);
     }
 

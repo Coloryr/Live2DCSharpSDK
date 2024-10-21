@@ -1,5 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using Live2DCSharpSDK.OpenGL;
+﻿using Live2DCSharpSDK.OpenGL;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Wpf;
 
 namespace Live2DCSharpSDK.WPF;

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using Live2DCSharpSDK.Framework;
 using Silk.NET.Core.Native;
 using Silk.NET.Vulkan;
@@ -323,13 +317,13 @@ public class PipelineResource(Vk vk, Device device)
         _pipelineLayout = [];
     }
 
-    public Pipeline GetPipeline(int index) 
-    { 
-        return _pipeline[index]; 
+    public Pipeline GetPipeline(int index)
+    {
+        return _pipeline[index];
     }
 
-    public PipelineLayout GetPipelineLayout(int index) 
-    { 
+    public PipelineLayout GetPipelineLayout(int index)
+    {
         return _pipelineLayout[index];
     }
 }

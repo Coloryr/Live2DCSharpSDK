@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Live2DCSharpSDK.Framework;
+﻿using Live2DCSharpSDK.Framework;
 using Silk.NET.Vulkan;
 
 namespace Live2DCSharpSDK.Vulkan;
@@ -100,7 +95,7 @@ public class CubismImageVulkan(Vk vk)
             Samples = SampleCountFlags.Count1Bit,
             SharingMode = SharingMode.Exclusive,
             Extent = new()
-            { 
+            {
                 Width = w,
                 Height = h,
                 Depth = 1
@@ -209,7 +204,7 @@ public class CubismImageVulkan(Vk vk)
 
         switch (CurrentLayout)
         {
-            case  ImageLayout.Undefined:
+            case ImageLayout.Undefined:
                 barrier.SrcAccessMask = 0;
                 break;
 

@@ -448,9 +448,9 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
     public void ChooseSupportedDepthFormat()
     {
         Format[] depthFormats =
-        [ 
+        [
             Format.D32SfloatS8Uint, Format.D32Sfloat,
-            Format.D24UnormS8Uint, 
+            Format.D24UnormS8Uint,
             Format.D16UnormS8Uint, Format.D16Unorm,
         ];
 
@@ -490,7 +490,7 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
     /// <summary>
     /// 同期オブジェクトを作成する
     /// </summary>
-    public unsafe  void CreateSyncObjects()
+    public unsafe void CreateSyncObjects()
     {
         var semaphoreInfo = new SemaphoreCreateInfo()
         {
@@ -595,7 +595,7 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
         {
             IsSwapchainInvalid = true;
         }
-        else if (result != Result.Success && result !=  Result.SuboptimalKhr)
+        else if (result != Result.Success && result != Result.SuboptimalKhr)
         {
             CubismLog.Error("failed to acquire swap chain image!");
         }
@@ -607,7 +607,7 @@ public class VulkanManager(LAppDelegateVulkan lapp, Vk vk, VulkanApi api)
     public void PostDraw()
     {
         Result result = SwapchainManager.QueuePresent(_presentQueue, _imageIndex);
-        if (result == Result.ErrorOutOfDateKhr || result ==  Result.SuboptimalKhr || FramebufferResized)
+        if (result == Result.ErrorOutOfDateKhr || result == Result.SuboptimalKhr || FramebufferResized)
         {
             FramebufferResized = false;
             IsSwapchainInvalid = true;

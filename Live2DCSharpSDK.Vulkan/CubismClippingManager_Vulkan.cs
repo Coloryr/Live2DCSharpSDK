@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Live2DCSharpSDK.Framework.Model;
+﻿using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Rendering;
 using Silk.NET.Vulkan;
 
@@ -13,7 +8,7 @@ public class CubismClippingManager_Vulkan(Vk vk) : CubismClippingManager
 {
     public override RenderType RenderType => RenderType.Vulkan;
 
-    public override unsafe CubismClippingContext CreateClippingContext(CubismClippingManager manager, 
+    public override unsafe CubismClippingContext CreateClippingContext(CubismClippingManager manager,
         CubismModel model, int* clippingDrawableIndices, int clipCount)
     {
         return new CubismClippingContext_Vulkan(manager, clippingDrawableIndices, clipCount);
@@ -64,7 +59,7 @@ public class CubismClippingManager_Vulkan(Vk vk) : CubismClippingManager
         // 生成したFrameBufferと同じサイズでビューポートを設定
         var viewport = CubismRenderer_Vulkan.GetViewport(ClippingMaskBufferSize.X, ClippingMaskBufferSize.Y, 0.0f, 1.0f);
         vk.CmdSetViewport(commandBuffer, 0, 1, &viewport);
-        var rect = CubismRenderer_Vulkan.GetScissor(0.0f, 0.0f,ClippingMaskBufferSize.X,ClippingMaskBufferSize.Y);
+        var rect = CubismRenderer_Vulkan.GetScissor(0.0f, 0.0f, ClippingMaskBufferSize.X, ClippingMaskBufferSize.Y);
         vk.CmdSetScissor(commandBuffer, 0, 1, &rect);
 
         // 各マスクのレイアウトを決定していく

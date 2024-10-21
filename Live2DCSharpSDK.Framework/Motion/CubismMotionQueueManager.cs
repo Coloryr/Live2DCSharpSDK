@@ -56,7 +56,7 @@ public class CubismMotionQueueManager
         motionQueueEntry = new CubismMotionQueueEntry()
         {
             Motion = motion
-        }; 
+        };
 
         Motions.Add(motionQueueEntry);
 

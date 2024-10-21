@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using Live2DCSharpSDK.App;
-using Live2DCSharpSDK.Framework;
+﻿using Live2DCSharpSDK.Framework;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
 
@@ -85,7 +78,7 @@ public class SwapchainManager
     /// <summary>
     /// スワップチェーンのイメージビュー
     /// </summary>
-    public ImageView[] ImageViews { get; private set; }= [];
+    public ImageView[] ImageViews { get; private set; } = [];
     /// <summary>
     /// スワップチェーン
     /// </summary>

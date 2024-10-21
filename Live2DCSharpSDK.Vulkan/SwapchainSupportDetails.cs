@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Silk.NET.Vulkan;
+﻿using Silk.NET.Vulkan;
 
 namespace Live2DCSharpSDK.Vulkan;
 
@@ -20,5 +15,5 @@ public class SwapchainSupportDetails
     /// <summary>
     /// 利用可能な表示モード
     /// </summary>
-    public PresentModeKHR[] PresentModes; 
+    public PresentModeKHR[] PresentModes;
 }

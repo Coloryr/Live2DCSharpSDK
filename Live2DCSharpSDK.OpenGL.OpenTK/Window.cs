@@ -1,4 +1,5 @@
 ﻿using Live2DCSharpSDK.App;
+using Live2DCSharpSDK.Framework;
 using Live2DCSharpSDK.OpenGL;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
@@ -16,12 +17,19 @@ public class Window : GameWindow
     {
         var version = GL.GetString(StringName.Version);
 
+        var cubismAllocator = new LAppAllocator();
+        var cubismOption = new CubismOption()
+        {
+            LogFunction = Console.WriteLine,
+            LoggingLevel = LAppDefine.CubismLoggingLevel
+        };
+        CubismFramework.StartUp(cubismAllocator, cubismOption);
     }
 
     protected unsafe override void OnLoad()
     {
         base.OnLoad();
-        lapp = new LAppDelegateOpenGL(new OpenTKApi(this), Console.WriteLine)
+        lapp = new LAppDelegateOpenGL(new OpenTKApi(this))
         {
             BGColor = new(0, 1, 0, 1)
         };

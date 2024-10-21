@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -5,8 +6,8 @@ using Avalonia.Interactivity;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Live2DCSharpSDK.App;
+using Live2DCSharpSDK.Framework;
 using Live2DCSharpSDK.OpenGL;
-using System;
 
 namespace Live2DCSharpSDK.Avalonia;
 
@@ -25,11 +26,20 @@ public partial class MainWindow : Window
         _renderTimer = new(GL);
 
         GLTop.PointerPressed += GLTop_PointerPressed;
+
+        // Cubism SDK ¤Î³õÆÚ»¯
+        var cubismAllocator = new LAppAllocator();
+        var cubismOption = new CubismOption()
+        {
+            LogFunction = Console.WriteLine,
+            LoggingLevel = LAppDefine.CubismLoggingLevel
+        };
+        CubismFramework.StartUp(cubismAllocator, cubismOption);
     }
 
     private void GLTop_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        
+
     }
 
     private void MainWindow_Closing(object? sender, WindowClosingEventArgs e)
@@ -55,7 +65,7 @@ public class OpenGlPageControl : OpenGlControlBase
 
     public OpenGlPageControl()
     {
-        
+
     }
 
     public string Info
@@ -79,14 +89,14 @@ public class OpenGlPageControl : OpenGlControlBase
 
         try
         {
-            lapp = new LAppDelegateOpenGL(new AvaloniaApi(this, gl), Console.WriteLine)
+            lapp = new LAppDelegateOpenGL(new AvaloniaApi(this, gl))
             {
                 BGColor = new(0, 0, 0, 0)
             };
         }
-        catch(Exception e)
-        { 
-            
+        catch (Exception e)
+        {
+
         }
         //var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources", "Mao");
         var model = lapp.Live2dManager.LoadModel("F:\\live2d\\Resources\\Haru\\", "Haru");

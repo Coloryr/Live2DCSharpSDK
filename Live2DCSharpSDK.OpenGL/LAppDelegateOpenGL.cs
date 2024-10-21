@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Live2DCSharpSDK.App;
-using Live2DCSharpSDK.Framework.Core;
+﻿using Live2DCSharpSDK.App;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Rendering;
 
@@ -14,7 +8,7 @@ public class LAppDelegateOpenGL : LAppDelegate
 {
     public OpenGLApi GL { get; }
 
-    public LAppDelegateOpenGL(OpenGLApi gl, LogFunction log) : base(log)
+    public LAppDelegateOpenGL(OpenGLApi gl)
     {
         GL = gl;
 
@@ -71,11 +65,11 @@ public class LAppDelegateOpenGL : LAppDelegate
 
     public override void RunPost()
     {
-        
+
     }
 
     public override void OnUpdatePre()
     {
-        
+
     }
 }

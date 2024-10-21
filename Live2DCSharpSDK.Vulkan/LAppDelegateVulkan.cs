@@ -1,5 +1,4 @@
 ﻿using Live2DCSharpSDK.App;
-using Live2DCSharpSDK.Framework.Core;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Rendering;
 using Silk.NET.Vulkan;
@@ -12,7 +11,7 @@ public class LAppDelegateVulkan : LAppDelegate
     public readonly Vk _vk;
     public readonly VulkanManager VulkanManager;
 
-    public LAppDelegateVulkan(VulkanApi api, LogFunction log) : base(log)
+    public LAppDelegateVulkan(VulkanApi api)
     {
         _api = api;
         _vk = Vk.GetApi();

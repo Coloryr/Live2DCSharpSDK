@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Live2DCSharpSDK.Framework;
+﻿using Live2DCSharpSDK.Framework;
 using Live2DCSharpSDK.Framework.Rendering;
 using Silk.NET.Vulkan;
 

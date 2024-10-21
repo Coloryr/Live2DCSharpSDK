@@ -139,7 +139,7 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
         // ModelDir[]に保持したディレクトリ名から
         // model3.jsonのパスを決定する.
         // ディレクトリ名とmodel3.jsonの名前を一致させておくこと.
-        if(!dir.EndsWith('\\') && !dir.EndsWith('/'))
+        if (!dir.EndsWith('\\') && !dir.EndsWith('/'))
         {
             dir = Path.GetFullPath(dir + '/');
         }
@@ -157,7 +157,7 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
         {
             throw new Exception($"[Live2D]File not found: {modelJsonName}");
         }
-        
+
         var model = new LAppModel(lapp, dir, modelJsonName);
         _models.Add(model);
 
