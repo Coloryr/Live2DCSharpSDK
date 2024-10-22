@@ -174,6 +174,12 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
         }
     }
 
+    public void RemoveModel(LAppModel model)
+    {
+        _models.Remove(model);
+        model.Dispose();
+    }
+
     /// <summary>
     /// モデル個数を得る
     /// </summary>
