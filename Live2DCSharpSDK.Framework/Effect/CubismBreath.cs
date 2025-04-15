@@ -8,7 +8,7 @@ namespace Live2DCSharpSDK.Framework.Effect;
 public class CubismBreath
 {
     /// <summary>
-    /// 呼吸にひもづいているパラメータのリスト
+    /// Handles the breathing effect
     /// </summary>
     public required List<BreathParameterData> Parameters { get; init; }
     /// <summary>
